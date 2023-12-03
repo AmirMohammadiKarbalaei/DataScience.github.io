@@ -108,16 +108,15 @@
                         The development of a predictive model has involved the implementation of the following procedural steps:
                     </p><ul class="text-faded" style="font-size: medium">
                         <li>
-                        Exploratory data analysis
-                        </li>
+
+                        Exploratory Data Analysis (EDA): The dataset has undergone thorough cleaning, and continuous data series, devoid of any gaps, has been selected for the purpose of model training.                        </li>
                         <li>
-                        Feature engineering</li>
+                        Feature Engineering: Lag features have been incorporated for Enmo and Angle-z to introduce a temporal element. Additionally, various features such as "Hour of day," "Day of Month," and others have been appended to the dataset. The significance of these features has been assessed using SHAP (SHapley Additive exPlanations).                    </li>
                         <li>
-                        Model implementation
-                        </li>
+                        Model Implementation: The Random Forest and HistGradientBoostingClassifier algorithms were employed for the model. Upon evaluation, it was determined that Random Forest outperformed HistGradientBoostingClassifier, achieving approximately 75% accuracy.                        </li>
                     </ul>
                     <p></p>
-                   <a href="https://github.com/AmirMohammadiKarbalaei/Detect-Sleep-States-CMI" "="" class="btn btn-primary btn-xl page-scroll" target="_blank">GitHub Repository</a>
+                   <a href="https://github.com/AmirMohammadiKarbalaei/Detect-Sleep-States-CMI/tree/eda/intial_eda" "="" class="btn btn-primary btn-xl page-scroll" target="_blank">GitHub Repository</a>
                 </div>
                 <div class="col-lg-4 text-center" style="padding-top: 100px">
                 <img src="media/Detect-Sleep-States-CMI/data_clusters.png" class="img-responsive" alt="" style="margin :auto">
