@@ -76,7 +76,7 @@
 
   <header>
     <img class="header-image" src="media/data-science-new-banner.jpg" alt="Background Image">
-    <div id="animation" style="width: 50%;  margin-right: auto; text-align: center;"></div>
+    <div id="animation" style="width: 45%;  margin-right: auto; text-align: center;"></div>
       <br></br>
     
       <script>
@@ -102,7 +102,9 @@
       
     
   </header>
-  
+  <div id="animationDA" style="width: 100%;background-color: #80c0eb;"></div>
+
+
 
   <section class="bg-primary" id="about">
       <div class="container" style = "display:flex;flex-direction: row-reverse;">
@@ -144,20 +146,12 @@
             </div>
         </div>
     </div>
+    
     <div id="animation2" style="width: 100%; height: 30%;"></div>
+    <div style="width: 80%;margin-bottom: 30px;margin-top: 30px;margin-left: 10% ;height: 5px; background-color: #386081;"></div>
   <br></br>
 
-  <script>
-    
-    var animation = bodymovin.loadAnimation({
-        container: document.getElementById('animation2'),
-        path: "1.json",
-        render: 'svg',
-        loop:true,
-        autoplay: true,
-        name: 'demo animation2'
-    })
-  </script>
+  
 
 </div>
       <div class="container-fluid">
@@ -166,7 +160,7 @@
             <div class="col-lg-3 col-lg-offset-1 col-sm-4">
                   <div style="width :95%">
                       <a href="Detect-Sleep-States-CMI.html" class="portfolio-box">
-                          <img src="media/Header/CMI header.png" class="img-responsive rounded-image2" alt="" style="height: 150px">
+                        <img src="media/Header/CMI header.png" class="img-responsive rounded-image2" alt="" style="height: 150px">
                           <div class="portfolio-box-caption">
                               <div class="portfolio-box-caption-content">
                                 <div class="project-category text-faded">
@@ -186,7 +180,8 @@
               <div class="col-lg-3 col-lg-offset-1 col-sm-4">
                   <div style="width :95%">
                     <a href="Grasp-and-Lift-EEG-Detection.html" class="portfolio-box">
-                      <img src="media/Header/EEG.jpg" class="img-responsive rounded-image2" alt="" style="height: 150px">
+                      
+                      <div id="animationCMI" style="width: 100%; height: 150px;"></div>
                       <div class="portfolio-box-caption">
                           <div class="portfolio-box-caption-content">
                               <div class="project-category text-faded">
@@ -231,8 +226,9 @@
               <div class="col-lg-3 col-lg-offset-1 col-sm-4">
                   <div style="width :95%">
                       <a href="Computer-Vision-Custom-data.html" class="portfolio-box">
-                          <img src="media/Header/computer vision.jpg" class="img-responsive rounded-image2" alt="" style="height: 150px">
-                          <div class="portfolio-box-caption">
+                          
+                        <div id="animation3" style="width: 100%; height: 150px;"></div>                          
+                        <div class="portfolio-box-caption">
                               <div class="portfolio-box-caption-content">
                                   <div class="project-category text-faded">
                                       Computer Vision
@@ -275,8 +271,10 @@
               <div class="col-lg-3 col-lg-offset-1 col-sm-4">
                   <div style="width :95%">
                       <a href="Reinforcement-Learning.html" class="portfolio-box">
-                          <img src="media/Header/Reinforcement learning.png" class="img-responsive rounded-image2" alt="" style="height: 150px" style="height: 150px">
-                          <div class="portfolio-box-caption">
+                        
+                        <div id="animationRL" style="width: 100%; height: 150px;"></div>
+
+                        <div class="portfolio-box-caption">
                               <div class="portfolio-box-caption-content">
                                   <div class="project-categorytext-faded">
                                       Q-learning
@@ -355,7 +353,62 @@
 
   <!-- Custom Theme JavaScript -->
   <script src="js/creative.js"></script>
-
+  <script>
+    
+    var animation2 = bodymovin.loadAnimation({
+        container: document.getElementById('animation2'),
+        path: "1.json",
+        render: 'svg',
+        loop:true,
+        autoplay: true,
+        name: 'demo animation2'
+    })
+  </script>
+  <script>
+    // Load Lottie animation for the specific container
+    var animation3 = bodymovin.loadAnimation({
+        container: document.getElementById('animation3'),
+        path: "CV.json",
+        render: 'svg',
+        loop: true,
+        autoplay: true,
+        name: 'demo animation3'
+    });
+</script>
+<script>
+    // Load Lottie animation for the specific container
+    var animationCMI = bodymovin.loadAnimation({
+        container: document.getElementById('animationCMI'),
+        path: "CMI.json",
+        render: 'svg',
+        loop: true,
+        autoplay: true,
+        name: 'animationCMI'
+    });
+</script>
+<script>
+    // Load Lottie animation for the specific container
+    var animationDA = bodymovin.loadAnimation({
+        container: document.getElementById('animationDA'),
+        path: "Data Analysis.json",
+        render: 'svg',
+        loop: true,
+        autoplay: true,
+        name: 'animationDA'
+    });
+</script>
+<script>
+    // Load Lottie animation for the specific container
+    var animationRL = bodymovin.loadAnimation({
+        container: document.getElementById('animationRL'),
+        path: "RL.json",
+        render: 'canvas',
+        loop: true,
+        autoplay: true,
+        name: 'animationRL'
+    });
+</script>
+  
 
 
 
