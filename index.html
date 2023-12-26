@@ -30,6 +30,7 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
   <![endif]-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 
 </head>
 
@@ -75,13 +76,33 @@
 
   <header>
     <img class="header-image" src="media/data-science-new-banner.jpg" alt="Background Image">
+    <div id="animation" style="width: 50%;  margin-right: auto; text-align: center;"></div>
+      <br></br>
+    
+      <script>
+        
+        var animation = bodymovin.loadAnimation({
+            container: document.getElementById('animation'),
+            path: "5.json",
+            render: 'svg',
+            loop:true,
+            autoplay: true,
+            name: 'demo animation'
+        })
+      </script>
+    
+    </div>
     <div class="header-content">
+        
       <h7>Amir MohammadiK</h7>
       <hr>
       <p>Data Scientist</p>
+      
       <a href="#about" class="btn btn-primary btn-xl page-scroll">About me</a>
-    </div>
+      
+    
   </header>
+  
 
   <section class="bg-primary" id="about">
       <div class="container" style = "display:flex;flex-direction: row-reverse;">
