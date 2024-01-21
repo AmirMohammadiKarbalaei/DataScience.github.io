@@ -511,3 +511,25 @@ z-index: -1;
     height: 100;
     margin: 20px auto;
 }
+
+
+
+.video-container {
+	overflow: hidden;
+	border-radius: 20px;
+}
+
+/* Style the video element */
+video {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+.project_desc{
+	text-align: center;
+
+
+
+	
+}

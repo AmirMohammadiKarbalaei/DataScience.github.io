@@ -68,16 +68,14 @@
                     <h2 style="font-style: italic">Sleep State Detection</h2><h2>
                     </h2><h4>CONCEPT</h4>
                     <p class="text-faded" style="font-size: medium">
-                        The “Zzzs” you catch each night are crucial for your overall health. Sleep affects everything from your development to cognitive functioning. Even so, research into sleep has proved challenging, due to the lack of naturalistic data capture alongside accurate annotation. If data science could help researchers better analyse wrist-worn accelerometer data for sleep monitoring, sleep experts could more easily conduct large-scale studies of sleep, thus improving the understanding of sleep's importance and function.</p>
-                    <h4>DATA</h4>
+                        The “Zzzs” you catch each night are crucial for your overall health. Sleep affects everything from your development to cognitive functioning. Even so, research into sleep has proved challenging, due to the lack of naturalistic data capture alongside accurate annotation. If data science could help researchers better analyse wrist-worn accelerometer data for sleep monitoring, sleep experts could more easily conduct large-scale studies of sleep, thus improving the understanding of sleep's importance and function.                    
+                        <h4>DATA</h4>
                     <p class="text-faded" style="font-size: medium">
-                        The dataset comprises about 500 multi-day recordings of wrist-worn accelerometer data annotated with two event types: onset, the beginning of sleep, and wakeup, the end of sleep. Your task is to detect the occurrence of these two events in the accelerometer series.
-                        While sleep logbooks remain the gold-standard, when working with accelerometer data we refer to sleep as the longest single period of inactivity while the watch is being worn.
-                        For this data, we have guided raters with several concrete instructions: 
+                        The dataset comprises about 500 multi-day recordings of wrist-worn accelerometer data annotated with two event types: onset, the beginning of sleep, and wakeup, the end of sleep. Your task is to detect the occurrence of these two events in the accelerometer series. While sleep logbooks remain the gold-standard, when working with accelerometer data we refer to sleep as the longest single period of inactivity while the watch is being worn. For this data, we have guided raters with several concrete instructions:
                         <br> </br>
                         <ul class="text-faded" style="font-size: medium">
                         <li>
-                        A single sleep period must be at least 30 minutes in length
+                            A single sleep period must be at least 30 minutes in length
                         </li>
                         <li>
                         A single sleep period can be interrupted by bouts of activity that do not exceed 30 consecutive minutes
@@ -111,9 +109,9 @@
 
                         Exploratory Data Analysis (EDA): The dataset has undergone thorough cleaning, and continuous data series, devoid of any gaps, has been selected for the purpose of model training.                        </li>
                         <li>
-                        Feature Engineering: Lag features have been incorporated for Enmo and Angle-z to introduce a temporal element. Additionally, various features such as "Hour of day," "Day of Month," and others have been appended to the dataset. The significance of these features has been assessed using SHAP (SHapley Additive exPlanations).                    </li>
+                        Feature Engineering: Lag features have been incorporated for Enmo and Angle-z to introduce a temporal element. Additionally, various features such as "Hour of day," "Day of Month," and others have been appended to the dataset. The significance of these features has been assessed using SHAP (Shapley Additive explanations).                    </li>
                         <li>
-                        Model Implementation: The Random Forest and HistGradientBoostingClassifier algorithms were employed for the model. Upon evaluation, it was determined that Random Forest outperformed HistGradientBoostingClassifier, achieving approximately 75% accuracy.                        </li>
+                        Model Implementation: A Random Forest and HistGradientBoostingClassifier algorithm were employed for the model. Upon evaluation, it was determined that Random Forest outperformed HistGradientBoostingClassifier, achieving approximately 75% accuracy.                        </li>
                     </ul>
                     <p></p>
                    <a href="https://github.com/AmirMohammadiKarbalaei/Detect-Sleep-States-CMI/tree/eda/intial_eda" "="" class="btn btn-primary btn-xl page-scroll" target="_blank">GitHub Repository</a>
