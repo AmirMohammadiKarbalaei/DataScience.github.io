@@ -191,6 +191,11 @@
 	 background-size: cover;
 	 -o-background-size: cover;
  }
+ .center {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
  
  header .header-content {
 	 position: relative;
