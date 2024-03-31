@@ -111,6 +111,3 @@ function setEqualHeights() {
     content.style.height = maxHeight + "px";
   });
 }
-
-window.addEventListener("load", setEqualHeights);
-window.addEventListener("resize", setEqualHeights);
