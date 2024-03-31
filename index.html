@@ -73,23 +73,9 @@
 
   <header>
     <img class="header-image" src="media/data-science-new-banner.jpg" alt="Background Image">
-    <div id="animation" style="width: 40%;  margin-right: auto; text-align: center;"></div>
-      <br></br>
     
-      <script>
-        
-        var animation = bodymovin.loadAnimation({
-            container: document.getElementById('animation'),
-            path: "media/animation/5.json",
-            render: 'svg',
-            loop:true,
-            autoplay: true,
-            name: 'demo animation'
-        })
-      </script>
-    
-    </div>
-    <div class="header-content">
+    <div id="animation" style="width: 40%;  ;"></div>
+    <div  class="header-content">
         
       <h7>Amir Mohammadi</h7>
       <hr>
@@ -97,7 +83,7 @@
       
       <a href="#about" class="btn btn-primary btn-xl page-scroll">About me</a>
       
-    
+    <div>
   </header>
   <div id="animationDA" style="width: 100%;background-color: #386081;"></div>
 
@@ -318,7 +304,17 @@
         name: 'animationdata'
     });
 </script>
-  
+<script>
+        
+    var animation = bodymovin.loadAnimation({
+        container: document.getElementById('animation'),
+        path: "media/animation/5.json",
+        render: 'svg',
+        loop:true,
+        autoplay: true,
+        name: 'demo animation'
+    })
+  </script>
 
 
 
