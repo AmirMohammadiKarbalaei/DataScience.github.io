@@ -605,3 +605,28 @@ h1 {
   background-color: #494949;
   color: white;
 }
+
+.tag-cloud {
+  display: inline-block;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 25px;
+  background-color: #2196f3;
+  margin-top: 2px;
+}
+.tag-BI {
+  display: inline-block;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 25px;
+  background-color: #d6b857;
+  margin-top: 2px;
+}
+.tag-ML {
+  display: inline-block;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 25px;
+  background-color: #f55146;
+  margin-top: 2px;
+}
