@@ -565,8 +565,9 @@ h1 {
 
 .column {
   float: left;
-  width: 25%;
-  height: 365px;
+  width: 33.33%;
+  min-height: 365px;
+  max-height: 1000px;
   display: none; /* Hide columns by default */
 }
 
@@ -574,7 +575,7 @@ h1 {
 .content {
   background-color: #e9d6d6;
   border: 1px solid #000000; /* Add your desired border color here */
-  height: 350px;
+  height: 360px;
   padding: 5%;
 }
 .row {
@@ -629,4 +630,14 @@ h1 {
   border-radius: 25px;
   background-color: #f55146;
   margin-top: 2px;
+}
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  margin-top: auto; /* Push tags to the bottom */
+}
+
+.tags-container > span {
+  margin: 1px;
 }
