@@ -158,49 +158,195 @@
   
 
 </div>
-      <div class="container-fluid">
-          <div class="row no-gutter">
-            
-            <div class="col-xl-6  col-lg-6 col-md-6  col-sm-6">
-                  <div style="width :100%">
-                      <a href="DA.html" class="portfolio-box">
-                        <img src="media/Header/DA.jpeg" class="img-responsive rounded-image2" alt="" style="height: 220px">
-                          <div class="portfolio-box-caption">
-                              <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded">
-                                    
-                                </div>
-                                  <div class="project-name">
-                                      
-                                  </div>
-                              </div>
-                          </div>
-                      </a>
-                      <h3 style="text-align: center">Data Analysis </h3><br>
-                      <p class="text-muted project_desc" style="font-size: small"></p>
-                      
-                  </div>
-                  
-              </div>
-              <div class="col-xl-6  col-lg-6 col-md-6  col-sm-6">
-                <div style="width :100%">
-                    <a href="AI and ML.html" class="portfolio-box">
-                      <img src="media/Header/AI and ML.jpeg" class="img-responsive rounded-image2" alt="" style="height: 220px">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                              <div class="project-category text-faded">
-                                  
-                              </div>
-                                <div class="project-name">
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <h3 style="text-align: center">AI & ML </h3><br>
-                    <p class="text-muted project_desc" style="font-size: small"></p>
-                    <!--b class="text-muted">Accepted Poster at IEEE Viz Conference 2015!</b-->
-                </div>
+<div id="myBtnContainer" class="text-align: center">
+    <button class="btn active" onclick="filterSelection('all')">
+      Show all
+    </button>
+    <button class="btn" onclick="filterSelection('AI')">
+      Artificial Intelligence
+    </button>
+    <button class="btn" onclick="filterSelection('DA')">
+      Data Analysis
+    </button>
+  
+    <button class="btn" onclick="filterSelection('BI')">
+      Business Intelligence
+    </button>
+</div>
+    <br></br>
+  <!-- Portfolio Gallery Grid -->
+  <div class="row" style="width: 75%">
+    <div class="column DA BI Power BI">
+      <div class="content rounded-image2">
+        <a href="/Business analysis.html">
+          <img
+            class="rounded-image2"
+            src="media/Header/ba.png "
+            alt="Nature"
+            style="width: 100%"
+          />
+        </a>
+        <h4 style="text-align: center">Business Analysis</h4>
+        <p class="project_desc">
+          Analysing orders dataset from a business comprising of over 3000
+          data points spaning from 2011 to 2016.
+        </p>
+      </div>
+    </div>
+    <div class="column TimeSeries AI">
+      <div class="content rounded-image2">
+        <a href="/Detect-Sleep-States-CMI.html">
+          <img
+            class="rounded-image2"
+            src="media/Header/CMI header.png"
+            alt="Nature"
+            style="width: 100%"
+          />
+        </a>
+        <h4 style="text-align: center">Detect Sleep States</h4>
+        <p class="project_desc">
+          Detect sleep onset and wake from wrist-worn accelerometer data
+        </p>
+      </div>
+    </div>
+    <div class="column RL AI">
+      <div class="content rounded-image2">
+        <a href="/Reinforcement-Learning.html">
+            <div id="animationRL" style="width: 100%; height: 150px;"></div>
+        </a>
+        <h4 style="text-align: center">Reinforcement Learning</h4>
+        <p class="project_desc">
+          Training a gaming agent for optimal performance in OpenAI Gym
+          environments.
+        </p>
+      </div>
+    </div>
+    <div class="column NLP AI">
+      <div class="content rounded-image2">
+        <a href="/NLP-Disaster-Tweets.html">
+          <img
+            src="media/Header/NLP.jpg"
+            alt="Lights"
+            style="width: 100%"
+            class="rounded-image2"
+          />
+        </a>
+        <h4 style="text-align: center">Disaster Tweets</h4>
+        <p class="project_desc">
+          Predict which Tweets are about real disasters and which ones are
+          not.
+        </p>
+      </div>
+    </div>
+    <div class="column DA BI Power BI">
+      <div class="content rounded-image2">
+        <a href="/Power BI.html">
+          <img
+            class="rounded-image2"
+            src="media/Header/olist.jpg"
+            alt="Nature"
+            style="width: 100%"
+          />
+        </a>
+        <h4 style="text-align: center">Business Data Analytics</h4>
+        <p class="project_desc">
+          Examining customer data from a Brazilian e-commerce store, to
+          uncover valuable insights.
+        </p>
+      </div>
+    </div>
+    <div class="column CV AI">
+      <div class="content rounded-image2">
+        <a href="/Computer-Vision-Custom-data.html">
+            <div id="animation3" style="width: 100%; height: 150px;"></div>
+        </a>
+        <h4 style="text-align: center">YOLO5</h4>
+        <p class="project_desc">
+          Training YOLO5 on a custom dataset for hand gesture recognition.
+        </p>
+      </div>
+    </div>
+    <div class="column TimeSeries AI">
+      <div class="content rounded-image2">
+        <a href="/Grasp-and-Lift-EEG-Detection.html">
+            <div id="animationCMI" style="width: 100%; height: 150px;"></div>
+         
+        </a>
+        <h4 style="text-align: center">EEG Detection</h4>
+        <p class="project_desc">
+          Leverage Electroencephalogram data analysis to identify and
+          predict hand movements.
+        </p>
+      </div>
+    </div>
+    <div class="column DA">
+      <div class="content rounded-image2">
+        <a href="/Amazon books.html">
+          <img
+            class="rounded-image2"
+            src="media/Header/Books.jpeg"
+            alt="Mountains"
+            style="width: 100%"
+          />
+        </a>
+        <h4 style="text-align: center">Top Sellers</h4>
+        <p class="project_desc">
+          Analysis of Amazon's Top 50 bestselling books from 2009 to 2019.
+        </p>
+      </div>
+    </div>
+    <div class="column DA">
+      <div class="content rounded-image2">
+        <a href="/Global Unemployment.html">
+          <img
+            src="media/Header/Unemployment.jpg"
+            alt="Lights"
+            style="width: 100%"
+            class="rounded-image2"
+          />
+        </a>
+        <h4 style="text-align: center">Global Unemployment</h4>
+        <p class="project_desc">
+          Analysing Unemployment Trends Across Age Groups and Genders
+          (2014-2024).
+        </p>
+      </div>
+    </div>
+    <div class="column DA BI">
+      <div class="content rounded-image2">
+        <a href="/Unsupervised_Learning.html">
+          <img
+            class="rounded-image2"
+            src="media/Header/Clustering.jpg"
+            alt="Nature"
+            style="width: 100%"
+          />
+        </a>
+        <h4 style="text-align: center">Customer segmentation</h4>
+        <p class="project_desc">
+          Utilizing clustering techniques to group shop customers for
+          effective targeted marketing strategies.
+        </p>
+      </div>
+    </div>
+    <div class="column DA BI">
+      <div class="content rounded-image2">
+        <a href="/AdventureWorks.html">
+            <div
+            id="animationdata"
+            style="width: 100%; height: 150px"
+          ></div>
+          
+        </a>
+        <h4 style="text-align: center">AdventureWorks</h4>
+        <p class="project_desc">
+          Analysing customer data from AdventureWorks, a Microsoft database,
+          to address key stakeholder questions.
+        </p>
+      </div>
+    </div>
+  </div>
+      
               
   </section>
 
