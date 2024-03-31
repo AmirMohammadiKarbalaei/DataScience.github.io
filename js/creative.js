@@ -88,7 +88,6 @@ function w3RemoveClass(element, name) {
 }
 
 // Add active class to the current button (highlight it)
-// Add active class to the current button (highlight it)
 var btnContainer = document.getElementById("myBtnContainer");
 var btns = btnContainer.getElementsByClassName("btn");
 for (var i = 0; i < btns.length; i++) {
@@ -101,3 +100,17 @@ for (var i = 0; i < btns.length; i++) {
     this.classList.add("active");
   });
 }
+
+function setEqualHeights() {
+  var contents = document.querySelectorAll(".content");
+  var maxHeight = 0;
+  contents.forEach(function (content) {
+    maxHeight = Math.max(maxHeight, content.offsetHeight);
+  });
+  contents.forEach(function (content) {
+    content.style.height = maxHeight + "px";
+  });
+}
+
+window.addEventListener("load", setEqualHeights);
+window.addEventListener("resize", setEqualHeights);

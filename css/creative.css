@@ -513,8 +513,6 @@ img::-moz-selection {
 .rounded-image {
   border-radius: 30%;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 .rounded-image2 {
   border-radius: 9%;
@@ -562,11 +560,13 @@ h1 {
   font-size: 50px;
   word-break: break-all;
 }
-
+.container {
+  display: flex;
+}
 .column {
   float: left;
   width: 33.33%;
-  min-height: 365px;
+  min-height: 360px;
   max-height: 1000px;
   display: none; /* Hide columns by default */
 }
@@ -574,9 +574,9 @@ h1 {
 /* Content */
 .content {
   background-color: #e9d6d6;
-  border: 1px solid #000000; /* Add your desired border color here */
-  height: 360px;
-  padding: 5%;
+  border: 2px solid #000000; /* Add your desired border color here */
+  margin: 2px;
+  padding: 4%;
 }
 .row {
   margin: 0 auto;
