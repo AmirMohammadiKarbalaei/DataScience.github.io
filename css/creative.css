@@ -565,7 +565,6 @@ h1 {
   float: left;
   width: 33.33%;
   min-height: 360px;
-
   display: none; /* Hide columns by default */
 }
 
@@ -632,7 +631,7 @@ h1 {
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: center;
   margin-top: auto; /* Push tags to the bottom */
 }
 
