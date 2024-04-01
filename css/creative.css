@@ -565,18 +565,60 @@ h1 {
   float: left;
   width: 33.33%;
   min-height: 360px;
+
   display: none; /* Hide columns by default */
 }
 
 /* Content */
 .content {
-  background-color: #e9d6d6;
-  border: 2px solid #000000; /* Add your desired border color here */
+  display: flex;
+  flex-direction: column; /* Align tags container to bottom */
+  justify-content: space-between; /* Align tags container to bottom */
+  background-color: #e7dede;
+  border: 2px solid #386081; /* Add your desired border color here */
   margin: 12px;
   padding: 4%;
+  position: relative; /* Position tags container relative to content */
 }
 .row {
   margin: 0 auto;
+}
+.tag-cloud {
+  display: inline-block;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 25px;
+  background-color: #2196f3;
+  margin-top: 2px;
+}
+.tag-BI {
+  display: inline-block;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 25px;
+  background-color: #d6b857;
+  margin-top: 2px;
+}
+.tag-ML {
+  display: inline-block;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 25px;
+  background-color: #f55146;
+  margin-top: 2px;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /*position: absolute; /* Position tags container absolutely */
+  bottom: 0; /* Align tags container to bottom of content */
+  width: 100%; /* Ensure tags container spans the full width */
+}
+
+.tags-container > span {
+  margin: 1px;
 }
 
 /* The "show" class is added to the filtered elements */
@@ -602,39 +644,4 @@ h1 {
 .btn.active {
   background-color: #494949;
   color: white;
-}
-
-.tag-cloud {
-  display: inline-block;
-  color: white;
-  padding: 0px 10px;
-  border-radius: 25px;
-  background-color: #2196f3;
-  margin-top: 2px;
-}
-.tag-BI {
-  display: inline-block;
-  color: white;
-  padding: 0px 10px;
-  border-radius: 25px;
-  background-color: #d6b857;
-  margin-top: 2px;
-}
-.tag-ML {
-  display: inline-block;
-  color: white;
-  padding: 0px 10px;
-  border-radius: 25px;
-  background-color: #f55146;
-  margin-top: 2px;
-}
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: auto; /* Push tags to the bottom */
-}
-
-.tags-container > span {
-  margin: 1px;
 }
