@@ -57,6 +57,8 @@ p {
 
 .bg-primary {
   background-color: #386081;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 .bg-dark {
@@ -96,12 +98,12 @@ aside {
   text-transform: uppercase;
   font-family: "Open Sans", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
-  color: #129feb;
+  color: #67b1d6;
 }
 
 .navbar-default .navbar-header .navbar-brand:hover,
 .navbar-default .navbar-header .navbar-brand:focus {
-  color: #129feb;
+  color: #67b1d6;
 }
 
 .navbar-default .nav > li > a,
@@ -119,7 +121,7 @@ aside {
 
 .navbar-default .nav > li.active > a,
 .navbar-default .nav > li.active > a:focus {
-  color: #129feb !important;
+  color: #67b1d6 !important;
   background-color: transparent;
 }
 
