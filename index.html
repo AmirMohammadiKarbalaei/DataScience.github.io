@@ -99,7 +99,7 @@
                     Welcome to my portfolio! I'm a passionate data scientist on a mission to reveal impactful narratives within the vast realms of data.
                     <br>
                 </br>
-                In the field of coding and data analysis, I am proficient in Python (and related libraries) as well as SQL. I also specialize in creating informative visualizations using Power BI and Tableau. My projects cover a wide range of topics, from predictive analytics to deep learning, demonstrating my expertise across diverse areas. Beyond technical skills, my primary focus is on using data to drive positive societal change. I believe that uncovering insights is not just a task; it's a commitment to guiding decisions for the betterment of society.                    <br>
+                In the field of coding and data analysis, I am proficient in Python (and related libraries) as well as SQL. I also specialise in creating informative visualisations using Power BI and Tableau. My projects cover a wide range of topics, from predictive analytics to deep learning, demonstrating my expertise across diverse areas. Beyond technical skills, my primary focus is on using data to drive positive societal change. I believe that uncovering insights is not just a task; it's a commitment to guiding decisions for the betterment of society.                    <br>
                     <br>
                     Looking ahead, I envision a data science future rooted in ethics, interpretability, and inclusivity. I'm not just a data scientist; I'm a steward, contributing to ethical AI frameworks and fostering a culture of responsible data use.Join me on this expedition, where each line of code shapes a narrative defining the future of data science. Together, let's illuminate the path forward with insights that transcend analysis — let's craft a future of positive change.
                 </br>    
@@ -170,6 +170,7 @@
     <br></br>
   <!-- Portfolio Gallery Grid -->
   <div class="row" style="width: 75%">
+    
     <div class="column DA BI Power BI">
       <div class="content rounded-image2">
         <a href="Business analysis.html">
@@ -193,6 +194,7 @@
         
       </div>
     </div>
+    
     <div class="column TimeSeries AI">
       <div class="content rounded-image2">
         <a href="Detect-Sleep-States-CMI.html">
@@ -350,7 +352,7 @@
         </a>
         <h4 style="text-align: center">Customer segmentation</h4>
         <p class="project_desc">
-          Utilizing clustering techniques to group shop customers for
+          Utilising clustering techniques to group shop customers for
           effective targeted marketing strategies.
         </p>
         <div class="tags-container">
@@ -515,6 +517,14 @@
     var animationcustomerseg = bodymovin.loadAnimation({
       container: document.getElementById("animationcustomerseg"),
       path: "media/animation/customerseg.json",
+      render: "canvas",
+      loop: true,
+      autoplay: true,
+    });
+    
+    var animationcustomerseg = bodymovin.loadAnimation({
+      container: document.getElementById("animationdiabetes"),
+      path: "media/animation/diabetes.json",
       render: "canvas",
       loop: true,
       autoplay: true,
