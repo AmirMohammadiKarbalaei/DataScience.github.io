@@ -59,6 +59,11 @@ p {
   background-color: #386081;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
+  background-image: url("/media/background/3.jpg"); /* from vecteezy.com */
+  /* Other properties you may need to adjust */
+  background-size: cover; /* Adjust to fit your needs */
+  background-position: center; /* Adjust to fit your needs */
+  background-repeat: no-repeat; /* Adjust to fit your needs */
 }
 
 .bg-dark {
