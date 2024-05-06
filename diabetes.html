@@ -83,15 +83,15 @@
                          After comprehensive data cleansing, the dataset has undergone thorough exploratory analysis. Each feature has been carefully examined to determine acceptable ranges and ensure data integrity.</li>
                          <h4>Feature Engineering:</h4>
                          <li class="text-faded">
-                             To enhance model performance, new features such as interactions between features have been integrated and evaluated. The importance of these features has been evaluated using SHAP (Shapley Additive Explanations).</li>
+                             To enhance model performance, new features such as interactions between features have been integrated. The importance of these features has been evaluated using SHAP (Shapley Additive Explanations).</li>
                             <h4>Synthetic Minority Oversampling Technique (SMOTE):</h4>
                             <li class="text-faded">
                             SMOTE is an oversampling method specifically designed for minority classes, generating synthetic samples to address overfitting issues associated with random oversampling. By employing this technique, we augment the data points in the minority class, thereby enhancing the model's ability to effectively learn from imbalanced datasets.
                         </li>
                             <h4>Model Implementation:</h4>
                             <li class="text-faded">
-                             various ML models has been implemented with Random Forest classifier scoring the most with 93% accuracy. Random Forest feature importance can be seen from the image on the right hand side.</li>
-                            <li class="text-faded">The SHAP summary plot reveals the influential features driving our model's predictions. Notably, Low Insulin values and low interaction between age and Insulin values exhibit substantial influence, while features like family history and number of pregnancies have minimal impact. Discarding these less impactful features can effectively reduce computational costs without compromising the model's predictive performance.</li>
+                             Various ML models have been implemented with Random Forest classifier scoring the highest with 93% accuracy. Random Forest feature importance can be seen from the image on the right hand side.</li>
+                            <li class="text-faded">The SHAP summary plot reveals the influential features driving our model's predictions. Notably, Low Insulin values and low interaction between age and Insulin values exhibit substantial influence, while features like Blood Pressure and number of pregnancies have minimal impact. Discarding these less impactful features can effectively reduce computational costs without compromising the model's predictive performance.</li>
                           <li class="text-faded">A sequential model has also been implemented to check for its suitability for our use case. the accuracies and losses for test,train and validation sets are shown in the NN Model Evaluation picture. the deep learning model proved to be similar to the random forest performance.</li>
                         <h4>Deployment:</h4>
                         <li class="text-faded">
