@@ -362,7 +362,7 @@
        
     </div>
     </div>
-    <div class="column DA BI">
+    <!-- <div class="column DA BI">
       <div class="content rounded-image2">
         <a href="Unsupervised_Learning.html">
           <div
@@ -382,7 +382,26 @@
         </div>
         
       </div>
-    </div>
+    </div> -->
+        <!-- <div class="column DA BI">
+      <div class="content rounded-image2">
+        <a href="Unsupervised_Learning.html">
+          <div
+          id="animationnews"
+          style="height: 200px"
+        ></div>
+        </a>
+        <h4 style="text-align: center">DailyLink </h4>
+        <p class="project_desc">
+          Your Personalised Daily News Recommender.
+        </p>
+        <div class="tags-container">
+            <span class="tag-ML">ML</span>
+
+        </div>
+        
+      </div>
+    </div> -->
     <div class="column DA BI">
       <div class="content rounded-image2">
         <a href="AdventureWorks.html">
@@ -524,6 +543,14 @@
     var animationshop = bodymovin.loadAnimation({
       container: document.getElementById("animationshop"),
       path: "media/animation/shop.json",
+      render: "canvas",
+      loop: true,
+      autoplay: true,
+    });
+
+    var animationshop = bodymovin.loadAnimation({
+      container: document.getElementById("animationnews"),
+      path: "media/animation/news.json",
       render: "canvas",
       loop: true,
       autoplay: true,
