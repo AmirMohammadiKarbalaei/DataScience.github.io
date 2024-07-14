@@ -114,7 +114,7 @@ function setEqualHeights() {
 particlesJS("particles-js", {
   particles: {
     number: {
-      value: 80,
+      value: 120,
       density: {
         enable: true,
         value_area: 800,
@@ -138,7 +138,7 @@ particlesJS("particles-js", {
       random: true,
       anim: {
         enable: true,
-        speed: 1,
+        speed: 4,
         opacity_min: 0.3,
         sync: false,
       },
@@ -162,7 +162,7 @@ particlesJS("particles-js", {
     },
     move: {
       enable: true,
-      speed: 5,
+      speed: 10,
       direction: "none",
       random: true,
       straight: false,
