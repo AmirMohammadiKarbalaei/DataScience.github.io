@@ -91,11 +91,15 @@
   <section class="bg-primary" id="about">
     <div class="container-fluid">
         <div class="row no-gutter">
+          
           <img  class="rounded-image" src="media/2.jpg" alt="" style="margin :auto"  >
+          
           <div class="row">
               <div class="col-lg-8 col-lg-offset-2 col-sm-10  text-center">
                   <hr class="light">
+
                   <p class="text-faded">
+                    
                     Welcome to my portfolio! I'm a passionate data scientist on a mission to reveal impactful narratives within the vast realms of data.
                     <br>
                 </br>
@@ -133,6 +137,8 @@
 
 
   <section class="no-padding" id="projects">
+
+    
     
     
     <div class="container" style="padding-top: 20px">
@@ -152,6 +158,7 @@
     <div id="animation2" style="width: 70%; margin-left: 15%"></div>
 
 </div>
+
 <div id="myBtnContainer" class="text-align: center">
     <button class="btn active" onclick="filterSelection('all')">
       Show all
@@ -168,6 +175,10 @@
     </button>
 </div>
     <br></br>
+
+
+    <div id="particles-js"></div>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
   <!-- Portfolio Gallery Grid -->
   <div class="row" style="width: 75%">
     <div class="column TimeSeries AI">
@@ -425,30 +436,79 @@
       </div>
     </div>
   </div>
-               
+           
   </section>
 
   <section id="contact">
     
       <div class="container">
         
-          <div class="row">
+        
+          <!-- <div class="row">
               <div class="col-lg-8 col-lg-offset-2 text-center">
-                  <h2 class="section-heading">Get In Touch!</h2>
+                <section id="contact">
+                  <div class="container">
+                      <h2>Get In Touch!</h2>
+                      <form action="#" method="post">
+                        
+                          <div class="form-group">
+                              <label for="name">Name</label>
+                              <input type="text" id="name" name="name" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="email">Email</label>
+                              <input type="email" id="email" name="email" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="subject">Subject</label>
+                              <input type="text" id="subject" name="subject" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="message">Message</label>
+                              <textarea id="message" name="message" rows="5" required></textarea>
+                          </div>
+                          <button type="submit">Send Message</button>
+                      </form>
+                      
+                  </div>
+              </section>
+          
+                  <h2 class="section-heading" style="text-align: center">Follow Me</h2>
+                  
+                  
                   <hr class="primary">
-                  <div class="col-lg-2 col-lg-offset-3 text-center">
+                  <div class="col-lg-2 col-lg-offset-4 text-center">
                     <a href="https://github.com/AmirMohammadiKarbalaei" target="_blank" class="fa fa-github fa-3x wow bounceIn" style="visibility: visible; animation-name: bounceIn;"></a>
                 </div>
                 <div class="col-lg-2  text-center">
                     <a href="https://www.linkedin.com/in/amir-mohammadikarbalaei-65b958193" target="_blank" class="fa fa-linkedin fa-3x wow bounceIn" style="visibility: visible; animation-name: bounceIn;"></a>
                 </div>
-                <div class="col-lg-2  text-center">
-                    <a href="mailto:a.mohammadikarbalaei@gmail.com" target="_blank" class="fa fa-envelope fa-3x wow bounceIn" style="visibility: visible; animation-name: bounceIn;"></a>
-                </div>
+                 <div class="col-lg-2  text-center">
+                    <a href="mailto:@gmail.com" target="_blank" class="fa fa-envelope fa-3x wow bounceIn" style="visibility: visible; animation-name: bounceIn;"></a>
+                </div> -->
           </div>
           
-      </div>
-      
+      </div> 
+      <section id="contact">
+    
+        <div class="container">
+          
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center">
+                    <h2 class="section-heading">Get In Touch!</h2>
+                    <hr class="primary">
+                    <div class="col-lg-2 col-lg-offset-3 text-center">
+                      <a href="https://github.com/AmirMohammadiKarbalaei" target="_blank" class="fa fa-github fa-3x wow bounceIn" style="visibility: visible; animation-name: bounceIn;"></a>
+                  </div>
+                  <div class="col-lg-2  text-center">
+                      <a href="https://www.linkedin.com/in/amir-mohammadikarbalaei-65b958193" target="_blank" class="fa fa-linkedin fa-3x wow bounceIn" style="visibility: visible; animation-name: bounceIn;"></a>
+                  </div>
+                  <div class="col-lg-2  text-center">
+                      <a href="mailto:a.mohammadikarbalaei@gmail.com" target="_blank" class="fa fa-envelope fa-3x wow bounceIn" style="visibility: visible; animation-name: bounceIn;"></a>
+                  </div>
+            </div>
+            
+        </div>   
   </section>
   <script>
     var animation2 = bodymovin.loadAnimation({
@@ -614,4 +674,5 @@
   window.addEventListener("resize", function () {
     setEqualHeights();
   });</script>
+  
 </body></html>
