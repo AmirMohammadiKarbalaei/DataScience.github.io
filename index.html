@@ -224,7 +224,7 @@
         
       </div>
     </div>
-    <div class="column DA BI Power BI">
+    <div class="column AI ML">
       <div class="content rounded-image2">
         <a href="Business analysis.html">
           <div id="animationcustomer" style="height: 200px;"></div>
@@ -270,6 +270,28 @@
     
       </div>
     </div>
+    <!-- <div class="column AI">
+      <div class="content rounded-image2">
+        <a href="FraudDetection.html">
+          <div id="fraud_animation" style="height: 200px;"></div>
+        </a>
+        <h4 style="text-align: center">Fraud Detection</h4>
+        <p class="project_desc">
+          Detect fraudulent transactions in financial data using machine learning algorithms.
+          
+        </p>
+        <div class="tags-container">
+
+        <span class="tag-BI">ML</span>
+        <span class="tag-cloud" style="background-color: #f59b46">Classification </span>
+        
+        
+        </div>
+        
+
+        
+      </div>
+    </div> -->
     <div class="column NLP AI">
       <div class="content rounded-image2">
         <a href="DailyLink.html">
@@ -671,6 +693,14 @@
     var animation = bodymovin.loadAnimation({
       container: document.getElementById("animation"),
       path: "media/animation/5.json",
+      render: "svg",
+      loop: true,
+      autoplay: true,
+      name: "demo animation",
+    });
+    var animation = bodymovin.loadAnimation({
+      container: document.getElementById("fraud_animation"),
+      path: "media/animation/fraud_animation.json",
       render: "svg",
       loop: true,
       autoplay: true,
