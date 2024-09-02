@@ -73,71 +73,63 @@
             <div class="row">
                 <div class="col-lg-8 text-center" style="text-align: left">
                     <!-- <hr class="light"> -->
-                    <h2 style="font-style: italic">Fraud Detection</h2>
+                    <h2 style="font-style: italic">Fraud Detection System</h2>
+                    
                     <h4>Overview</h4>
                     <p class="text-faded" style="font-size: medium">
-                        FraudDetection is a Python-based system for detecting fraudulent transactions in financial data. The system uses a combination of machine learning algorithms and data preprocessing techniques to identify potentially fraudulent transactions.
+                        The FraudDetection System is a Python-based solution designed to identify and mitigate fraudulent transactions within financial datasets. By leveraging state-of-the-art machine learning algorithms and comprehensive data preprocessing techniques, this system ensures the accurate detection of fraudulent activities.
                     </p>
-    
-                    <h4>Features</h4>
+                    
+                    <h4>Key Features</h4>
                     <ul style="font-size: medium">
                         <li class="text-faded">
-                            <strong>Data Preprocessing:</strong> Handles missing values, encodes categorical variables, and normalises numerical features.
+                            <strong>Data Preprocessing:</strong> Robust data preprocessing capabilities, including handling of missing values, encoding of categorical variables, and normalisation of numerical features, to ensure data integrity and model accuracy.
                         </li>
                         <li class="text-faded">
-                            <strong>Machine Learning Models:</strong> Includes a deep learning model (FraudDetectionModel) and a random forest model (FraudDetectionRFModel).
+                            <strong>Machine Learning Models:</strong> Integration of multiple machine learning models, including a deep learning model (FraudDetectionModel) and a random forest model (FraudDetectionRFModel), tailored for high-performance fraud detection.
                         </li>
                         <li class="text-faded">
-                            <strong>Model Evaluation:</strong> Calculates accuracy, precision, recall, and F1 score for each model.
+                            <strong>Model Evaluation:</strong> Comprehensive model evaluation metrics, including accuracy, precision, recall, and F1 score, to rigorously assess the effectiveness of each model.
                         </li>
                         <li class="text-faded">
-                            <strong>Model Saving and Loading:</strong> Allows for saving and loading trained models for future use.
+                            <strong>Model Persistence:</strong> Support for saving and loading trained models, enabling seamless deployment and reuse in various operational environments.
                         </li>
                     </ul>
-    
-                    <h4>Requirements</h4>
+                    
+                    <h4>System Requirements</h4>
                     <ul style="font-size: medium">
-                        <li class="text-faded">Python 3.10.14</li>
-                        <li class="text-faded">pandas for data manipulation and analysis</li>
-                        <li class="text-faded">numpy for numerical computations</li>
-                        <li class="text-faded">torch for deep learning</li>
-                        <li class="text-faded">sklearn for machine learning</li>
-                        <li class="text-faded">matplotlib and seaborn for data visualisation</li>
+                        <li class="text-faded">Python</li>
+                        <li class="text-faded">Pandas for data manipulation and analysis</li>
+                        <li class="text-faded">Numpy for numerical computations</li>
+                        <li class="text-faded">Torch for deep learning</li>
+                        <li class="text-faded">Scikit-Learn for machine learning</li>
+                        <li class="text-faded">Matplotlib and Seaborn for data visualisation</li>
                     </ul>
-    
-                    <h4>Usage</h4>
-                    <p class="text-faded" style="font-size: medium">
-                        <strong>Data Preparation:</strong>
-                    </p>
+                    
+                    <h4>Usage Instructions</h4>
                     <ul style="font-size: medium">
-                        <li class="text-faded">Download the dataset (e.g., Fraud.csv) and place it in the Fraud_data directory.</li>
-                        <li class="text-faded">Preprocess the data using the DataPreprocessing module.</li>
+                        <li class="text-faded">
+                            <strong>Data Preparation:</strong> Download the relevant dataset (e.g., Fraud.csv) and place it in the designated Fraud_data directory. Utilise the DataPreprocessing module to prepare the data for model training.
+                        </li>
+                        <li class="text-faded">
+                            <strong>Model Training:</strong> Train a deep learning model using the FraudDetectionModel class and the random forest model using the FraudDetectionRFModel class to detect fraudulent transactions.
+                        </li>
+                        <li class="text-faded">
+                            <strong>Model Evaluation:</strong> Apply the ModelEvaluation module to thoroughly assess the performance of each trained model using various metrics.
+                        </li>
+                        <li class="text-faded">
+                            <strong>Model Persistence:</strong> Save the trained models with the ModelSaving module, and load them when required using the ModelLoading module for continued analysis.
+                        </li>
                     </ul>
-                    <p class="text-faded" style="font-size: medium">
-                        <strong>Model Training:</strong>
-                    </p>
-                    <ul style="font-size: medium">
-                        <li class="text-faded">Train the deep learning model using the FraudDetectionModel class.</li>
-                        <li class="text-faded">Train the random forest model using the FraudDetectionRFModel class.</li>
-                    </ul>
-                    <p class="text-faded" style="font-size: medium">
-                        <strong>Model Evaluation:</strong>
-                    </p>
-                    <ul style="font-size: medium">
-                        <li class="text-faded">Evaluate the performance of each model using the ModelEvaluation module.</li>
-                    </ul>
-                    <p class="text-faded" style="font-size: medium">
-                        <strong>Model Saving and Loading:</strong>
-                    </p>
-                    <ul style="font-size: medium">
-                        <li class="text-faded">Save the trained models using the ModelSaving module.</li>
-                        <li class="text-faded">Load the saved models using the ModelLoading module.</li>
-                    </ul>
-    
+                    
                     <h4>Example Use Cases</h4>
                     <ul style="font-size: medium">
-                        <li class="text-faded">Fraud Detection: Use the system to detect fraudulent transactions in a financial dataset.</li>
-                        <li class="text-faded">Model Comparison: Use the system to compare the performance of different machine learning models on a fraud detection task.</li>
+                        <li class="text-faded">
+                            <strong>Fraud Detection:</strong> Employ the system to detect and prevent fraudulent transactions within a financial dataset, safeguarding financial operations.
+                        </li>
+                        <li class="text-faded">
+                            <strong>Model Comparison:</strong> Utilise the system to perform comparative analysis of different machine learning models, optimising the approach to fraud detection tasks.
+                        </li>
                     </ul>
                 </div>
             </div>
