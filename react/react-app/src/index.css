@@ -988,11 +988,12 @@ body::before {
 
 .timeline-item:nth-child(odd) .timeline-content {
   margin-right: 50px;
-  text-align: right;
+  text-align: left;
 }
 
 .timeline-item:nth-child(even) .timeline-content {
   margin-left: 50px;
+  text-align: right;
 }
 
 .timeline-date {
@@ -1086,6 +1087,10 @@ body::before {
 }
 
 .timeline-item:nth-child(odd) .timeline-tags {
+  justify-content: flex-start;
+}
+
+.timeline-item:nth-child(even) .timeline-tags {
   justify-content: flex-end;
 }
 
@@ -1973,6 +1978,21 @@ body::before {
   font-weight: bold;
 }
 
+/* Align bullet layout opposite to side: right-side card (odd) -> left text; left-side card (even) -> right text */
+.timeline-item:nth-child(even) .responsibilities {
+  text-align: right;
+}
+
+.timeline-item:nth-child(even) .responsibilities li {
+  padding-left: 0;
+  padding-right: 25px;
+}
+
+.timeline-item:nth-child(even) .responsibilities li::before {
+  left: auto;
+  right: 0;
+}
+
 /* Skills Evolution */
 .skills-evolution {
   padding: 100px 0;
@@ -2545,6 +2565,28 @@ body::before {
     padding-right: 0;
     grid-row: 2;
   }
+}
+
+/* Project detail small UI tweaks */
+.section-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  margin: 1.5rem 0 2rem 0;
+}
+
+.btn-text {
+  background: transparent;
+  border: none;
+  color: #00d4ff;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.btn-text:hover {
+  color: #5b73f0;
 }
 
 /* Contact Section */

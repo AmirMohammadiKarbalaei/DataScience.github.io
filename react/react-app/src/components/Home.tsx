@@ -70,9 +70,8 @@ const Home: React.FC = () => {
 
   // Typing animation effect
   useEffect(() => {
-    let currentText = '';
-    let currentIndex = 0;
-    let isDeleting = false;
+  let currentText = '';
+  let isDeleting = false;
     
     const typeEffect = () => {
       const fullText = titles[titleIndex];
@@ -236,7 +235,7 @@ const Home: React.FC = () => {
               </div>
             </div>
             <div className="about-text">
-              <div className="about-highlights">
+              {/* <div className="about-highlights">
                 <div className="highlight-item">
                   <i className="fas fa-brain"></i>
                   <span>AI & Machine Learning Expert</span>
@@ -249,7 +248,7 @@ const Home: React.FC = () => {
                   <i className="fas fa-rocket"></i>
                   <span>Y Combinator Experience</span>
                 </div>
-              </div>
+              </div> */}
               <p className="about-description">
                 I am a dedicated data scientist with a passion for uncovering
                 meaningful insights from complex data. Currently working at <strong>Unilever</strong> as a 
@@ -258,8 +257,8 @@ const Home: React.FC = () => {
               </p>
               <p className="about-description">
                 My journey spans from Y Combinator-funded healthcare AI startups to Fortune 500 companies, 
-                covering predictive analytics, deep learning, and customer operations optimization. 
-                I specialize in creating informative visualizations using Power BI and Tableau, 
+                covering predictive analytics, deep learning, and customer operations optimisation. 
+                I specialise in creating informative visualisations using Power BI and Tableau, 
                 always focusing on using data to drive positive societal change.
               </p>
               <div className="about-cta">
@@ -367,7 +366,7 @@ const Home: React.FC = () => {
             </div>
 
             <div className="skill-category">
-              <h3>Data Visualization & BI</h3>
+              <h3>Data Visualisation & BI</h3>
               <div className="skills-list">
                 <div className="skill-item">
                   <span className="skill-name">Power BI</span>
@@ -451,7 +450,7 @@ const Home: React.FC = () => {
             </div>
 
             <div className="skill-category">
-              <h3>Specialized Tools & Frameworks</h3>
+              <h3>Specialised Tools & Frameworks</h3>
               <div className="skills-list">
                 <div className="skill-item">
                   <span className="skill-name">Jupyter Notebooks</span>

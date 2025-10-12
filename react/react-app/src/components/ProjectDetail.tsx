@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { projects } from '../data/projects';
 
+// Small helper: collapsible list for long arrays
 const ProjectDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const project = projects.find(p => p.id === id);
@@ -26,6 +27,28 @@ const ProjectDetail: React.FC = () => {
     );
   }
 
+  const CollapsibleList: React.FC<{ items: string[]; defaultVisibleCount?: number }> = ({ items, defaultVisibleCount = 5 }) => {
+    const [expanded, setExpanded] = useState(false);
+    if (!items || items.length === 0) return null;
+
+    const visible = expanded ? items : items.slice(0, defaultVisibleCount);
+
+    return (
+      <div>
+        <ul>
+          {visible.map((it, i) => (
+            <li key={i}>{it}</li>
+          ))}
+        </ul>
+        {items.length > defaultVisibleCount && (
+          <button className="btn-text" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>
+            {expanded ? 'Show less' : `Show ${items.length - defaultVisibleCount} more`}
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="project-detail">
       {/* Navigation */}
@@ -43,6 +66,9 @@ const ProjectDetail: React.FC = () => {
             {/* Left Column - Main Content */}
             <div className="project-main">
               <h2 className="project-detail-title small-header-title" >{project.title}</h2>
+
+              {/* small visual divider */}
+              <div className="section-divider" aria-hidden="true" />
               
               {project.content.data && (
                 <div className="project-section">
@@ -51,25 +77,51 @@ const ProjectDetail: React.FC = () => {
                 </div>
               )}
 
-              {project.content.process && (
+              {project.content.processSections ? (
                 <div className="project-section">
                   <h3>Development Process</h3>
-                  <ul>
-                    {project.content.process.map((step, index) => (
-                      <li key={index}>{step}</li>
-                    ))}
-                  </ul>
+                  {Object.entries(project.content.processSections).map(([section, body]) => (
+                    <div key={section} style={{ marginBottom: '1rem' }}>
+                      <h4 style={{ color: '#00d4ff', marginBottom: '0.5rem' }}>{section}</h4>
+                      {Array.isArray(body) ? (
+                        <ul>
+                          {body.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>{body}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : project.content.process && (
+                <div className="project-section">
+                  <h3>Development Process</h3>
+                  <CollapsibleList items={project.content.process} />
                 </div>
               )}
 
               {project.content.keyFindings && (
                 <div className="project-section">
                   <h3>Key Findings</h3>
-                  <ul>
-                    {project.content.keyFindings.map((finding, index) => (
-                      <li key={index}>{finding}</li>
-                    ))}
-                  </ul>
+                  <CollapsibleList items={project.content.keyFindings} defaultVisibleCount={4} />
+                </div>
+              )}
+
+              {project.content.findings && (
+                <div className="project-section">
+                  <h3>Findings</h3>
+                  {Object.entries(project.content.findings).map(([section, bullets]) => (
+                    <div key={section} style={{ marginBottom: '1rem' }}>
+                      <h4 style={{ color: '#00d4ff', marginBottom: '0.5rem' }}>{section}</h4>
+                      <ul>
+                        {bullets.map((b, i) => (
+                          <li key={i}>{b}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               )}
 

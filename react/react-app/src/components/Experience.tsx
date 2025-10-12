@@ -67,10 +67,10 @@ const Experience: React.FC = () => {
                 <span className="stat-number">5+</span>
                 <span className="stat-label">Years Experience</span>
               </div>
-              <div className="stat-item">
+              {/* <div className="stat-item">
                 <span className="stat-number">7</span>
                 <span className="stat-label">Companies</span>
-              </div>
+              </div> */}
               <div className="stat-item">
                 <span className="stat-number">30+</span>
                 <span className="stat-label">Projects Delivered</span>
@@ -103,7 +103,7 @@ const Experience: React.FC = () => {
                 <div className="timeline-tags">
                   <span className="timeline-tag">Customer Operations</span>
                   <span className="timeline-tag">AI Analytics</span>
-                  <span className="timeline-tag">Process Optimization</span>
+                  <span className="timeline-tag">Process Optimisation</span>
                 </div>
               </div>
             </div>
@@ -115,12 +115,13 @@ const Experience: React.FC = () => {
                   <i className="fas fa-university"></i>
                 </div>
                 <h3>Research Assistant</h3>
-                <h4 className="company-name">University of Bath · Part-time</h4>
-                <div className="location">Remote</div>
-                <p>
-                  Conducted research in advanced machine learning and natural language processing, 
-                  contributing to academic publications and cutting-edge AI research projects.
-                </p>
+                <h4 className="company-name">School of Management, University of Bath · Part-time</h4>
+                <div className="location">Bath, UK</div>
+                <ul className="responsibilities">
+                  <li>Built Python tools to automate large-scale data extraction and processing.</li>
+                  <li>Applied NLP to structure unstructured text into analysis‑ready datasets.</li>
+                  <li>Partnered with researchers to design pipelines and validate data quality.</li>
+                </ul>
                 <div className="timeline-tags">
                   <span className="timeline-tag">Natural Language Processing (NLP)</span>
                   <span className="timeline-tag">Machine Learning</span>
@@ -144,11 +145,8 @@ const Experience: React.FC = () => {
                   entrepreneurial community, enhancing student engagement and data accessibility.
                 </p>
                 <ul className="responsibilities">
-                  <li>Developed a secure, scalable attendance tracking system enhancing student engagement and data accessibility</li>
-                  <li>Implemented a GDPR-compliant PostgreSQL database for efficient storage and management of attendance data</li>
-                  <li>Integrated data collection through LDAP queries and RFID card readers for accurate, automated tracking</li>
-                  <li>Designed a responsive Power BI dashboard delivering insightful visualizations for real-time analysis</li>
-                  <li>Leveraged cloud-based technologies and created detailed documentation for long-term system usability</li>
+                  <li>Designed an end‑to‑end data pipeline integrating multiple sources for automated attendance tracking.</li>
+                  <li>Built a Power BI dashboard to provide real‑time engagement insights for stakeholders.</li>
                 </ul>
                 <div className="timeline-tags">
                   <span className="timeline-tag">Software Development</span>
@@ -170,25 +168,16 @@ const Experience: React.FC = () => {
                   <h3>Data Scientist - AI Healthcare Applications</h3>
                   <div className="achievement-badge startup">Y Combinator</div>
                 </div>
-                <h4 className="company-name">Nightingaile (YC S24) · Part-time</h4>
+                <h4 className="company-name">Simplifine (YC S24) · Part-time</h4>
                 <div className="location">San Francisco, California, United States · Remote</div>
                 <p>
-                  Worked in a dynamic Y Combinator-funded startup environment, developing cutting-edge localized 
+                  Worked in a dynamic Y Combinator-funded startup environment, developing cutting-edge localised 
                   language models (LLMs) specifically designed for healthcare professionals. Led Windows application 
                   development that significantly improved documentation, diagnosis, and patient communication processes.
                 </p>
-                <div className="impact-metrics">
-                  <div className="metric">
-                    <span className="metric-value">100%</span>
-                    <span className="metric-label">Main Developer</span>
-                  </div>
-                  <div className="metric">
-                    <span className="metric-value">Healthcare</span>
-                    <span className="metric-label">AI Focus</span>
-                  </div>
-                </div>
+             
                 <ul className="responsibilities">
-                  <li>Developed cutting-edge localized language models (LLMs) for healthcare professionals</li>
+                  <li>Developed cutting-edge localised language models (LLMs) for healthcare professionals</li>
                   <li>Main developer for Windows application improving documentation and diagnosis processes</li>
                   <li>Contributed to securing Y Combinator funding and positioning startup for future success</li>
                   <li>Enhanced patient communication processes for doctors through AI-powered solutions</li>
@@ -211,7 +200,7 @@ const Experience: React.FC = () => {
                 </div>
                 <div className="job-header">
                   <h3>Data Analytics Trainee</h3>
-                  <div className="achievement-badge success">100% Score</div>
+                 
                 </div>
                 <h4 className="company-name">Generation UK & Ireland · Full-time</h4>
                 <div className="location">Leeds, England, United Kingdom · Remote</div>
@@ -219,16 +208,7 @@ const Experience: React.FC = () => {
                   Comprehensive data analytics training program focusing on real-world business applications, 
                   team leadership, and mentoring responsibilities.
                 </p>
-                <div className="impact-metrics">
-                  <div className="metric">
-                    <span className="metric-value">2</span>
-                    <span className="metric-label">Teams Led</span>
-                  </div>
-                  <div className="metric">
-                    <span className="metric-value">100%</span>
-                    <span className="metric-label">Success Rate</span>
-                  </div>
-                </div>
+
                 <ul className="responsibilities">
                   <li>Conducted comprehensive analysis of Olist dataset using Power BI and SQL, investigating customer satisfaction factors</li>
                   <li>Guided two teams in completing interim and final projects, achieving 100% scores through effective leadership</li>
@@ -258,7 +238,7 @@ const Experience: React.FC = () => {
                   deep learning, computer vision, and competitive programming challenges.
                 </p>
                 <ul className="responsibilities">
-                  <li>Utilized time series forecasting and classification techniques to detect and analyze EEG biopotential signals</li>
+                  <li>Utilised time series forecasting and classification techniques to detect and analyse EEG biopotential signals</li>
                   <li>Applied unsupervised learning to cluster retail customers enabling targeted marketing strategies</li>
                   <li>Implemented Q-learning to train autonomous agents for Gym environment games</li>
                   <li>Competed in Kaggle "Detecting Sleep State" competition with thorough EDA and feature engineering</li>
@@ -304,7 +284,7 @@ const Experience: React.FC = () => {
         </div>
       </section>
 
-      {/* Skills Evolution */}
+      {/* Skills Evolution
       <section className="skills-evolution">
         <div className="container">
           <h2 className="section-title">Skills Evolution</h2>
@@ -356,7 +336,7 @@ const Experience: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Floating Action Buttons */}
       <div className="floating-actions">
