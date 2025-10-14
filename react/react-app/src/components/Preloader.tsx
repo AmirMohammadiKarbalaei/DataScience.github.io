@@ -28,7 +28,7 @@ const Preloader: React.FC = () => {
           <div className="logo-text">
             <span className="brand-text">Amir</span>
             <span className="brand-dot">.</span>
-            <span className="brand-domain">dev</span>
+            <span className="brand-domain">Data</span>
           </div>
         </div>
         

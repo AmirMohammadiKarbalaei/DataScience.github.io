@@ -21,16 +21,7 @@ const Home: React.FC = () => {
     'Analytics Professional'
   ];
 
-  // Animation for skill bars
-  const animateSkillBars = () => {
-    const skillBars = document.querySelectorAll('.skill-progress');
-    skillBars.forEach((bar) => {
-      const width = bar.getAttribute('data-width');
-      if (width) {
-        (bar as HTMLElement).style.width = width + '%';
-      }
-    });
-  };
+  // Skills section no longer uses progress bars; simple chips are displayed.
 
   // Animation for stats counter
   const animateStats = () => {
@@ -110,9 +101,7 @@ const Home: React.FC = () => {
             entry.target.classList.add('visible');
             
             // Trigger specific animations based on the section
-            if (entry.target === skillsRef.current) {
-              setTimeout(animateSkillBars, 500);
-            }
+            // No skill bar animation needed
             if (entry.target === statsRef.current) {
               setTimeout(animateStats, 500);
             }
@@ -143,6 +132,38 @@ const Home: React.FC = () => {
   const filteredProjects = filter === 'all' 
     ? projects 
     : projects.filter(project => project.category.includes(filter));
+
+  // Map skill names to Font Awesome icons for visual variety
+  const getSkillIcon = (name: string) => {
+    const s = name.toLowerCase();
+    if (s.includes('python')) return 'fab fa-python';
+    if (s.includes('sql')) return 'fas fa-database';
+    if (s.includes('pandas')) return 'fas fa-table';
+    if (s.includes('numpy')) return 'fas fa-cubes';
+    if (s.includes('scikit') || s.includes('xgboost') || s.includes('lightgbm')) return 'fas fa-project-diagram';
+    if (s.includes('pytorch')) return 'fas fa-fire';
+    if (s.includes('tensor')) return 'fas fa-layer-group';
+    if (s.includes('power bi')) return 'fas fa-chart-bar';
+    if (s.includes('tableau')) return 'fas fa-chart-pie';
+    if (s.includes('feature')) return 'fas fa-tools';
+    if (s.includes('spacy')) return 'fas fa-language';
+    if (s.includes('transformer')) return 'fas fa-robot';
+    if (s.includes('vision') || s.includes('opencv')) return 'fas fa-camera';
+    if (s.includes('time series')) return 'fas fa-chart-line';
+    if (s.includes('a/b') || s.includes('experiment')) return 'fas fa-vial';
+    if (s.includes('statistical')) return 'fas fa-superscript';
+    if (s.includes('explainability') || s.includes('shap') || s.includes('lime')) return 'fas fa-lightbulb';
+    if (s.includes('matplotlib') || s.includes('seaborn') || s.includes('visualis')) return 'fas fa-chart-area';
+    if (s.includes('mlops')) return 'fas fa-cogs';
+    return 'fas fa-circle';
+  };
+
+  const SkillPill: React.FC<{ text: string }> = ({ text }) => (
+    <span className="skill-pill">
+      <i className={`${getSkillIcon(text)} pill-icon`} aria-hidden="true"></i>
+      {text}
+    </span>
+  );
 
   return (
     <div>
@@ -193,15 +214,15 @@ const Home: React.FC = () => {
           </div>
           <div className="hero-stats">
             <div className="hero-stat">
-              <span className="hero-stat-number">5+</span>
+              <span className="hero-stat-number">4+</span>
               <span className="hero-stat-label">Years Experience</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-number">30+</span>
+              <span className="hero-stat-number">35+</span>
               <span className="hero-stat-label">Projects</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-number">7</span>
+              <span className="hero-stat-number">5</span>
               <span className="hero-stat-label">Companies</span>
             </div>
           </div>
@@ -230,7 +251,7 @@ const Home: React.FC = () => {
                 </div>
                 <div className="profile-badge">
                   <i className="fas fa-calendar"></i>
-                  5+ Years Exp
+                  4+ Years Exp
                 </div>
               </div>
             </div>
@@ -252,14 +273,10 @@ const Home: React.FC = () => {
               <p className="about-description">
                 I am a dedicated data scientist with a passion for uncovering
                 meaningful insights from complex data. Currently working at <strong>Unilever</strong> as a 
-                Customer Operations and Una Bot Analyst, I bring expertise in Python, SQL, and advanced 
-                analytics to drive business excellence.
+                Customer Operations and Una Bot Analyst.
               </p>
               <p className="about-description">
-                My journey spans from Y Combinator-funded healthcare AI startups to Fortune 500 companies, 
-                covering predictive analytics, deep learning, and customer operations optimisation. 
-                I specialise in creating informative visualisations using Power BI and Tableau, 
-                always focusing on using data to drive positive societal change.
+                Beyond technical proficiency, my primary focus is on using data to drive positive societal change. I believe that uncovering insights is a commitment to guiding better decisions, and I am deeply invested in advancing a future where data science is ethical, transparent, and inclusive. By championing responsible AI and fostering interpretability, I strive to contribute to a field that balances innovation with accountability.
               </p>
               <div className="about-cta">
                 <Link to="/experience" className="btn-outline">
@@ -277,224 +294,106 @@ const Home: React.FC = () => {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="skills-section">
+      <section id="skills" className="skills-section" aria-label="Skills">
         <div className="container">
-          <h2 className="section-title">Technical Arsenal</h2>
-          <div className="skills-grid" ref={skillsRef}>
-            <div className="skill-category">
-              <h3>Programming & Data Processing</h3>
+          <h2 className="section-title">Skills & Tools</h2>
+          {/* Core stack row: your primary tools */}
+          
+
+
+          {/* Categorised skills matrix - concise 4 buckets */}
+          <div className="skills-grid">
+            <div className="skills-category">
+              <h3><i className="fas fa-code"></i> Core Data & ML</h3>
               <div className="skills-list">
-                <div className="skill-item">
-                  <span className="skill-name">Python</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="95"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">SQL</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="93"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Pandas</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="92"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">NumPy</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="90"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">R</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="75"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">ETL Processes</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="88"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="skill-category">
-              <h3>Machine Learning & AI</h3>
-              <div className="skills-list">
-                <div className="skill-item">
-                  <span className="skill-name">Scikit-Learn</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="92"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">TensorFlow</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="88"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">PyTorch</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="82"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Keras</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="85"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Hugging Face</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="85"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">OpenAI APIs</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="80"></div>
-                  </div>
-                </div>
+                {['Python','SQL','Pandas','NumPy','Scikit-Learn','XGBoost/LightGBM','Feature Engineering'].map(s => (
+                  <SkillPill key={`coreml-${s}`} text={s} />
+                ))}
               </div>
             </div>
 
-            <div className="skill-category">
-              <h3>Data Visualisation & BI</h3>
+            <div className="skills-category">
+              <h3><i className="fas fa-robot"></i> Deep Learning & AI</h3>
               <div className="skills-list">
-                <div className="skill-item">
-                  <span className="skill-name">Power BI</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="92"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Tableau</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="85"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Matplotlib</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="87"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Seaborn</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="88"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Plotly</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="83"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Microsoft Excel</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="90"></div>
-                  </div>
-                </div>
+                {['PyTorch','TensorFlow','spaCy','Transformers','Computer Vision (OpenCV)'].map(s => (
+                  <SkillPill key={`dlai-${s}`} text={s} />
+                ))}
               </div>
             </div>
 
-            <div className="skill-category">
-              <h3>Database & Cloud Technologies</h3>
+            <div className="skills-category">
+              <h3><i className="fas fa-chart-line"></i> Analytics & Experimentation</h3>
               <div className="skills-list">
-                <div className="skill-item">
-                  <span className="skill-name">PostgreSQL</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="85"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">MySQL</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="82"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">MongoDB</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="75"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">AWS</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="78"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Docker</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="78"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Git</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="92"></div>
-                  </div>
-                </div>
+                {['A/B Testing & Experimentation','Statistical Inference','Model Explainability (SHAP/LIME)'].map(s => (
+                  <SkillPill key={`analytics-${s}`} text={s} />
+                ))}
               </div>
             </div>
 
-            <div className="skill-category">
-              <h3>Specialised Tools & Frameworks</h3>
+            <div className="skills-category">
+              <h3><i className="fas fa-chart-bar"></i> BI & Visualisation</h3>
               <div className="skills-list">
-                <div className="skill-item">
-                  <span className="skill-name">Jupyter Notebooks</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="95"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Apache Spark</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="72"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Streamlit</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="85"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">NLTK/spaCy</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="80"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">MLflow</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="75"></div>
-                  </div>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-name">Statistical Analysis</span>
-                  <div className="skill-bar">
-                    <div className="skill-progress" data-width="88"></div>
-                  </div>
-                </div>
+                {['Power BI','Tableau','Matplotlib','Seaborn'].map(s => (
+                  <SkillPill key={`biviz-${s}`} text={s} />
+                ))}
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-width banner of project types */}
+        <div className="skills-works">
+          <div className="container works-inner">
+            <span className="works-title">
+              <i className="fas fa-briefcase" aria-hidden="true"></i> What I build:
+            </span>
+            <div className="works-list">
+              {[
+                'Reinforcement Learning',
+                'Time Series Forecasting',
+                'Classification',
+                "Predictive Models",
+                'Object Detection',
+                'Clustering',
+                'Anomaly Detection',
+                'Recommendation Systems',
+                'LLM & NLP Solutions',
+                'Topic Modeling',
+                'RAG Apps',
+                'BI Dashboards',
+
+
+              ].map((item) => (
+                <span key={`work-${item}`} className="work-pill">
+                  <i
+                    className={`${
+                      item.toLowerCase().includes('time series') ? 'fas fa-chart-line' :
+                      item.toLowerCase().includes('object') ? 'fas fa-crosshairs' :
+                      item.toLowerCase().includes('cluster') ? 'fas fa-project-diagram' :
+                      item.toLowerCase().includes('anomaly') ? 'fas fa-exclamation-triangle' :
+                      item.toLowerCase().includes('recommend') ? 'fas fa-thumbs-up' :
+                      item.toLowerCase().includes('nlp') ? 'fas fa-language' :
+                      item.toLowerCase().includes('topic') ? 'fas fa-comments' :
+                      item.toLowerCase().includes('rag') ? 'fas fa-book-open' :
+                      item.toLowerCase().includes('dashboard') ? 'fas fa-chart-bar' :
+                      item.toLowerCase().includes('classification') ? 'fas fa-check-circle' :
+                      item.toLowerCase().includes('reinforcement') ? 'fas fa-dice' :
+                      item.toLowerCase().includes('predict') ? 'fas fa-bullseye' :
+                      'fas fa-circle'
+
+                      
+                    } pill-icon`}
+                    aria-hidden="true"
+                  ></i>
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section
       <section className="stats-section">
         <div className="container">
           <div className="stats-grid" ref={statsRef}>
@@ -516,7 +415,7 @@ const Home: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
 
 

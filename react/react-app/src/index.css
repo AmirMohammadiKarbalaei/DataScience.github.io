@@ -1,5 +1,144 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap');
 
+/* Accessibility utility: visually hide but keep for screen readers */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important; /* added line */
+  border: 0 !important;
+}
+
+/* Skills: layout for professional grid */
+.skills-section .skills-core {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.skills-section .skills-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .skills-section .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .skills-section .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.skills-section .skills-category {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  backdrop-filter: blur(6px);
+}
+
+.skills-section .skills-category h3 {
+  font-size: 1.05rem;
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e5e7eb;
+}
+
+.skills-section .skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Small icons inside skill pills */
+.skill-pill .pill-icon,
+.work-pill .pill-icon {
+  margin-right: 8px;
+  opacity: 0.85;
+}
+
+/* Full-width works banner */
+.skills-works {
+  width: 100%;
+  background: linear-gradient(90deg, rgba(59,130,246,0.08), rgba(236,72,153,0.08));
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-top: 28px;
+}
+
+.skills-works .works-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.skills-works .works-title {
+  font-weight: 600;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.skills-works .works-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skills-works .work-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  color: #e5e7eb;
+}
+.skills-marquee {
+  overflow: hidden;
+  position: relative;
+  margin-top: 40px;
+}
+
+.marquee-track {
+  display: inline-flex;
+  gap: 14px;
+  white-space: nowrap;
+  will-change: transform;
+  animation: scroll-rtl 26s linear infinite;
+}
+
+.skills-marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-rtl {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -829,11 +968,32 @@ body::before {
   background: rgba(0, 0, 0, 0.2);
 }
 
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 40px;
-  margin-top: 60px;
+.skills-grid { display: none; }
+
+.skills-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.skill-pill {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  color: #e6faff;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 18px rgba(0, 212, 255, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.skill-pill:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(0, 212, 255, 0.25);
+  border-color: rgba(0, 212, 255, 0.45);
 }
 
 .skill-category {
@@ -1306,7 +1466,7 @@ body::before {
     font-size: 0.9rem;
   }
   
-  .project-detail-title {
+  .project-detail-title, .section-title {
     font-size: 2.5rem;
   }
   

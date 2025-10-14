@@ -70,7 +70,7 @@ const Navigation: React.FC = () => {
           <div className="nav-brand">
             <span className="brand-text">Amir</span>
             <span className="brand-dot">.</span>
-            <span className="brand-domain">dev</span>
+            <span className="brand-domain">Data</span>
           </div>
 
           {/* Desktop Navigation */}
