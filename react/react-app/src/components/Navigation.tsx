@@ -7,14 +7,14 @@ const Navigation: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  const navItems = [
-    { id: 'home', label: 'Home', href: '#home' },
-    { id: 'about', label: 'About', href: '#about' },
-    { id: 'skills', label: 'Skills', href: '#skills' },
+  const navItems = React.useMemo(() => [
+    { id: 'home', label: 'Home', href: location.pathname === '/' ? '#home' : '/' },
+    { id: 'about', label: 'About', href: location.pathname === '/' ? '#about' : '/#about' },
+    { id: 'skills', label: 'Skills', href: location.pathname === '/' ? '#skills' : '/#skills' },
     { id: 'experience', label: 'Experience', href: '/experience' },
-    { id: 'projects', label: 'Projects', href: '#projects' },
-    { id: 'contact', label: 'Contact', href: '#contact' }
-  ];
+    { id: 'projects', label: 'Projects', href: location.pathname === '/' ? '#projects' : '/#projects' },
+    { id: 'contact', label: 'Contact', href: location.pathname === '/' ? '#contact' : '/#contact' }
+  ], [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,25 +38,35 @@ const Navigation: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [navItems]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    // If it's a route link (starts with /), don't prevent default
-    if (href.startsWith('/')) {
+    // If it's a route link (starts with /) but not an anchor link, don't prevent default
+    if (href.startsWith('/') && !href.includes('#')) {
       setIsMobileMenuOpen(false);
       return;
     }
     
-    e.preventDefault();
-    const targetId = href.substring(1);
-    const targetElement = document.getElementById(targetId);
+    // If we're on a different page and trying to navigate to a home section, navigate to home first
+    if (href.startsWith('/#') && location.pathname !== '/') {
+      setIsMobileMenuOpen(false);
+      window.location.href = href; // This will navigate to home page and then to the anchor
+      return;
+    }
     
-    if (targetElement) {
-      const offsetTop = targetElement.offsetTop - 80;
-      window.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth'
-      });
+    // Handle anchor links on the same page
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const targetId = href.substring(1);
+      const targetElement = document.getElementById(targetId);
+      
+      if (targetElement) {
+        const offsetTop = targetElement.offsetTop - 80;
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        });
+      }
     }
     
     setIsMobileMenuOpen(false);
@@ -67,17 +77,17 @@ const Navigation: React.FC = () => {
       {/* Main Navigation */}
       <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`}>
         <div className="nav-container">
-          <div className="nav-brand">
+          <Link to="/" className="nav-brand">
             <span className="brand-text">Amir</span>
             <span className="brand-dot">.</span>
             <span className="brand-domain">Data</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <ul className="nav-menu desktop-nav">
             {navItems.map((item) => (
               <li key={item.id} className="nav-item">
-                {item.href.startsWith('/') ? (
+                {item.href.startsWith('/') && !item.href.includes('#') ? (
                   <Link
                     to={item.href}
                     className={`nav-link ${location.pathname === item.href ? 'active' : ''}`}
@@ -87,7 +97,10 @@ const Navigation: React.FC = () => {
                 ) : (
                   <a
                     href={item.href}
-                    className={`nav-link ${activeSection === item.id ? 'active' : ''}`}
+                    className={`nav-link ${
+                      location.pathname === '/' && activeSection === item.id ? 'active' : 
+                      location.pathname === item.href ? 'active' : ''
+                    }`}
                     onClick={(e) => handleNavClick(e, item.href)}
                   >
                     {item.label}
@@ -115,7 +128,7 @@ const Navigation: React.FC = () => {
           <ul className="mobile-nav-menu">
             {navItems.map((item) => (
               <li key={item.id} className="mobile-nav-item">
-                {item.href.startsWith('/') ? (
+                {item.href.startsWith('/') && !item.href.includes('#') ? (
                   <Link
                     to={item.href}
                     className={`mobile-nav-link ${location.pathname === item.href ? 'active' : ''}`}
@@ -126,7 +139,10 @@ const Navigation: React.FC = () => {
                 ) : (
                   <a
                     href={item.href}
-                    className={`mobile-nav-link ${activeSection === item.id ? 'active' : ''}`}
+                    className={`mobile-nav-link ${
+                      location.pathname === '/' && activeSection === item.id ? 'active' : 
+                      location.pathname === item.href ? 'active' : ''
+                    }`}
                     onClick={(e) => handleNavClick(e, item.href)}
                   >
                     {item.label}

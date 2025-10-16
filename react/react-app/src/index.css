@@ -174,7 +174,7 @@ body {
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 5px;
 }
 
 /* Futuristic grid background */
@@ -843,6 +843,9 @@ body::before {
 .tag-bi { background: rgba(0, 191, 255, 0.2); border-color: #00bfff; }
 .tag-da { background: rgba(72, 209, 204, 0.2); border-color: #48d1cc; }
 .tag-dashboard { background: rgba(255, 105, 180, 0.2); border-color: #ff69b4; }
+.tag-drl { background: rgba(255, 140, 0, 0.2); border-color: #ff8c00; }
+.tag-robotics { background: rgba(53, 114, 165, 0.2); border-color: #3572a1; }
+.tag-rl { background: rgba(34, 139, 34, 0.2); border-color: #228b22; }
 
 
 /* Contact Section */
@@ -2524,13 +2527,13 @@ body::before {
 }
 
 .project-main {
-  flex: 2;
+  flex: 1.75;
   min-width: 0;
   text-align: left;
 }
 
 .project-sidebar {
-  flex: 1;
+  flex: 1.2;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -2552,7 +2555,7 @@ body::before {
 .project-detail-image {
   width: 100%;
   height: auto;
-  max-width: 500px; /* Optional: limit max width for very large images */
+  max-width: 1200px; /* Increased max width for larger images */
   border-radius: 12px;
   margin-bottom: 8px;
   object-fit: contain; /* Use contain to avoid cropping */

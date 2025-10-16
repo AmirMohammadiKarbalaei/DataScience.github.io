@@ -64,7 +64,7 @@ const Experience: React.FC = () => {
             </p>
             <div className="hero-stats">
               <div className="stat-item">
-                <span className="stat-number">5+</span>
+                <span className="stat-number">4+</span>
                 <span className="stat-label">Years Experience</span>
               </div>
               {/* <div className="stat-item">
@@ -72,7 +72,7 @@ const Experience: React.FC = () => {
                 <span className="stat-label">Companies</span>
               </div> */}
               <div className="stat-item">
-                <span className="stat-number">30+</span>
+                <span className="stat-number">35+</span>
                 <span className="stat-label">Projects Delivered</span>
               </div>
             </div>

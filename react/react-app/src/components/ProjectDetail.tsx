@@ -155,6 +155,16 @@ const ProjectDetail: React.FC = () => {
                   />
                 </div>
               )}
+
+              {/* Video Player */}
+              {project.video && (
+                <div className="project-video-container">
+                  <video controls className="project-video">
+                    <source src={project.video} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              )}
             </div>
 
             {/* Right Column - Images */}
@@ -204,6 +214,35 @@ const ProjectDetail: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <style>
+        {`
+          .project-video-container {
+            position: relative;
+            z-index: 1;
+            margin-top: 20px; /* Adds gap between GitHub button and video */
+          }
+
+          .project-video {
+            border-radius: 10px; /* Adds rounded corners to the video */
+            width: 100%;
+            height: auto;
+          }
+
+          .project-sidebar {
+            position: relative;
+            z-index: 0;
+          }
+
+          .project-image-container img {
+            width: 100%; /* Ensure the image takes up the full width of its container */
+            height: auto; /* Maintain aspect ratio */
+            max-width: 1400px; /* Further increased maximum width for larger displays */
+            margin: 0 auto; /* Center the image horizontally */
+            display: block; /* Ensure proper centering */
+          }
+        `}
+      </style>
     </div>
   );
 };

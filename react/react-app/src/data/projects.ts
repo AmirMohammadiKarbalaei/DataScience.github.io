@@ -8,6 +8,7 @@ export interface Project {
   category: string[];
   githubUrl?: string;
   streamlitUrl?: string;
+  video?: string;
   content: {
     data?: string;
   process?: string[];
@@ -20,6 +21,43 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+   {
+    id: 'reinforcement-learning',
+    title: 'Deep Reinforcement Learning for Robotic Locomotion',
+    description: 'Training a simulated bipedal robot, the HalfCheetah, to run using four distinct DRL algorithms.',
+    image: '/media/reinforcement learning/HalfCheetah.png',
+    animation: '/media/animation/RL.json',
+    tags: ['Reinforcement-Learning', 'DRL', 'Robotics'],
+    category: ['RL', 'AI'],
+    video: '/media/reinforcement learning/halfcheetah.mp4',
+    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/DRL-Robotic-Locomotion',
+    content: {
+        data: 'This project involved training a simulated bipedal robot, the HalfCheetah, to run. Four distinct Deep Reinforcement Learning (DRL) algorithms were implemented from scratch to systematically compare their effectiveness on this continuous control task.',
+        processSections: {
+          'Objective': 'To train a reinforcement learning agent to achieve stable and efficient forward locomotion in the HalfCheetah-v4 environment, which features a high-dimensional continuous state (17 dimensions) and action space (6 dimensions).',
+          'Skills & Technologies Demonstrated': [
+            'Algorithm Implementation: Implemented four major DRL algorithms from scratch: Deep Deterministic Policy Gradient (DDPG), Twin Delayed DDPG (TD3), Soft Actor-Critic (SAC), and Truncated Quantile Critics (TQC).',
+            'Technical Concepts: Applied deep understanding of actor-critic architectures, deterministic vs. stochastic policies, off-policy learning, entropy maximisation, and distributional reinforcement learning.',
+            'Experimental Design: Conducted a systematic comparison of algorithm performance, evaluating learning speed, sample efficiency, asymptotic performance, and stability.',
+            'Problem Solving & Optimisation: Identified and solved a critical training instability in DDPG by implementing online state normalisation, which dramatically improved its performance.'
+          ],
+          'Tools': 'Utilised the Gymnasium simulation environment and the MuJoCo physics engine.'
+        },
+        keyFindings: [
+          'Exceeded Expert Performance: Three of the four algorithms achieved scores at or above the expert benchmark (a score of 10,000). The top-performing agent, DDPG, achieved a final mean return of 12,050.',
+          'Surprising Top Performer: The carefully optimised DDPG implementation outperformed more recent algorithms due to the implementation of online state normalisation.',
+          'Systematic Performance Ranking: The final evaluation produced a clear performance hierarchy for this task: DDPG > TQC > SAC > TD3.',
+          'DDPG: Fastest to learn and achieved the highest final score.',
+          'TQC & SAC: Demonstrated the most stable learning curves, consistent with their underlying entropy regularisation and distributional critic methods.',
+          'TD3: Underperformed due to high sensitivity to hyperparameters and limited computational time for extensive tuning.'
+        ],
+        images: [
+          { src: '/media/reinforcement learning/moving average.png', caption: '50-episode moving average of training return' },
+          { src: '/media/reinforcement learning/evaluation episodes.png', caption: 'Return during the final 20 evaluation episodes' },
+          { src: '/media/reinforcement learning/Asymptotic score.png', caption: 'Asymptotic score, learning speed, GPU footprint, and wall-clock training time' }
+        ]
+    }
+  },
   {
     id: 'diabetes-classification',
     title: 'Diabetes Classification',
@@ -59,6 +97,53 @@ export const projects: Project[] = [
         { src: '/media/diabetes/Feature-importance.png', caption: 'Random Forest feature importance' },
         { src: '/media/diabetes/NNloss.png', caption: 'NN Model Loss (train/val/test)' },
         { src: '/media/diabetes/NNacc.png', caption: 'NN Model Accuracy (train/val/test)' }
+      ]
+    }
+  },
+  {
+    id: 'detect-sleep-states',
+    title: 'Detect Sleep States - Child Mind Institute',
+    description: 'Detect sleep onset and wake from wrist-worn accelerometer data to determine a person\'s sleep state.',
+    image: '/media/Detect-Sleep-States-CMI/data_dis.png',
+    animation: '/media/animation/cmi2.json',
+    tags: ['ML', 'Classification', 'Time-Series', 'EDA'],
+    category: ['TimeSeries', 'AI'],
+    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Detect-Sleep-States-CMI',
+    content: {
+      data: 'The "Zzzs" you catch each night are crucial for your overall health. Sleep affects everything from your development to cognitive functioning. This project aims to help researchers better analyse wrist-worn accelerometer data for sleep monitoring, enabling large-scale studies to improve understanding of sleep\'s importance and function. The dataset comprises about 500 multi-day recordings of wrist-worn accelerometer data annotated with sleep onset and wakeup events. Annotation guidelines used for the dataset include: a sleep period must be at least 30 minutes long; interruptions shorter than 30 consecutive minutes are allowed within a sleep window; the longest single sleep window in a night is recorded; no events are recorded for periods when the device is not worn; and there is at most one recorded sleep window per night.',
+      process: [
+        'Exploratory Data Analysis (EDA): Thorough dataset cleaning and selection of continuous data series for model training',
+        'Feature Engineering: Incorporated lag features for Enmo and Angle-Z to introduce temporal elements',
+        'Additional features: Added "Hour of day," "Day of Month," and other temporal features to the dataset',
+        'Feature importance assessment using SHAP (Shapley Additive explanations) analysis',
+        'Model Implementation: Compared Random Forest and HistGradientBoostingClassifier algorithms',
+        'Model evaluation and performance optimisation achieving approximately 75% accuracy'
+      ],
+      keyFindings: [
+        'Random Forest outperformed HistGradientBoostingClassifier with ~75% accuracy',
+        'Lag features for Enmo and Angle-Z significantly improved temporal pattern recognition',
+        'SHAP analysis revealed key feature importance in sleep state detection',
+        'Temporal features like hour of day and day of month contributed to model performance',
+        'Sleep periods must be at least 30 minutes long with interruptions not exceeding 30 minutes',
+        'Successfully identified sleep onset and wakeup events from continuous accelerometer data',
+        'Model effectively handled multi-day recordings for realistic sleep pattern analysis'
+      ],
+      limitations: [
+        'Model accuracy limited to ~75%, indicating room for improvement',
+        'Dataset restricted to wrist-worn accelerometer data only',
+        'Sleep annotation depends on longest single period of inactivity definition',
+        'No predictions made during device removal periods to avoid false positives',
+        'Model requires continuous data series without gaps for optimal performance'
+      ],
+      images: [
+        { src: '/media/Detect-Sleep-States-CMI/data_clusters.png', caption: 'Cluster Map of Series Data' },
+        { src: '/media/Detect-Sleep-States-CMI/data_dis.png', caption: 'Enmo and Angle-Z Distributions' },
+        { src: '/media/Detect-Sleep-States-CMI/class_distributions.png', caption: 'Class Distributions for Data Split' },
+        { src: '/media/Detect-Sleep-States-CMI/Classification report.jpg', caption: 'Classification Report' },
+        { src: '/media/Detect-Sleep-States-CMI/Confusion matrix.png', caption: 'Confusion Matrix' },
+        { src: '/media/Detect-Sleep-States-CMI/ROC curve.png', caption: 'ROC Curve Analysis' },
+        { src: '/media/Detect-Sleep-States-CMI/feature_data.jpg', caption: 'Feature Data Analysis' },
+        { src: '/media/Detect-Sleep-States-CMI/shap.png', caption: 'SHAP Feature Importance Analysis' }
       ]
     }
   },
@@ -148,53 +233,6 @@ export const projects: Project[] = [
     }
   },
   {
-    id: 'detect-sleep-states',
-    title: 'Detect Sleep States - Child Mind Institute',
-    description: 'Detect sleep onset and wake from wrist-worn accelerometer data to determine a person\'s sleep state.',
-    image: '/media/Detect-Sleep-States-CMI/data_dis.png',
-    animation: '/media/animation/cmi2.json',
-    tags: ['ML', 'Classification', 'Time-Series', 'EDA'],
-    category: ['TimeSeries', 'AI'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Detect-Sleep-States-CMI',
-    content: {
-      data: 'The "Zzzs" you catch each night are crucial for your overall health. Sleep affects everything from your development to cognitive functioning. This project aims to help researchers better analyse wrist-worn accelerometer data for sleep monitoring, enabling large-scale studies to improve understanding of sleep\'s importance and function. The dataset comprises about 500 multi-day recordings of wrist-worn accelerometer data annotated with sleep onset and wakeup events. Annotation guidelines used for the dataset include: a sleep period must be at least 30 minutes long; interruptions shorter than 30 consecutive minutes are allowed within a sleep window; the longest single sleep window in a night is recorded; no events are recorded for periods when the device is not worn; and there is at most one recorded sleep window per night.',
-      process: [
-        'Exploratory Data Analysis (EDA): Thorough dataset cleaning and selection of continuous data series for model training',
-        'Feature Engineering: Incorporated lag features for Enmo and Angle-Z to introduce temporal elements',
-        'Additional features: Added "Hour of day," "Day of Month," and other temporal features to the dataset',
-        'Feature importance assessment using SHAP (Shapley Additive explanations) analysis',
-        'Model Implementation: Compared Random Forest and HistGradientBoostingClassifier algorithms',
-        'Model evaluation and performance optimization achieving approximately 75% accuracy'
-      ],
-      keyFindings: [
-        'Random Forest outperformed HistGradientBoostingClassifier with ~75% accuracy',
-        'Lag features for Enmo and Angle-Z significantly improved temporal pattern recognition',
-        'SHAP analysis revealed key feature importance in sleep state detection',
-        'Temporal features like hour of day and day of month contributed to model performance',
-        'Sleep periods must be at least 30 minutes long with interruptions not exceeding 30 minutes',
-        'Successfully identified sleep onset and wakeup events from continuous accelerometer data',
-        'Model effectively handled multi-day recordings for realistic sleep pattern analysis'
-      ],
-      limitations: [
-        'Model accuracy limited to ~75%, indicating room for improvement',
-        'Dataset restricted to wrist-worn accelerometer data only',
-        'Sleep annotation depends on longest single period of inactivity definition',
-        'No predictions made during device removal periods to avoid false positives',
-        'Model requires continuous data series without gaps for optimal performance'
-      ],
-      images: [
-        { src: '/media/Detect-Sleep-States-CMI/data_clusters.png', caption: 'Cluster Map of Series Data' },
-        { src: '/media/Detect-Sleep-States-CMI/data_dis.png', caption: 'Enmo and Angle-Z Distributions' },
-        { src: '/media/Detect-Sleep-States-CMI/class_distributions.png', caption: 'Class Distributions for Data Split' },
-        { src: '/media/Detect-Sleep-States-CMI/Classification report.jpg', caption: 'Classification Report' },
-        { src: '/media/Detect-Sleep-States-CMI/Confusion matrix.png', caption: 'Confusion Matrix' },
-        { src: '/media/Detect-Sleep-States-CMI/ROC curve.png', caption: 'ROC Curve Analysis' },
-        { src: '/media/Detect-Sleep-States-CMI/feature_data.jpg', caption: 'Feature Data Analysis' },
-        { src: '/media/Detect-Sleep-States-CMI/shap.png', caption: 'SHAP Feature Importance Analysis' }
-      ]
-    }
-  },
-  {
     id: 'fraud-detection',
     title: 'Fraud Detection',
     description: 'Detect fraudulent transactions in financial data using machine learning algorithms.',
@@ -205,41 +243,43 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com/AmirMohammadiKarbalaei/FraudDetection',
     content: {
       data: 'The FraudDetection System is a Python-based solution designed to identify and mitigate fraudulent transactions within financial datasets. By leveraging state-of-the-art machine learning algorithms and comprehensive data preprocessing techniques, this system ensures the accurate detection of fraudulent activities.',
-        process: [
-          'Data Preprocessing: Robust data preprocessing including missing value handling, categorical encoding and numeric normalisation.',
-          'Model Training & Comparison: Trained and compared Random Forest and a deep learning model (FraudDetectionModel).',
-          'Evaluation & Persistence: Evaluated models using precision/recall/F1 and implemented model persistence for reuse in production.'
+      process: [
+        'Data Preprocessing: Robust data preprocessing including missing value handling, categorical encoding and numeric normalisation.',
+        'Model Training & Comparison: Trained and compared Random Forest and a deep learning model (FraudDetectionModel).',
+        'Evaluation & Persistence: Evaluated models using precision/recall/F1 and implemented model persistence for reuse in production.'
+      ],
+      processSections: {
+        'Overview': 'Python-based fraud detection system that combines feature engineering, classical ML and deep learning to identify suspicious transactions in financial datasets.',
+        'Key Features': [
+          'Robust data preprocessing capabilities, including handling of missing values, encoding of categorical variables, and normalisation of numerical features.',
+          'Integration of multiple machine learning models, including a deep learning model (FraudDetectionModel) and a random forest model (FraudDetectionRFModel), tailored for high-performance fraud detection.',
+          'Comprehensive model evaluation metrics, including accuracy, precision, recall, and F1 score, to rigorously assess the effectiveness of each model.',
+          'Support for saving and loading trained models, enabling seamless deployment and reuse in various operational environments.'
         ],
-        processSections: {
-          'Overview': 'Python-based fraud detection system that combines feature engineering, classical ML and deep learning to identify suspicious transactions in financial datasets.',
-          'Key Features': [
-            'Comprehensive data preprocessing pipeline (missing values, encoding, normalisation)',
-            'Multiple model support (Random Forest, deep learning model) for comparative evaluation',
-            'Model persistence for saving/loading trained artefacts to support deployment'
-          ],
-          'System Requirements': [
-            'Python',
-            'Pandas for data manipulation',
-            'Numpy for numerical computations',
-            'Torch for deep learning (optional)',
-            'Scikit-Learn for classical ML',
-            'Matplotlib / Seaborn for visualisation'
-          ],
-          'Usage Instructions': [
-            'Place dataset (e.g. Fraud.csv) in the Fraud_data directory and run the DataPreprocessing module to prepare features',
-            'Train models using the provided training scripts (supports deep learning and Random Forest workflows)',
-            'Evaluate models with provided evaluation scripts and save the best performing model using the ModelSaving utilities'
-          ],
-          'Example Use Cases': [
-            'Detect fraudulent transactions in a financial pipeline to reduce chargebacks and losses',
-            'Use system as a benchmarking tool to compare modelling approaches and feature engineering strategies'
-          ]
-        },
-        keyFindings: [
-          'Multiple modelling approaches improve robustness to different fraud patterns',
-          'Careful preprocessing and class imbalance handling are critical for performance',
-          'Model persistence enables simple deployment and integration into downstream systems'
+        'System Requirements': [
+          'Python',
+          'Pandas for data manipulation and analysis',
+          'Numpy for numerical computations',
+          'Torch for deep learning',
+          'Scikit-Learn for machine learning',
+          'Matplotlib and Seaborn for data visualisation'
         ],
+        'Usage Instructions': [
+          'Download the relevant dataset (e.g., Fraud.csv) and place it in the designated Fraud_data directory. Utilise the DataPreprocessing module to prepare the data for model training.',
+          'Train a deep learning model using the FraudDetectionModel class and the random forest model using the FraudDetectionRFModel class to detect fraudulent transactions.',
+          'Apply the ModelEvaluation module to thoroughly assess the performance of each trained model using various metrics.',
+          'Save the trained models with the ModelSaving module, and load them when required using the ModelLoading module for continued analysis.'
+        ],
+        'Example Use Cases': [
+          'Employ the system to detect and prevent fraudulent transactions within a financial dataset, safeguarding financial operations.',
+          'Utilise the system to perform comparative analysis of different machine learning models, optimising the approach to fraud detection tasks.'
+        ]
+      },
+      keyFindings: [
+        'Multiple modelling approaches improve robustness to different fraud patterns.',
+        'Careful preprocessing and class imbalance handling are critical for performance.',
+        'Model persistence enables simple deployment and integration into downstream systems.'
+      ],
       images: [
         { src: '/media/FraudDetection/modeleval.png', caption: 'Model Evaluation' },
         { src: '/media/FraudDetection/ROC-AUC.png', caption: 'ROC-AUC' },
@@ -261,52 +301,59 @@ export const projects: Project[] = [
         data: 'DailyLinkAI curates a personalised daily news feed by analysing article content from reputable sources such as BBC and SkyNews. The application uses NLP embeddings and retrieval techniques to recommend contextually relevant articles based on user interests.',
         processSections: {
           'Article Collection': 'Articles are scraped from trusted sources (sitemaps/RSS) and stored with metadata to ensure comprehensive coverage.',
-          'Content Analysis & Embeddings': 'Text is cleaned and converted to embeddings (BERT-based) so that semantic similarity can be computed across articles.',
-          'Retrieval-Augmented Recommendation (RAG)': 'Nearest-neighbour retrieval on embeddings is used to surface semantically-close articles which are then presented in a personalised digest.',
+          'Content Analysis': [
+            'Text is cleaned and converted to embeddings (BERT-based) so that semantic similarity can be computed across articles.',
+            'The system employs RAG (Retrieval-Augmented Generation) to find and suggest articles with the closest vector matches, ensuring recommendations are contextually relevant to the user\'s interests.'
+          ],
           'Deployment': 'Streamlit application provides an intuitive front-end and a lightweight backend designed for scalability and fast responses.'
         },
+        keyFindings: [
+          'Personalised News Feed: Tailored news recommendations based on user interests and interactions.',
+          'Comprehensive Coverage: Articles from diverse, reputable sources covering various angles of important topics.',
+          'Intelligent Recommendations: Utilises state-of-the-art embedding techniques and similarity scoring to suggest articles that align with user preferences.',
+          'Scalable and Efficient: Lightweight backend system for fast and reliable news delivery.'
+        ],
         images: [
           { src: '/media/DailyLinkAI/app_screenshot.png', caption: 'Streamlit App' }
-        ],
-        
+        ]
     }
   },
-  {
-    id: 'reinforcement-learning',
-    title: 'OpenAI Gym - Reinforcement Learning',
-    description: 'Training a gaming agent for optimal performance in OpenAI Gym environments.',
-    image: '/media/reinforcement learning/CartPole v1.png',
-    animation: '/media/animation/RL.json',
-    tags: ['Reinforcement-Learning', 'ML'],
-    category: ['RL', 'AI'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Reinforcement-Learning',
-    content: {
-      data: 'OpenAI Gym is a toolkit for developing and comparing reinforcement learning algorithms. It offers a standardised platform with predefined environments, such as games and simulations, where agents learn to make decisions by interacting with the environment. The agent receives feedback in the form of observations and rewards, aiming to maximise cumulative rewards over time.',
-      processSections: {
-        'Training Loop (Q-Learning)': [
-          'Initialize Q-table and define state-action space.',
-          'Choose actions with an epsilon-greedy policy to balance exploration and exploitation.',
-          'Observe reward and update Q-table using the Bellman equation.',
-          'Decay exploration over episodes and evaluate performance on test episodes.'
-        ],
-        'Evaluation & Tuning': 'Track cumulative rewards, tune learning rate and discount factor, and compare performance across environments (CartPole, Acrobot, LunarLander).'
-      },
-      keyFindings: [
-        'Successfully implemented Q-Learning algorithm across multiple OpenAI Gym environments',
-        'Agent learned optimal policies for CartPole v1, Acrobot v1, and LunarLander v2 environments',
-        'Q-Learning effectively balanced exploration and exploitation strategies',
-        'Learning rate significantly influenced magnitude of Q-table updates',
-        'Agent performance improved dramatically from random actions to exploiting learned Q-values',
-        'Different environments required varying training strategies and hyperparameter tuning',
-        'Demonstrated successful transfer of reinforcement learning principles across diverse gaming scenarios'
-      ],
-      images: [
-        { src: '/media/reinforcement learning/CartPole v1.png', caption: 'Model Performance in CartPole v1 Environment' },
-        { src: '/media/reinforcement learning/Acrobot v1.png', caption: 'Model Performance in Acrobot v1 Environment' },
-        { src: '/media/reinforcement learning/LunarLander v2.png', caption: 'Model Performance in LunarLander v2 Environment' }
-      ]
-    }
-  },
+  // {
+  //   id: 'reinforcement-learning',
+  //   title: 'OpenAI Gym - Reinforcement Learning',
+  //   description: 'Training a gaming agent for optimal performance in OpenAI Gym environments.',
+  //   image: '/media/reinforcement learning/CartPole v1.png',
+  //   animation: '/media/animation/RL.json',
+  //   tags: ['Reinforcement-Learning', 'ML'],
+  //   category: ['RL', 'AI'],
+  //   githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Reinforcement-Learning',
+  //   content: {
+  //     data: 'OpenAI Gym is a toolkit for developing and comparing reinforcement learning algorithms. It offers a standardised platform with predefined environments, such as games and simulations, where agents learn to make decisions by interacting with the environment. The agent receives feedback in the form of observations and rewards, aiming to maximise cumulative rewards over time.',
+  //     processSections: {
+  //       'Training Loop (Q-Learning)': [
+  //         'Initialize Q-table and define state-action space.',
+  //         'Choose actions with an epsilon-greedy policy to balance exploration and exploitation.',
+  //         'Observe reward and update Q-table using the Bellman equation.',
+  //         'Decay exploration over episodes and evaluate performance on test episodes.'
+  //       ],
+  //       'Evaluation & Tuning': 'Track cumulative rewards, tune learning rate and discount factor, and compare performance across environments (CartPole, Acrobot, LunarLander).'
+  //     },
+  //     keyFindings: [
+  //       'Successfully implemented Q-Learning algorithm across multiple OpenAI Gym environments',
+  //       'Agent learned optimal policies for CartPole v1, Acrobot v1, and LunarLander v2 environments',
+  //       'Q-Learning effectively balanced exploration and exploitation strategies',
+  //       'Learning rate significantly influenced magnitude of Q-table updates',
+  //       'Agent performance improved dramatically from random actions to exploiting learned Q-values',
+  //       'Different environments required varying training strategies and hyperparameter tuning',
+  //       'Demonstrated successful transfer of reinforcement learning principles across diverse gaming scenarios'
+  //     ],
+  //     images: [
+  //       { src: '/media/reinforcement learning/CartPole v1.png', caption: 'Model Performance in CartPole v1 Environment' },
+  //       { src: '/media/reinforcement learning/Acrobot v1.png', caption: 'Model Performance in Acrobot v1 Environment' },
+  //       { src: '/media/reinforcement learning/LunarLander v2.png', caption: 'Model Performance in LunarLander v2 Environment' }
+  //     ]
+  //   }
+  // },
   {
     id: 'disaster-tweets',
     title: 'Disaster Tweets',
@@ -320,7 +367,7 @@ export const projects: Project[] = [
       data: 'The ubiquitousness of smartphones enables people to announce an emergency they\'re observing in real-time. Because of this, more agencies are interested in programatically monitoring Twitter (i.e. disaster relief organisations and news agencies). But, it\'s not always clear whether a person\'s words are actually announcing a disaster. The aim of this project is to build a machine learning model that predicts which Tweets are about real disasters and which ones aren\'t.',
       processSections: {
         'Data Understanding': 'Each sample contains tweet text, an optional keyword and an optional location. The dataset was inspected for missing values and distribution of classes.',
-        'Data Cleaning & Preparation': 'Removed punctuation, lower-cased text, removed non-English tokens, and vectorized text using TF-IDF. Split into train/test sets with stratification.',
+        'Data Cleaning & Preparation': 'Removed punctuation, lower-cased text, removed non-English tokens, and vectorised text using TF-IDF. Split into train/test sets with stratification.',
         'Modeling': [
           'Implemented Naive Bayes and baseline models for quick iteration.',
           'Evaluated using accuracy and F1; Naive Bayes produced ~78% test accuracy on the cleaned dataset.'
@@ -344,20 +391,19 @@ export const projects: Project[] = [
     content: {
       data: 'Comprehensive analysis of customer data from a Brazilian e-commerce platform, providing insights into customer behavior, sales patterns, and business performance.',
       processSections: {
-        'Data Integration': 'Joined orders, customers, sellers, deliveries and reviews tables to form an analytical dataset.',
-        'Metrics & KPIs': 'Engineered delivery delay, review sentiment, and seller performance metrics to power dashboards.',
-        'Dashboarding': 'Built Power BI reports visualising delivery performance, reviews and customer metrics.'
+        'Data Analysis': 'This is a public dataset from a Brazilian e-commerce platform, featuring information on 100,000 orders placed at the Olist Store between 2016 and 2018. The dataset encompasses orders from various marketplaces in Brazil. Its diverse features enable a comprehensive view of each order, spanning from order status, price, payment, and freight performance to customer location, product attributes, and customer reviews. Additionally, geolocation dataset is provided that associates Brazilian zip codes with latitude/longitude coordinates. It\'s important to note that this dataset consists of real commercial data, has been anonymized, and any references to companies and partners in the review text have been replaced with the names of Game of Thrones great houses.',
+        'Concept': 'This dataset was generously provided by Olist, the largest department store in Brazilian marketplaces. Olist connects small businesses from all over Brazil to channels without hassle and with a single contract. Those merchants are able to sell their products through the Olist Store and ship them directly to the customers using Olist logistics partners. After a customer purchases the product from Olist Store a seller gets notified to fulfill that order. Once the customer receives the product, or the estimated delivery date is due, the customer gets a satisfaction survey by email where he can give a note for the purchase experience and write down some comments.',
+        'Process': 'In an ever-changing market landscape, customer contentment is closely linked to the smooth integration of product excellence, efficient delivery, and the overall service encounter. This Project aims to transform the comprehension and improvement of customer contentment by exploring the domains of delivery and review sentiment.',
+    
       },
       findings: {
         'Delivery': ['Delays concentrated in specific regions and sellers; targeted interventions reduced delays.'],
         'Reviews': ['On-time deliveries correlate with higher review scores and repeat purchases.']
-      }
-      ,
+      },
       images: [
         { src: '/media/Olist/Data Schema.png', caption: 'Database Schema' },
         { src: '/media/Olist/Olist Reviews.jpg', caption: 'Reviews Analysis' },
         { src: '/media/Olist/Olist Delivery.jpg', caption: 'Delivery Analysis' }
-
       ]
     }
   },
@@ -399,31 +445,28 @@ export const projects: Project[] = [
     category: ['TimeSeries', 'AI'],
     githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Kaggle-Grasp-and-Lift-EEG-Detection',
     content: {
-      data: 'This project aims to address the critical need for assisting patients with neurological disabilities or limb amputations in regaining the ability to perform fundamental hand functions. We leverage EEG (Electroencephalogram) data analysis to identify and understand simple hand movements. The dataset contains 12 subjects with 10 series of trials each, detecting 6 events in Grasp-and-Lift (GAL) sequences.',
+      data: 'This project leverages EEG data analysis to assist patients with neurological disabilities or limb amputations in regaining fundamental hand functions. By identifying and understanding simple hand movements, the project aims to improve quality of life.',
       processSections: {
-        'Signal Processing & EDA': 'Applied Butterworth filtering to clean EEG signals, visualised raw and processed channels and investigated trial-level statistics.',
-        'Event Detection & Labeling': 'Extracted events for GAL sequences and aligned signals to events for supervised learning.',
-        'Dimensionality Reduction': 'Used PCA to reduce feature dimensionality while retaining key variance.',
-        'Modeling': [
-          'Tested classical ML (Random Forest, KNN, XGBoost) and deep learning approaches (CNN, ResNet).',
-          'ResNet achieved the best results (~32% accuracy) on the 7-class task, outperforming baselines.'
-        ]
+        'Concept': 'The project addresses the need for assisting patients with neurological disabilities by leveraging EEG data to identify and understand hand movements.',
+        'Data': 'The dataset includes 12 subjects, each with 10 series of trials. The training set comprises the first 8 series, while the test set includes the 9th and 10th series. The goal is to detect 6 sequential events: HandStart, FirstDigitTouch, BothStartLoadPhase, LiftOff, Replace, and BothReleased.',
+        'Process': [
+          'Exploratory Data Analysis: Cleaned and filtered data using the Butterworth Filter. Extracted class-specific data and applied Principal Component Analysis (PCA) for dimensionality reduction.',
+          'Model Implementation: Tested various models, including Random Forest, KNN, XGBoost, and deep learning models like CNN and ResNet. ResNet achieved the highest accuracy of 32%, more than double the random guess baseline of 14.3%.',
+          'Future Work: Focus on advanced feature engineering and incorporating temporal modeling to enhance accuracy and insights.'
+        ],
+        'Future Directions': 'Future efforts will prioritize feature engineering and temporal modeling to improve accuracy and provide deeper insights into EEG signal interpretation.'
       },
       keyFindings: [
-        'ResNet demonstrated superiority achieving 32% accuracy in 7-class classification',
-        'Performance more than double random guess accuracy (14.3% for 7-class task)',
-        'Successfully detected 6 GAL events: HandStart, FirstDigitTouch, BothStartLoadPhase, LiftOff, Replace, BothReleased',
-        'PCA effectively reduced dimensionality while preserving essential features',
-        'Butterworth filtering improved signal quality and model performance',
-        'Deep learning models outperformed traditional machine learning approaches',
-        'EEG signals provided meaningful insights for neurological disability assistance'
+        'ResNet achieved 32% accuracy, outperforming other models.',
+        'PCA effectively reduced dimensionality while preserving essential features.',
+        'Butterworth filtering improved signal quality and model performance.',
+        'EEG signals provided meaningful insights for assisting neurological disabilities.'
       ],
       limitations: [
-        'Accuracy limited to 32%, indicating significant room for improvement',
-        'Complex 7-class classification task remains challenging',
-        'EEG signal interpretation requires advanced feature engineering',
-        'Limited dataset size with only 12 subjects may affect generalization',
-        'Need for more sophisticated temporal modeling approaches'
+        'Accuracy limited to 32%, indicating room for improvement.',
+        'Complex 7-class classification task remains challenging.',
+        'Limited dataset size may affect generalization.',
+        'Advanced feature engineering and temporal modeling are needed.'
       ],
       images: [
         { src: '/media/EEG/data viz not processed.png', caption: 'Raw EEG Data Visualization' },
@@ -435,28 +478,33 @@ export const projects: Project[] = [
   },
   {
     id: 'top-sellers',
-    title: 'Top Sellers',
+    title: 'Amazon Top 50 Bestselling Books',
     description: 'Analysis of Amazon\'s Top 50 bestselling books from 2009 to 2019.',
     image: '/media/Amazon Top50 Books/BoxPlot.png',
     animation: '/media/animation/book.json',
     tags: ['DA', 'Visualisation'],
     category: ['DA'],
     content: {
-      data: 'Comprehensive analysis of Amazon\'s Top 50 bestselling books from 2009 to 2019, exploring trends, patterns, and insights in the publishing industry.',
+      data: 'Dataset on Amazon\'s Top 50 bestselling books from 2009 to 2019. Contains 550 books, data has been categorised into fiction and non-fiction using Goodreads.',
       processSections: {
-        'Data Preparation': 'Load and harmonise Top 50 books datasets across years and standardise metadata such as genres and publication year.',
-        'Exploratory Analysis': 'Visualise sales, ratings and distributions to identify outliers and trends.',
-        'Dashboarding & Reporting': 'Create visualisations and dashboards to make publishing insights actionable.'
+        'Data': 'The dataset encompasses essential columns including Book Name, Author, User Rating, Reviews, Genre, Price, and Year, spanning from 2009 to 2019. This comprehensive dataset provides a rich foundation for in-depth analysis and correlation studies. By meticulously analysing the complex interrelationships among these data columns, significant insights can be extracted.',
+        'Key Findings': [
+          'Ratings generally increase over the years, indicating improved book quality.',
+          'User ratings skew towards higher values, with most books receiving 4 to 5 stars.',
+          'Number of Reviews are predominantly lower than 20000, with a long tail of books accumulating high review counts.',
+          'Prices vary, but most books are priced below $20.',
+          'Non-fiction titles are more prevalent among bestsellers.',
+          'Non-fiction books have slightly higher median prices and wider price ranges.',
+          'User ratings show minimal differences between fiction and non-fiction, but fiction books exhibit wider variability.',
+          'Fiction books tend to accumulate more reviews, with a wider range in counts.',
+          'A weak positive correlation exists between user ratings and review counts.',
+          'There is also a weak positive correlation between user rating and price.',
+          'There\'s a moderate negative correlation between review counts and price, indicating lower-priced books tend to receive more reviews.',
+          'There is a moderate positive correlation observed between review counts and year of publication, suggesting that newer books tend to attract more reviews.',
+          'The average reviews are increasing year by year from 2012 to 2019.'
+        ],
+        'Conclusion': 'Overall, these findings emphasise the intricate mix of factors affecting user ratings, reviews, and prices in the book world. Elements such as book quality, genre popularity, and pricing strategies all come into play. However, it\'s essential to remember that correlation doesn\'t equal causation. While books with more reviews often have higher ratings, it doesn\'t necessarily mean one directly causes the other. Other factors, like the book\'s inherent quality or its genre\'s popularity, likely contribute significantly to these observed trends.'
       },
-      keyFindings: [
-        'Certain genres dominate top-seller lists in multiple years, indicating persistent reader preferences.',
-        'There are clear outliers in sales and ratings which correlate with marketing events and seasonal releases.',
-        'Relationship plots reveal modest correlation between rating and sales, driven by a few blockbuster titles.'
-      ],
-      limitations: [
-        'Data limited to top-50 lists which may omit long-tail bestsellers and self-published works.',
-        'Missing or inconsistent metadata (e.g., genre tags) across years required manual harmonisation.'
-      ],
       images: [
         { src: '/media/Amazon Top50 Books/BoxPlot.png', caption: 'Box Plot Analysis' },
         { src: '/media/Amazon Top50 Books/data distribution.png', caption: 'Data Distribution' },
@@ -464,34 +512,7 @@ export const projects: Project[] = [
       ]
     }
   },
-  {
-    id: 'adventure-works',
-    title: 'Adventure Works - Retail Sales Analysis',
-    description: 'Retail sales analysis for a sample Adventure Works dataset to identify regional and product performance.',
-    image: '/media/Adventure_works/Regional sales in best performing country.png',
-    animation: '/media/animation/DA.json',
-    tags: ['DA', 'Visualisation', 'EDA'],
-    category: ['DA', 'BI'],
-    content: {
-      data: 'The dataset contains product sales, store information, trading duration and sick leave statistics aggregated at store and department levels.',
-      process: [
-        'Ingested and validated multiple CSV exports, normalised date fields and categorical labels.',
-        'Performed exploratory data analysis to identify top-performing regions and seasonal trends.',
-        'Aggregated sales metrics by store and department, then visualised revenue vs trading duration.',
-        'Produced a short interactive notebook summarising findings and providing reproducible charts.'
-      ],
-      keyFindings: [
-        'Certain stores consistently outperform peers driven by longer average trading duration and higher average spend.',
-        'There is a measurable relationship between staff sick-leave hours and store revenue variability in specific departments.',
-        'Regional sales variation suggests targeted marketing could improve under-performing areas.'
-      ],
-      images: [
-        { src: '/media/Adventure_works/Regional sales in best performing country.png', caption: 'Regional sales in best performing country' },
-        { src: '/media/Adventure_works/Rev vs store trading duration.png', caption: 'Revenue vs store trading duration' },
-        { src: '/media/Adventure_works/Average Sick leave Hour  Vs department.png', caption: 'Average sick leave hours vs department' }
-      ]
-    }
-  },
+  
   
   // {
   //   id: 'computer-vision-custom-data',
@@ -509,7 +530,7 @@ export const projects: Project[] = [
   //       'Annotated images using bounding-box tools and exported labels in YOLO format.',
   //       'Trained YOLOv5 models with augmentation (flip, scale, color jitter) and tuned hyperparameters for detection performance.',
   //       'Evaluated models using mAP (mean average precision) and confusion matrices; iterated on difficult classes.'
-  //     ],
+  //     },
   //     keyFindings: [
   //       'Augmentation and careful class balancing improved detection robustness significantly.',
   //       'YOLOv5 provided real-time detection capability suitable for live webcam applications.',
@@ -539,7 +560,7 @@ export const projects: Project[] = [
         'Data collection covering unemployment rates from 2014 to 2024 across multiple countries',
         'Analysis by country, gender, and age group dimensions',
         'Statistical analysis to identify patterns and correlations between demographics',
-        'Visualization of trends and comparative analysis across regions',
+        'Visualisation of trends and comparative analysis across regions',
         'Impact assessment of global events (COVID-19) on unemployment rates'
       ],
       keyFindings: [
@@ -559,4 +580,5 @@ export const projects: Project[] = [
       ]
     }
   }
+ 
 ];
