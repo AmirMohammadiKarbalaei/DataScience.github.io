@@ -2402,7 +2402,8 @@ body::before {
   transition: transform 0.3s ease;
 }
 
-.quick-actions:hover .quick-action-toggle i {
+.quick-actions:hover .quick-action-toggle i,
+.quick-actions.active .quick-action-toggle i {
   transform: rotate(45deg);
 }
 
@@ -2419,7 +2420,8 @@ body::before {
   pointer-events: none;
 }
 
-.quick-actions:hover .quick-actions-menu {
+.quick-actions:hover .quick-actions-menu,
+.quick-actions.active .quick-actions-menu {
   opacity: 1;
   transform: translateY(0);
   pointer-events: all;

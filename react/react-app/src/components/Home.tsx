@@ -10,6 +10,8 @@ const Home: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [currentTitle, setCurrentTitle] = useState('');
   const [titleIndex, setTitleIndex] = useState(0);
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [isClickedOpen, setIsClickedOpen] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
   const skillsRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
@@ -128,6 +130,25 @@ const Home: React.FC = () => {
       });
     };
   }, []);
+
+  // Close quick actions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.quick-actions')) {
+        setQuickActionsOpen(false);
+        setIsClickedOpen(false);
+      }
+    };
+
+    if (quickActionsOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [quickActionsOpen]);
 
   const filteredProjects = filter === 'all' 
     ? projects 
@@ -542,8 +563,28 @@ const Home: React.FC = () => {
       </section>
 
       {/* Quick Actions Floating Menu */}
-      <div className="quick-actions">
-        <div className="quick-action-toggle">
+      <div 
+        className={`quick-actions ${quickActionsOpen ? 'active' : ''}`}
+        onMouseEnter={() => {
+          if (!isClickedOpen) {
+            setQuickActionsOpen(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (!isClickedOpen) {
+            setQuickActionsOpen(false);
+          }
+        }}
+      >
+        <div 
+          className="quick-action-toggle"
+          onClick={(e) => {
+            e.stopPropagation();
+            const newState = !quickActionsOpen;
+            setQuickActionsOpen(newState);
+            setIsClickedOpen(newState);
+          }}
+        >
           <i className="fas fa-plus"></i>
         </div>
         <div className="quick-actions-menu">
