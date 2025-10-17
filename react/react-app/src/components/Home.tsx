@@ -5,6 +5,8 @@ import LottieAnimation from './LottieAnimation';
 import Navigation from './Navigation';
 import ParticleBackground from './ParticleBackground';
 import Preloader from './Preloader';
+import SEOHead from './SEOHead';
+import { trackContactInteraction, trackEvent } from '../utils/analytics';
 
 const Home: React.FC = () => {
   const [filter, setFilter] = useState('all');
@@ -188,6 +190,79 @@ const Home: React.FC = () => {
 
   return (
     <div>
+      <SEOHead 
+        title="Amir Mohammadi - Data Scientist & AI Engineer | Portfolio"
+        description="Experienced Data Scientist and AI Engineer with 5+ years expertise in Machine Learning, Deep Learning, Computer Vision, NLP, and Reinforcement Learning. Browse my portfolio of 25+ data science projects including fraud detection, EEG analysis, and robotic locomotion."
+        keywords={[
+          "Amir Mohammadi",
+          "Data Scientist", 
+          "AI Engineer",
+          "Machine Learning Engineer",
+          "Deep Learning",
+          "Computer Vision", 
+          "Natural Language Processing",
+          "Reinforcement Learning",
+          "Python Developer",
+          "SQL Expert",
+          "Power BI Developer",
+          "Data Analytics",
+          "Artificial Intelligence",
+          "UK Data Scientist",
+          "Unilever Data Scientist",
+          "Bath University",
+          "Data Science Portfolio",
+          "ML Projects",
+          "AI Portfolio"
+        ]}
+        url="https://amirmohammadikarbalai.github.io/DataScience.github.io/"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "name": "Amir Mohammadi Karbalaei",
+          "alternateName": "Amir Mohammadi",
+          "jobTitle": ["Data Scientist", "AI Engineer", "Machine Learning Engineer"],
+          "description": "Experienced Data Scientist and AI Engineer with 5+ years expertise in Machine Learning, Deep Learning, Computer Vision, NLP, and Reinforcement Learning.",
+          "url": "https://amirmohammadikarbalai.github.io/DataScience.github.io/",
+          "image": "https://amirmohammadikarbalai.github.io/DataScience.github.io/media/data-science-new-banner.jpg",
+          "sameAs": [
+            "https://github.com/AmirMohammadiKarbalaei",
+            "https://www.linkedin.com/in/amir-mohammadikarbalaei-65b958193"
+          ],
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Unilever",
+            "description": "Global consumer goods company"
+          },
+          "alumniOf": {
+            "@type": "EducationalOrganization",
+            "name": "University of Bath"
+          },
+          "knowsAbout": [
+            "Data Science",
+            "Machine Learning", 
+            "Artificial Intelligence",
+            "Deep Learning",
+            "Computer Vision",
+            "Natural Language Processing",
+            "Reinforcement Learning",
+            "Python Programming",
+            "SQL",
+            "Power BI",
+            "Data Analytics",
+            "Statistical Analysis"
+          ],
+          "hasCredential": [
+            {
+              "@type": "EducationalOccupationalCredential",
+              "name": "5+ Years Data Science Experience"
+            }
+          ],
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://amirmohammadikarbalai.github.io/DataScience.github.io/"
+          }
+        }}
+      />
       <Preloader />
       <Navigation />
       <ParticleBackground />
@@ -198,13 +273,14 @@ const Home: React.FC = () => {
       </div>
       
       {/* Header */}
-      <header id="home" className="header">
+      <header id="home" className="header" role="banner">
         <img
           className="header-image"
           src="/media/data-science-new-banner.jpg"
-          alt="Background"
+          alt="Amir Mohammadi Data Scientist and AI Engineer banner showing data visualization and machine learning concepts"
+          loading="eager"
         />
-        <div className="header-overlay"></div>
+        <div className="header-overlay" aria-hidden="true"></div>
 
         <div className="header-content">
           <div className="hero-text">
@@ -251,7 +327,7 @@ const Home: React.FC = () => {
       </header>
 
       {/* About Section */}
-      <section id="about" className="about-section">
+      <section id="about" className="about-section" aria-labelledby="about-title">
         <div className="container">
           <h2 className="section-title">About Me</h2>
           <div className="about-content" ref={aboutRef}>
@@ -441,7 +517,7 @@ const Home: React.FC = () => {
 
 
       {/* Projects Section */}
-      <section id="projects" className="projects-section">
+      <section id="projects" className="projects-section" aria-labelledby="projects-title">
         <div className="projects-header-container">
           <div className="projects-header">
             <h2 className="section-title">Projects</h2>
@@ -492,7 +568,12 @@ const Home: React.FC = () => {
 
           <div className="projects-grid">
             {filteredProjects.map((project) => (
-              <Link key={project.id} to={`/project/${project.id}`} className="project-card-link">
+              <Link 
+                key={project.id} 
+                to={`/project/${project.id}`} 
+                className="project-card-link"
+                onClick={() => trackEvent('project_click', 'Projects', project.title)}
+              >
                 <div className="project-card">
                   <div className="project-image-container">
                     {project.animation ? (
@@ -532,7 +613,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="contact-section">
+      <section id="contact" className="contact-section" aria-labelledby="contact-title">
         <div className="container">
           <h2 className="contact-title">Get In Touch!</h2>
           <div className="social-links">
@@ -541,6 +622,7 @@ const Home: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="social-link"
+              onClick={() => trackContactInteraction('github')}
             >
               <i className="fab fa-github"></i>
             </a>
@@ -549,12 +631,14 @@ const Home: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="social-link"
+              onClick={() => trackContactInteraction('linkedin')}
             >
               <i className="fab fa-linkedin"></i>
             </a>
             <a
               href="mailto:a.mohammadikarbalaei@gmail.com"
               className="social-link"
+              onClick={() => trackContactInteraction('email')}
             >
               <i className="fas fa-envelope"></i>
             </a>

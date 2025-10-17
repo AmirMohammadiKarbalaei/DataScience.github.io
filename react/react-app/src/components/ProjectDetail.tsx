@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { projects } from '../data/projects';
+import SEOHead from './SEOHead';
+import { trackProjectView, trackEvent } from '../utils/analytics';
 
 // Small helper: collapsible list for long arrays
 const ProjectDetail: React.FC = () => {
@@ -14,7 +16,12 @@ const ProjectDetail: React.FC = () => {
       left: 0,
       behavior: 'instant'
     });
-  }, [id]);
+
+    // Track project view in Google Analytics
+    if (project) {
+      trackProjectView(project.id, project.title);
+    }
+  }, [id, project]);
 
   if (!project) {
     return (
@@ -51,6 +58,21 @@ const ProjectDetail: React.FC = () => {
 
   return (
     <div className="project-detail">
+      <SEOHead 
+        title={`${project.title} - Amir Mohammadi | Data Science Project`}
+        description={`${project.description} ${project.content.data ? project.content.data.substring(0, 150) + '...' : ''}`}
+        keywords={[
+          ...project.tags,
+          "Amir Mohammadi",
+          "Data Science Project",
+          "Machine Learning",
+          "AI Project",
+          "Portfolio"
+        ]}
+        url={`https://amirmohammadikarbalai.github.io/DataScience.github.io/project/${project.id}`}
+        type="article"
+        image={project.image}
+      />
       {/* Navigation */}
       <nav className="project-nav">
         <div className="container">
@@ -139,7 +161,13 @@ const ProjectDetail: React.FC = () => {
               {/* Action Buttons */}
               <div className="project-actions">
                 {project.githubUrl && (
-                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+                  <a 
+                    href={project.githubUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn-primary"
+                    onClick={() => trackEvent('github_click', 'Projects', project.title)}
+                  >
                     GitHub Repository
                   </a>
                 )}

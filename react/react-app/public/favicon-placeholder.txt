@@ -1,0 +1,11 @@
+<!-- This is a placeholder file. You should replace this with actual favicon files -->
+<!-- Generate your favicon files using a service like favicon.io or realfavicongenerator.net -->
+<!-- 
+Required files for SEO:
+- favicon.ico (32x32)
+- favicon-16x16.png
+- favicon-32x32.png  
+- apple-touch-icon.png (180x180)
+- android-chrome-192x192.png
+- android-chrome-512x512.png
+-->

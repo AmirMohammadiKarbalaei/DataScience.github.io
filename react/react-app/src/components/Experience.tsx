@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from './Navigation';
 import ParticleBackground from './ParticleBackground';
+import SEOHead from './SEOHead';
 
 const Experience: React.FC = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -51,6 +52,24 @@ const Experience: React.FC = () => {
 
   return (
     <div className="experience-page">
+      <SEOHead 
+        title="Professional Experience - Amir Mohammadi | Data Scientist Career Journey"
+        description="Explore Amir Mohammadi's professional journey as a Data Scientist and AI Engineer. From Unilever Customer Operations to Y Combinator startup experience, featuring 5+ years in machine learning, healthcare AI, and data analytics."
+        keywords={[
+          "Amir Mohammadi Experience",
+          "Data Scientist Career",
+          "AI Engineer Experience", 
+          "Unilever Data Scientist",
+          "Y Combinator",
+          "Healthcare AI",
+          "Machine Learning Career",
+          "Professional Journey",
+          "Data Science Experience",
+          "UK Data Scientist",
+          "Career Timeline"
+        ]}
+        url="https://amirmohammadikarbalai.github.io/DataScience.github.io/experience"
+      />
       <Navigation />
       <ParticleBackground />
       
