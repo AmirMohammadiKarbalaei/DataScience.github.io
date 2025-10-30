@@ -466,7 +466,6 @@ body::before {
   background: transparent;
   position: relative;
   z-index: 1;
-  overflow: hidden;
 }
 
 .about-content {
