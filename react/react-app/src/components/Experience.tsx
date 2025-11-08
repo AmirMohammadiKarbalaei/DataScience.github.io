@@ -128,7 +128,7 @@ const Experience: React.FC = () => {
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-date">Feb 2025 - May 2025</div>
+              <div className="timeline-date">Dec 2025 - June 2025</div>
               <div className="timeline-content">
                 <div className="company-logo">
                   <i className="fas fa-university"></i>
