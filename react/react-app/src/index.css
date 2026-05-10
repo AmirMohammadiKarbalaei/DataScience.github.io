@@ -845,7 +845,11 @@ body::before {
 .tag-drl { background: rgba(255, 140, 0, 0.2); border-color: #ff8c00; }
 .tag-robotics { background: rgba(53, 114, 165, 0.2); border-color: #3572a1; }
 .tag-rl { background: rgba(34, 139, 34, 0.2); border-color: #228b22; }
-
+.tag-ollama { background: rgba(255, 0, 255, 0.2); border-color: #ff00ff; }
+.tag-llm { background: rgba(0, 255, 255, 0.2); border-color: #00e613; }
+.tag-voice-ai { background: rgba(255, 20, 147, 0.2); border-color: #ff1433; }
+.tag-qdrant { background: rgba(4, 93, 109, 0.2); border-color: #057260; }
+.tag-fastapi { background: rgba(255, 0, 157, 0.2); border-color: #ff008c; }
 
 /* Contact Section */
 .contact-section {
