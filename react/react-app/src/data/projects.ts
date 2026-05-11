@@ -21,6 +21,44 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+{
+  id: 'local-ai-voice-assistant',
+  title: 'Jarvis: Local AI Voice Assistant with Tool Routing',
+  description: 'A privacy-first voice assistant combining local speech recognition, LLM reasoning, JSON-based tool routing, real-time APIs, and text-to-speech. No cloud required.',
+  image: '/media/jarvis/Jarvis.png',
+  animation: '/media/animation/AI_Assistant.json',
+  tags: ['LLM', 'Voice-AI', 'Ollama'],
+  category: ['AI', 'LLM'],
+  video: '/media/jarvis/Jarvis.m4a',
+  githubUrl: 'https://github.com/AmirMohammadiKarbalaei/local-ai-voice-assistant',
+  content: {
+    data: 'A fully local AI voice assistant that listens for a wake word, transcribes speech with faster-whisper, routes requests through a custom LLM-based tool router, executes Python tools, and responds through Kokoro TTS, all running on-device via Ollama.',
+    processSections: {
+      'Objective': 'Build a private, local-first AI assistant that goes beyond chatbot interaction by supporting real-time voice input, on-device LLM reasoning, tool execution, and natural spoken output without relying on cloud AI services.',
+      'Skills & Technologies Demonstrated': [
+        'End-to-End Voice Pipeline: Designed the full system from microphone input through speech-to-text, LLM reasoning, tool execution, response generation, and TTS playback.',
+        'LLM Tool Routing: Built a JSON-based tool router that determines when a tool is needed, selects the correct one, repairs common speech-to-text transcription errors, validates arguments, and safely executes Python functions.',
+        'Hybrid Request Handling: Implemented deterministic fast paths for common requests (time, weather, Wikipedia) alongside an LLM router for ambiguous or multi-step commands, balancing latency and capability.',
+        'Local AI Inference: Integrated Ollama with configurable fast and smart models (qwen3:4b and qwen3:8b), enabling the assistant to trade off response speed against reasoning depth per request.',
+        'Voice UX Engineering: Added wake-word activation, conversation mode, stop and shutdown commands, listening beeps, streamed TTS output, and text cleaning (removing markdown, emojis, and code blocks) to produce natural spoken responses.',
+        'Modular Tool Architecture: Built a reusable ToolRegistry supporting weather, time, web search (Tavily with DuckDuckGo fallback), Wikipedia, calculator, currency conversion, and a full timer system.',
+        'Asynchronous Timer System: Developed a non-blocking threaded timer engine with labelled timers, spoken warnings, cancellation by label or ID, active timer listing, alarm playback, and voice-controlled alarm stopping.'
+      ],
+      'Tools': 'Python, Ollama, faster-whisper, speech_recognition, Kokoro TTS, PyTorch, CUDA, Open-Meteo API, Tavily API, DuckDuckGo Instant Answer API, Wikipedia REST API, sounddevice, requests, threading.'
+    },
+    keyFindings: [
+      'Delivered a working local voice assistant handling both open-ended conversation and practical real-world commands without any cloud dependency.',
+      'Hybrid routing with deterministic fast paths for common requests and LLM routing for ambiguous ones improved both reliability and response latency.',
+      'Explicit speech-to-text error repair (e.g. "little pool" to Liverpool, "what timer is it" to "what time is it") significantly improved robustness in real voice interaction.',
+      'Streaming LLM output into TTS chunks allowed the assistant to start speaking before the full response was generated, reducing perceived latency.',
+      'Modular ToolRegistry design makes it straightforward to extend the assistant with new capabilities without touching the core conversation loop.',
+      'Project prioritised practical voice-assistant concerns including latency, transcription robustness, privacy, and spoken output quality alongside model performance.'
+    ],
+    images: [
+      { src: '/media/jarvis/tool-routing-flow.png', caption: 'System architecture: microphone to faster-whisper to LLM tool router to Python tools to Kokoro TTS' },
+    ]
+  }
+},
    {
     id: 'reinforcement-learning',
     title: 'Deep Reinforcement Learning for Robotic Locomotion',
@@ -57,50 +95,7 @@ export const projects: Project[] = [
           { src: '/media/reinforcement learning/Asymptotic score.png', caption: 'Asymptotic score, learning speed, GPU footprint, and wall-clock training time' }
         ]
     }
-  },
-  {
-    id: 'diabetes-classification',
-    title: 'Diabetes Classification',
-    description: 'Classify diabetes patient\'s health status based on their current health metrics.',
-    image: '/media/diabetes/EDA.png',
-    animation: '/media/animation/diabetes.json',
-    tags: ['ML', 'Classification', 'EDA'],
-    category: ['AI', 'TimeSeries'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Pima-Indians-Diabetes',
-    streamlitUrl: 'https://pima-indians-diabetes-k6mzyppban6rqolb5mtrdc.streamlit.app/?embed=true&embed_options=dark_theme',
-    content: {
-      data: 'The datasets consist of several medical predictor (independent) variables and one target (dependent) variable, Outcome. Independent variables include the number of pregnancies the patient has had, their BMI, insulin level, age, and so on.',
-      process: [
-        'Exploratory Data Analysis (EDA): Performed comprehensive data cleansing and exploratory analysis. Each feature was inspected to determine acceptable ranges, distributions and missing value treatment; visualisations were used to highlight skew, outliers and correlations.',
-        'Feature Engineering: Created interaction features (for example Age x Insulin) and transformed skewed variables. Feature importance and contribution were evaluated using SHAP (Shapley Additive Explanations) to identify the most influential predictors.',
-        'SMOTE (Synthetic Minority Oversampling Technique): Applied SMOTE to augment the minority class and mitigate class imbalance, improving model generalisation relative to naive oversampling.',
-        'Model Implementation: Implemented and compared multiple machine learning models (Random Forest, XGBoost, and a shallow neural network). Random Forest achieved the best performance (≈93% accuracy). A sequential neural network was also trained — its accuracy and loss curves are provided for train/validation/test comparisons and showed comparable performance to Random Forest in this task.',
-        'Model Interpretation (SHAP): SHAP summary plots indicate that low Insulin values and interactions between Age and Insulin are among the strongest drivers of model predictions. Features such as Blood Pressure and number of pregnancies had relatively low impact and were candidates for removal to reduce model complexity.',
-        'Deployment: Following a comparative evaluation, the random forest (RF) model has been selected for deployment due to its performance similarity to the deep learning model. This decision is underpinned by the RF models interpretability and its lightweight, scalable characteristics, making it a pragmatic choice over deep learning models which demand significant computational resources. To streamline the models usability for prediction, a Streamlit application has been developed. This application seamlessly processes input data in the form of a pandas dataframe resembling the training dataset, conducting necessary preprocessing and feature engineering to enable predictions.'
-      ],
-      processSections: {
-        'Exploratory Data Analysis (EDA)': 'After comprehensive data cleansing, the dataset has undergone thorough exploratory analysis. Each feature has been carefully examined to determine acceptable ranges and ensure data integrity. Visualisations (histograms, boxplots, correlations) were used to surface skewness, outliers and relationships between features.',
-        'Feature Engineering': 'To enhance model performance, new features such as interactions between Age and Insulin were created. Skewed variables were transformed and missing values addressed. SHAP (Shapley Additive Explanations) was used to evaluate feature importance and guide feature selection.',
-        'Synthetic Minority Oversampling Technique (SMOTE)': 'SMOTE was applied to the training data to synthetically up-sample the minority class, improving balance and reducing model bias towards the majority class. This helped models better identify positive diabetes cases without overfitting to duplicates.',
-        'Model Implementation': [
-          'Multiple ML models implemented: Random Forest, XGBoost and a sequential neural network.',
-          'Random Forest achieved highest accuracy (~93%) on validation/test holdouts.',
-          'SHAP summary plots show low Insulin and Age x Insulin interactions are strong predictors; Blood Pressure and pregnancies were less influential.',
-          'The neural network produced similar performance but required more compute and tuning; accuracy/loss curves for train/validation/test are available in the project images.'
-        ],
-        'Deployment': 'Random Forest was selected for deployment due to interpretability and lower computational cost. A Streamlit app was created that accepts a pandas DataFrame, runs identical preprocessing/feature engineering steps and returns predictions via a simple web UI.'
-      },
-      images: [
-        { src: '/media/diabetes/Data-Table.png', caption: 'Dataset Overview' },
-        { src: '/media/diabetes/EDA.png', caption: 'Feature distributions' },
-        { src: '/media/diabetes/Feature-Corr.png', caption: 'Feature Correlation' },
-        { src: '/media/diabetes/Feature-importance.png', caption: 'Random Forest feature importance' },
-        { src: '/media/diabetes/NNloss.png', caption: 'NN Model Loss (train/val/test)' },
-        { src: '/media/diabetes/NNacc.png', caption: 'NN Model Accuracy (train/val/test)' }
-      ]
-    }
-  },
-  {
+  },{
     id: 'detect-sleep-states',
     title: 'Detect Sleep States - Child Mind Institute',
     description: 'Detect sleep onset and wake from wrist-worn accelerometer data to determine a person\'s sleep state.',
@@ -147,6 +142,49 @@ export const projects: Project[] = [
       ]
     }
   },
+  {
+    id: 'diabetes-classification',
+    title: 'Diabetes Classification',
+    description: 'Classify diabetes patient\'s health status based on their current health metrics.',
+    image: '/media/diabetes/EDA.png',
+    animation: '/media/animation/diabetes.json',
+    tags: ['ML', 'Classification', 'EDA'],
+    category: ['AI', 'TimeSeries'],
+    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Pima-Indians-Diabetes',
+    streamlitUrl: 'https://pima-indians-diabetes-k6mzyppban6rqolb5mtrdc.streamlit.app/?embed=true&embed_options=dark_theme',
+    content: {
+      data: 'The datasets consist of several medical predictor (independent) variables and one target (dependent) variable, Outcome. Independent variables include the number of pregnancies the patient has had, their BMI, insulin level, age, and so on.',
+      process: [
+        'Exploratory Data Analysis (EDA): Performed comprehensive data cleansing and exploratory analysis. Each feature was inspected to determine acceptable ranges, distributions and missing value treatment; visualisations were used to highlight skew, outliers and correlations.',
+        'Feature Engineering: Created interaction features (for example Age x Insulin) and transformed skewed variables. Feature importance and contribution were evaluated using SHAP (Shapley Additive Explanations) to identify the most influential predictors.',
+        'SMOTE (Synthetic Minority Oversampling Technique): Applied SMOTE to augment the minority class and mitigate class imbalance, improving model generalisation relative to naive oversampling.',
+        'Model Implementation: Implemented and compared multiple machine learning models (Random Forest, XGBoost, and a shallow neural network). Random Forest achieved the best performance (≈93% accuracy). A sequential neural network was also trained with its accuracy and loss curves provided for train/validation/test comparisons and showed comparable performance to Random Forest in this task.',
+        'Model Interpretation (SHAP): SHAP summary plots indicate that low Insulin values and interactions between Age and Insulin are among the strongest drivers of model predictions. Features such as Blood Pressure and number of pregnancies had relatively low impact and were candidates for removal to reduce model complexity.',
+        'Deployment: Following a comparative evaluation, the random forest (RF) model has been selected for deployment due to its performance similarity to the deep learning model. This decision is underpinned by the RF models interpretability and its lightweight, scalable characteristics, making it a pragmatic choice over deep learning models which demand significant computational resources. To streamline the models usability for prediction, a Streamlit application has been developed. This application seamlessly processes input data in the form of a pandas dataframe resembling the training dataset, conducting necessary preprocessing and feature engineering to enable predictions.'
+      ],
+      processSections: {
+        'Exploratory Data Analysis (EDA)': 'After comprehensive data cleansing, the dataset has undergone thorough exploratory analysis. Each feature has been carefully examined to determine acceptable ranges and ensure data integrity. Visualisations (histograms, boxplots, correlations) were used to surface skewness, outliers and relationships between features.',
+        'Feature Engineering': 'To enhance model performance, new features such as interactions between Age and Insulin were created. Skewed variables were transformed and missing values addressed. SHAP (Shapley Additive Explanations) was used to evaluate feature importance and guide feature selection.',
+        'Synthetic Minority Oversampling Technique (SMOTE)': 'SMOTE was applied to the training data to synthetically up-sample the minority class, improving balance and reducing model bias towards the majority class. This helped models better identify positive diabetes cases without overfitting to duplicates.',
+        'Model Implementation': [
+          'Multiple ML models implemented: Random Forest, XGBoost and a sequential neural network.',
+          'Random Forest achieved highest accuracy (~93%) on validation/test holdouts.',
+          'SHAP summary plots show low Insulin and Age x Insulin interactions are strong predictors; Blood Pressure and pregnancies were less influential.',
+          'The neural network produced similar performance but required more compute and tuning; accuracy/loss curves for train/validation/test are available in the project images.'
+        ],
+        'Deployment': 'Random Forest was selected for deployment due to interpretability and lower computational cost. A Streamlit app was created that accepts a pandas DataFrame, runs identical preprocessing/feature engineering steps and returns predictions via a simple web UI.'
+      },
+      images: [
+        { src: '/media/diabetes/Data-Table.png', caption: 'Dataset Overview' },
+        { src: '/media/diabetes/EDA.png', caption: 'Feature distributions' },
+        { src: '/media/diabetes/Feature-Corr.png', caption: 'Feature Correlation' },
+        { src: '/media/diabetes/Feature-importance.png', caption: 'Random Forest feature importance' },
+        { src: '/media/diabetes/NNloss.png', caption: 'NN Model Loss (train/val/test)' },
+        { src: '/media/diabetes/NNacc.png', caption: 'NN Model Accuracy (train/val/test)' }
+      ]
+    }
+  },
+  
   {
     id: 'business-analysis',
     title: 'Business Analysis',
