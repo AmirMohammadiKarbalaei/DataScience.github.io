@@ -331,7 +331,7 @@ export const projects: Project[] = [
     description: 'Your Personalised Daily News Recommender.',
     image: '/media/DailyLinkAI/app_screenshot.png',
     animation: '/media/animation/news.json',
-    tags: ['NLP', 'ML', 'RAG'],
+    tags: ['NLP', 'ML'], 
     category: ['NLP', 'AI'],
     githubUrl: 'https://github.com/AmirMohammadiKarbalaei/DailyLinkai',
     streamlitUrl: 'https://dailylinkai.streamlit.app',
@@ -473,47 +473,47 @@ export const projects: Project[] = [
   //     ]
   //   }
   // },
-  {
-    id: 'eeg-detection',
-    title: 'EEG Detection - Neurological Disability Hand Function',
-    description: 'Leverage Electroencephalogram data analysis to identify and predict hand movements.',
-    image: '/media/EEG/PCA.png',
-    animation: '/media/animation/CMI.json',
-    tags: ['ML', 'Time-Series', 'Classification', 'EDA'],
-    category: ['TimeSeries', 'AI'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Kaggle-Grasp-and-Lift-EEG-Detection',
-    content: {
-      data: 'This project leverages EEG data analysis to assist patients with neurological disabilities or limb amputations in regaining fundamental hand functions. By identifying and understanding simple hand movements, the project aims to improve quality of life.',
-      processSections: {
-        'Concept': 'The project addresses the need for assisting patients with neurological disabilities by leveraging EEG data to identify and understand hand movements.',
-        'Data': 'The dataset includes 12 subjects, each with 10 series of trials. The training set comprises the first 8 series, while the test set includes the 9th and 10th series. The goal is to detect 6 sequential events: HandStart, FirstDigitTouch, BothStartLoadPhase, LiftOff, Replace, and BothReleased.',
-        'Process': [
-          'Exploratory Data Analysis: Cleaned and filtered data using the Butterworth Filter. Extracted class-specific data and applied Principal Component Analysis (PCA) for dimensionality reduction.',
-          'Model Implementation: Tested various models, including Random Forest, KNN, XGBoost, and deep learning models like CNN and ResNet. ResNet achieved the highest accuracy of 32%, more than double the random guess baseline of 14.3%.',
-          'Future Work: Focus on advanced feature engineering and incorporating temporal modeling to enhance accuracy and insights.'
-        ],
-        'Future Directions': 'Future efforts will prioritize feature engineering and temporal modeling to improve accuracy and provide deeper insights into EEG signal interpretation.'
-      },
-      keyFindings: [
-        'ResNet achieved 32% accuracy, outperforming other models.',
-        'PCA effectively reduced dimensionality while preserving essential features.',
-        'Butterworth filtering improved signal quality and model performance.',
-        'EEG signals provided meaningful insights for assisting neurological disabilities.'
-      ],
-      limitations: [
-        'Accuracy limited to 32%, indicating room for improvement.',
-        'Complex 7-class classification task remains challenging.',
-        'Limited dataset size may affect generalization.',
-        'Advanced feature engineering and temporal modeling are needed.'
-      ],
-      images: [
-        { src: '/media/EEG/data viz not processed.png', caption: 'Raw EEG Data Visualization' },
-        { src: '/media/EEG/data viz processed.png', caption: 'Processed EEG Data After Filtering' },
-        { src: '/media/EEG/PCA.png', caption: 'Principal Component Analysis - Dimensionality Reduction' },
-        { src: '/media/EEG/Random forest evaluation.png', caption: 'Random Forest Model Evaluation Results' }
-      ]
-    }
-  },
+  // {
+  //   id: 'eeg-detection',
+  //   title: 'EEG Detection - Neurological Disability Hand Function',
+  //   description: 'Leverage Electroencephalogram data analysis to identify and predict hand movements.',
+  //   image: '/media/EEG/PCA.png',
+  //   animation: '/media/animation/CMI.json',
+  //   tags: ['ML', 'Time-Series', 'Classification', 'EDA'],
+  //   category: ['TimeSeries', 'AI'],
+  //   githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Kaggle-Grasp-and-Lift-EEG-Detection',
+  //   content: {
+  //     data: 'This project leverages EEG data analysis to assist patients with neurological disabilities or limb amputations in regaining fundamental hand functions. By identifying and understanding simple hand movements, the project aims to improve quality of life.',
+  //     processSections: {
+  //       'Concept': 'The project addresses the need for assisting patients with neurological disabilities by leveraging EEG data to identify and understand hand movements.',
+  //       'Data': 'The dataset includes 12 subjects, each with 10 series of trials. The training set comprises the first 8 series, while the test set includes the 9th and 10th series. The goal is to detect 6 sequential events: HandStart, FirstDigitTouch, BothStartLoadPhase, LiftOff, Replace, and BothReleased.',
+  //       'Process': [
+  //         'Exploratory Data Analysis: Cleaned and filtered data using the Butterworth Filter. Extracted class-specific data and applied Principal Component Analysis (PCA) for dimensionality reduction.',
+  //         'Model Implementation: Tested various models, including Random Forest, KNN, XGBoost, and deep learning models like CNN and ResNet. ResNet achieved the highest accuracy of 32%, more than double the random guess baseline of 14.3%.',
+  //         'Future Work: Focus on advanced feature engineering and incorporating temporal modeling to enhance accuracy and insights.'
+  //       ],
+  //       'Future Directions': 'Future efforts will prioritize feature engineering and temporal modeling to improve accuracy and provide deeper insights into EEG signal interpretation.'
+  //     },
+  //     keyFindings: [
+  //       'ResNet achieved 32% accuracy, outperforming other models.',
+  //       'PCA effectively reduced dimensionality while preserving essential features.',
+  //       'Butterworth filtering improved signal quality and model performance.',
+  //       'EEG signals provided meaningful insights for assisting neurological disabilities.'
+  //     ],
+  //     limitations: [
+  //       'Accuracy limited to 32%, indicating room for improvement.',
+  //       'Complex 7-class classification task remains challenging.',
+  //       'Limited dataset size may affect generalization.',
+  //       'Advanced feature engineering and temporal modeling are needed.'
+  //     ],
+  //     images: [
+  //       { src: '/media/EEG/data viz not processed.png', caption: 'Raw EEG Data Visualization' },
+  //       { src: '/media/EEG/data viz processed.png', caption: 'Processed EEG Data After Filtering' },
+  //       { src: '/media/EEG/PCA.png', caption: 'Principal Component Analysis - Dimensionality Reduction' },
+  //       { src: '/media/EEG/Random forest evaluation.png', caption: 'Random Forest Model Evaluation Results' }
+  //     ]
+  //   }
+  // },
   {
     id: 'top-sellers',
     title: 'Amazon Top 50 Bestselling Books',
