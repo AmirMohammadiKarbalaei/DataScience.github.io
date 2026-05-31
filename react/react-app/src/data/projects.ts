@@ -96,6 +96,53 @@ export const projects: Project[] = [
         ]
     }
   },{
+    id: 'eeg-detection',
+    title: 'EEG Detection - Neurological Disability Hand Function',
+    description: 'Leverage Deep Learning and 1D-UNet segmentation models on Electroencephalogram (EEG) data to accurately identify and predict hand movements, achieving top-tier AUC scores.',
+    image: '/media/EEG/before_after_preprocessing.png',
+    animation: '/media/animation/CMI.json',
+    tags: ['Deep Learning', 'Time-Series', 'UNet', 'Ensemble', 'Signal Processing'],
+    category: ['TimeSeries', 'AI'],
+    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Kaggle-Grasp-and-Lift-EEG-Detection',
+    content: {
+      data: 'This project leverages EEG data analysis to assist patients with neurological disabilities or limb amputations in regaining fundamental hand functions. By identifying and understanding simple hand movements, the project aims to improve quality of life.',
+      processSections: {
+        'Concept': 'The project addresses the need for assisting patients with neurological disabilities by leveraging EEG data to identify and understand hand movements.',
+        'Data': 'The dataset includes 12 subjects, each with 10 series of trials. The training set comprises the first 8 series, while the test set includes the 9th and 10th series. The goal is to detect 6 sequential events: HandStart, FirstDigitTouch, BothStartLoadPhase, LiftOff, Replace, and BothReleased.',
+        'Process': [
+          'Preprocessing & Signal Denoising: Applied Wavelet Denoising (db2, level 3) combined with universal hard thresholding. This isolated underlying neurological frequencies and removed high-frequency muscle artifacts while preserving temporal resolution.',
+          'Baseline Deep Learning: Shifted from basic classification models to a 1D-UNet architecture capable of outputting dense, per-sample probability traces, achieving a strong baseline Private AUC of 0.910.',
+          'Advanced Pipeline & Ensembling: Upgraded the UNet encoder to EfficientNet-B3, implemented Leave-One-Subject-Out (LOSO) cross-validation, and added robust data augmentations (Channel Dropout, Amplitude Scaling, Gaussian Noise). Ensembling the 12 fold models and applying causal smoothing boosted the Private AUC to an exceptional 0.965.'
+        ],
+        'Future Directions': 'Future efforts will prioritize deploying these highly accurate, ensembled segmentation models into real-time, low-latency edge devices for live prosthetic control.'
+      },
+      keyFindings: [
+        'Advanced 1D-UNet architecture natively outputting probability traces drastically outperformed early spatial baseline models.',
+        'Ensembling models across 12 LOSO folds alongside causal smoothing improved the Private AUC score from an initial 0.910 to 0.965.',
+        'Wavelet denoising proved highly effective at removing high-frequency noise from raw EEG signals, allowing the CNN to learn grasp-related patterns without overfitting.',
+        'Event-density-weighted sampling ensured the model heavily prioritized critical transition zones around event boundaries during training.'
+      ],
+      limitations: [
+        'Leave-One-Subject-Out cross-validation combined with EfficientNet-B3 ensembling requires significant computational resources and inference time.',
+        'High inter-subject variability in EEG signals required strict per-fold Standard Scaling to prevent data leakage.',
+        'Translating a 12-model ensemble into a real-time clinical application requires extensive model distillation and quantization.'
+      ],
+      images: [
+        { 
+          src: '/media/EEG/before_after_preprocessing.png', 
+          caption: 'EEG Signal Preprocessing: Raw vs. Wavelet Denoised Data' 
+        },
+        { 
+          src: '/media/EEG/prediction_traces.png', 
+          caption: 'UNet Segmentation: Predicted Probabilities vs. Ground Truth' 
+        },
+        { 
+          src: '/media/EEG/roc_curves.png', 
+          caption: 'Validation ROC Curves across all 6 Hand Movement Events' 
+        }
+      ]
+    }
+  },{
     id: 'detect-sleep-states',
     title: 'Detect Sleep States - Child Mind Institute',
     description: 'Detect sleep onset and wake from wrist-worn accelerometer data to determine a person\'s sleep state.',
@@ -473,47 +520,7 @@ export const projects: Project[] = [
   //     ]
   //   }
   // },
-  // {
-  //   id: 'eeg-detection',
-  //   title: 'EEG Detection - Neurological Disability Hand Function',
-  //   description: 'Leverage Electroencephalogram data analysis to identify and predict hand movements.',
-  //   image: '/media/EEG/PCA.png',
-  //   animation: '/media/animation/CMI.json',
-  //   tags: ['ML', 'Time-Series', 'Classification', 'EDA'],
-  //   category: ['TimeSeries', 'AI'],
-  //   githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Kaggle-Grasp-and-Lift-EEG-Detection',
-  //   content: {
-  //     data: 'This project leverages EEG data analysis to assist patients with neurological disabilities or limb amputations in regaining fundamental hand functions. By identifying and understanding simple hand movements, the project aims to improve quality of life.',
-  //     processSections: {
-  //       'Concept': 'The project addresses the need for assisting patients with neurological disabilities by leveraging EEG data to identify and understand hand movements.',
-  //       'Data': 'The dataset includes 12 subjects, each with 10 series of trials. The training set comprises the first 8 series, while the test set includes the 9th and 10th series. The goal is to detect 6 sequential events: HandStart, FirstDigitTouch, BothStartLoadPhase, LiftOff, Replace, and BothReleased.',
-  //       'Process': [
-  //         'Exploratory Data Analysis: Cleaned and filtered data using the Butterworth Filter. Extracted class-specific data and applied Principal Component Analysis (PCA) for dimensionality reduction.',
-  //         'Model Implementation: Tested various models, including Random Forest, KNN, XGBoost, and deep learning models like CNN and ResNet. ResNet achieved the highest accuracy of 32%, more than double the random guess baseline of 14.3%.',
-  //         'Future Work: Focus on advanced feature engineering and incorporating temporal modeling to enhance accuracy and insights.'
-  //       ],
-  //       'Future Directions': 'Future efforts will prioritize feature engineering and temporal modeling to improve accuracy and provide deeper insights into EEG signal interpretation.'
-  //     },
-  //     keyFindings: [
-  //       'ResNet achieved 32% accuracy, outperforming other models.',
-  //       'PCA effectively reduced dimensionality while preserving essential features.',
-  //       'Butterworth filtering improved signal quality and model performance.',
-  //       'EEG signals provided meaningful insights for assisting neurological disabilities.'
-  //     ],
-  //     limitations: [
-  //       'Accuracy limited to 32%, indicating room for improvement.',
-  //       'Complex 7-class classification task remains challenging.',
-  //       'Limited dataset size may affect generalization.',
-  //       'Advanced feature engineering and temporal modeling are needed.'
-  //     ],
-  //     images: [
-  //       { src: '/media/EEG/data viz not processed.png', caption: 'Raw EEG Data Visualization' },
-  //       { src: '/media/EEG/data viz processed.png', caption: 'Processed EEG Data After Filtering' },
-  //       { src: '/media/EEG/PCA.png', caption: 'Principal Component Analysis - Dimensionality Reduction' },
-  //       { src: '/media/EEG/Random forest evaluation.png', caption: 'Random Forest Model Evaluation Results' }
-  //     ]
-  //   }
-  // },
+  
   {
     id: 'top-sellers',
     title: 'Amazon Top 50 Bestselling Books',

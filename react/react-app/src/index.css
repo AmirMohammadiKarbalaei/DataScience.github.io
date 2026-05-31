@@ -850,7 +850,10 @@ body::before {
 .tag-voice-ai { background: rgba(255, 20, 147, 0.2); border-color: #ff1433; }
 .tag-qdrant { background: rgba(4, 93, 109, 0.2); border-color: #057260; }
 .tag-fastapi { background: rgba(255, 0, 157, 0.2); border-color: #ff008c; }
-
+.tag-deep-learning{ background: rgba(79, 23, 231, 0.2); border-color: #ce01f7; }
+.tag-unet{ background: rgba(223, 92, 164, 0.2); border-color: #684d4d; }
+.tag-signal-processing{ background: rgba(255, 165, 0, 0.2); border-color: #ffa500; }
+.tag-ensemble{ background: rgba(4, 104, 17, 0.2); border-color: #02083b; }
 /* Contact Section */
 .contact-section {
   padding: 100px 0;
