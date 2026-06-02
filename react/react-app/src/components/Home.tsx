@@ -284,10 +284,10 @@ const Home: React.FC = () => {
 
         <div className="header-content">
           <div className="hero-text">
-            <h1 className="header-title small-header-title">
+            {/* <h1 className="header-title small-header-title">
               Hi, I'm <br />
-              <span className="gradient-text">Amir Mohammadikarbalaei</span>
-            </h1>
+              <span className="gradient-text">Amir</span>
+            </h1> */}
             <div className="typing-container">
               <span className="typing-prefix">I'm a </span>
               <span className="typing-text">{currentTitle}</span>
