@@ -4,6 +4,7 @@ export interface Project {
   description: string;
   image: string;
   animation?: string;
+  htmlSimulation?: string;
   tags: string[];
   category: string[];
   githubUrl?: string;
@@ -27,6 +28,7 @@ export const projects: Project[] = [
   description: 'A privacy-first voice assistant combining local speech recognition, LLM reasoning, JSON-based tool routing, real-time APIs, and text-to-speech. No cloud required.',
   image: '/media/jarvis/Jarvis.png',
   animation: '/media/animation/AI_Assistant.json',
+  htmlSimulation: '/media/jarvis/voice-assistant-pipeline.html',
   tags: ['LLM', 'Voice-AI', 'Ollama'],
   category: ['AI', 'LLM'],
   video: '/media/jarvis/Jarvis.m4a',

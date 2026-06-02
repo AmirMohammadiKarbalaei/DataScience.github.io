@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #06080f;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hi: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border-hi: rgba(255,255,255,0.18);
+    --cyan: #00e5ff;
+    --cyan-dim: rgba(0,229,255,0.12);
+    --pink: #ff2d78;
+    --pink-dim: rgba(255,45,120,0.12);
+    --gold: #ffb700;
+    --gold-dim: rgba(255,183,0,0.12);
+    --green: #00e5a0;
+    --green-dim: rgba(0,229,160,0.12);
+    --purple: #a855f7;
+    --purple-dim: rgba(168,85,247,0.12);
+    --text: #e8ecf1;
+    --muted: rgba(232,236,241,0.45);
+    --mono: 'DM Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  /* — Background mesh — */
+  .mesh {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(0,229,255,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255,45,120,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 60% 10%, rgba(168,85,247,0.04) 0%, transparent 70%);
+  }
+
+  /* — Canvas for curves — */
+  canvas {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  }
+
+  /* — Layout — */
+  .shell {
+    position: relative; z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 24px 48px;
+  }
+
+  /* — Header — */
+  .hdr {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 40px;
+  }
+  .hdr-logo {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(0,229,255,0.25);
+  }
+  .hdr-text h1 {
+    font-family: var(--sans); font-size: 22px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .hdr-text p {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    margin-top: 4px; letter-spacing: 0.5px;
+  }
+
+  /* — Legend — */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-bottom: 32px;
+  }
+  .leg-item {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .leg-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  /* — Grid layout — */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  /* — Lane labels — */
+  .lane-labels {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    margin-bottom: 12px;
+  }
+  .lane-lbl {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--muted); text-align: center;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 0 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+
+  /* — Node columns — */
+  .col {
+    display: flex; flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px;
+    position: relative;
+  }
+
+  /* — Nodes — */
+  .node {
+    position: relative;
+    width: 100%; max-width: 168px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    backdrop-filter: blur(8px);
+  }
+  .node:hover {
+    transform: translateY(-2px) scale(1.02);
+    background: var(--surface-hi);
+  }
+  .node-icon {
+    font-size: 16px; margin-bottom: 4px; display: block;
+    line-height: 1;
+  }
+  .node-name {
+    font-family: var(--sans); font-size: 12px; font-weight: 600;
+    color: var(--text); line-height: 1.3;
+  }
+  .node-sub {
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+    margin-top: 3px; line-height: 1.4;
+  }
+
+  /* — Color variants — */
+  .nc { border-color: rgba(0,229,255,0.25); }
+  .nc:hover { border-color: var(--cyan); box-shadow: 0 4px 20px rgba(0,229,255,0.15), inset 0 0 16px rgba(0,229,255,0.06); }
+  .nc .node-icon { color: var(--cyan); }
+
+  .np { border-color: rgba(255,45,120,0.25); }
+  .np:hover { border-color: var(--pink); box-shadow: 0 4px 20px rgba(255,45,120,0.15), inset 0 0 16px rgba(255,45,120,0.06); }
+  .np .node-icon { color: var(--pink); }
+
+  .ng { border-color: rgba(0,229,160,0.25); }
+  .ng:hover { border-color: var(--green); box-shadow: 0 4px 20px rgba(0,229,160,0.15), inset 0 0 16px rgba(0,229,160,0.06); }
+  .ng .node-icon { color: var(--green); }
+
+  .ngo { border-color: rgba(255,183,0,0.25); }
+  .ngo:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(255,183,0,0.15), inset 0 0 16px rgba(255,183,0,0.06); }
+  .ngo .node-icon { color: var(--gold); }
+
+  .npu { border-color: rgba(168,85,247,0.25); }
+  .npu:hover { border-color: var(--purple); box-shadow: 0 4px 20px rgba(168,85,247,0.15), inset 0 0 16px rgba(168,85,247,0.06); }
+  .npu .node-icon { color: var(--purple); }
+
+  /* — Central orchestrator — */
+  .orch-wrap {
+    grid-column: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+  }
+  .orch {
+    position: relative; z-index: 5;
+    width: 100%; max-width: 168px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(168,85,247,0.5);
+    background: rgba(168,85,247,0.08);
+    padding: 14px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 32px rgba(168,85,247,0.12);
+  }
+  .orch:hover {
+    transform: translateY(-2px) scale(1.03);
+    border-color: var(--purple);
+    box-shadow: 0 8px 40px rgba(168,85,247,0.25), inset 0 0 24px rgba(168,85,247,0.1);
+  }
+  .orch-badge {
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+    background: var(--purple); color: #fff;
+    font-family: var(--mono); font-size: 9px; font-weight: 500;
+    padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  /* — Tool grid inside col — */
+  .tool-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    width: 100%; max-width: 220px;
+  }
+  .tool-chip {
+    border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 7px 8px;
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .tool-chip:hover {
+    border-color: rgba(0,229,160,0.4); color: var(--green);
+    background: var(--green-dim);
+  }
+  .tool-chip-icon { font-size: 13px; flex-shrink: 0; }
+
+  /* — Model cards — */
+  .model-stack {
+    display: flex; flex-direction: column; gap: 8px;
+    width: 100%; max-width: 168px;
+  }
+  .model-card {
+    border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 10px 12px;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .model-card.fast { border-color: rgba(255,183,0,0.3); }
+  .model-card.fast:hover { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 4px 16px rgba(255,183,0,0.12); }
+  .model-card.smart { border-color: rgba(168,85,247,0.3); }
+  .model-card.smart:hover { border-color: var(--purple); background: var(--purple-dim); box-shadow: 0 4px 16px rgba(168,85,247,0.12); }
+  .model-tag {
+    font-family: var(--mono); font-size: 9px; font-weight: 500;
+    letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px;
+    display: inline-block; margin-bottom: 5px;
+  }
+  .fast .model-tag { background: var(--gold-dim); color: var(--gold); }
+  .smart .model-tag { background: var(--purple-dim); color: var(--purple); }
+  .model-name { font-family: var(--mono); font-size: 11px; color: var(--text); font-weight: 500; }
+  .model-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* — Vertical connector lines — */
+  .vline {
+    width: 1px; height: 20px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+    margin: 2px auto;
+    flex-shrink: 0;
+  }
+  .vline-cyan { background: linear-gradient(to bottom, rgba(0,229,255,0.35), rgba(0,229,255,0.08)); }
+  .vline-pink { background: linear-gradient(to bottom, rgba(255,45,120,0.35), rgba(255,45,120,0.08)); }
+  .vline-green { background: linear-gradient(to bottom, rgba(0,229,160,0.35), rgba(0,229,160,0.08)); }
+
+  /* — Spacer for alignment — */
+  .spacer { height: 20px; }
+  .spacer-sm { height: 8px; }
+
+  /* — Status bar — */
+  .status-bar {
+    margin-top: 40px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    display: flex; flex-wrap: wrap; gap: 20px; align-items: center;
+  }
+  .status-item {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    animation: pulseAnim 2s ease-in-out infinite;
+  }
+  @keyframes pulseAnim {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+  .pulse-cyan { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+  .pulse-pink { background: var(--pink); box-shadow: 0 0 6px var(--pink); }
+  .pulse-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+  /* — Tooltip — */
+  .tooltip {
+    position: fixed; z-index: 100;
+    background: rgba(10,14,25,0.95);
+    border: 1px solid var(--border-hi);
+    border-radius: 10px; padding: 10px 14px;
+    pointer-events: none; opacity: 0;
+    transition: opacity 0.15s ease;
+    max-width: 220px;
+    backdrop-filter: blur(16px);
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip-title { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tooltip-body { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.5; }
+
+  /* — Animated highlight — */
+  .highlight {
+    position: absolute; inset: -1px; border-radius: 13px;
+    pointer-events: none; opacity: 0;
+    box-shadow: 0 0 0 2px var(--cyan);
+    transition: opacity 0.2s ease;
+  }
+  .node:hover .highlight { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="mesh"></div>
+<canvas id="cvs"></canvas>
+
+<div class="shell">
+
+  <div class="hdr">
+    <div class="hdr-logo">🤖</div>
+    <div class="hdr-text">
+      <h1>Jarvis</h1>
+      <p>Local AI Voice Assistant · Pipeline Architecture</p>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--cyan)"></div> Main LLM path</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--pink)"></div> Fast / deterministic path</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div> Tool execution</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div> Streaming output</div>
+  </div>
+
+  <div class="lane-labels">
+    <div class="lane-lbl">Voice Input</div>
+    <div class="lane-lbl">Orchestration</div>
+    <div class="lane-lbl">Request Routing</div>
+    <div class="lane-lbl">Inference</div>
+    <div class="lane-lbl">Output</div>
+  </div>
+
+  <div class="pipeline" id="pipeline">
+
+    <!-- COL 1: Voice Input -->
+    <div class="col" id="col1">
+      <div class="node nc" id="n-mic" data-tip="Microphone" data-desc="Captures raw audio from the system microphone via sounddevice. Device index is configurable in .env.">
+        <span class="node-icon">🎤</span>
+        <div class="node-name">Microphone</div>
+        <div class="node-sub">sounddevice capture</div>
+      </div>
+      <div class="vline vline-cyan"></div>
+      <div class="node nc" id="n-listener" data-tip="SpeechListener" data-desc="Uses speech_recognition for audio capture, silence detection, and phrase segmentation. Configurable pause threshold and energy threshold.">
+        <span class="node-icon">🎙️</span>
+        <div class="node-name">SpeechListener</div>
+        <div class="node-sub">speech_recognition</div>
+      </div>
+      <div class="vline vline-cyan"></div>
+      <div class="node nc" id="n-whisper" data-tip="Faster-Whisper" data-desc="Local STT transcription via faster-whisper. Runs on CUDA with float16. Model: small.en by default. No cloud dependency.">
+        <span class="node-icon">📝</span>
+        <div class="node-name">Faster-Whisper</div>
+        <div class="node-sub">small.en · cuda fp16</div>
+      </div>
+      <div class="vline vline-cyan"></div>
+      <div class="node nc" id="n-wake" data-tip="Wake-word handler" data-desc="Checks transcribed text for wake words (hey jarvis, ok jarvis, etc.), stop words, and shutdown commands. Manages conversation state activation.">
+        <span class="node-icon">⚡</span>
+        <div class="node-name">Wake Word</div>
+        <div class="node-sub">state activation</div>
+      </div>
+    </div>
+
+    <!-- COL 2: Orchestration -->
+    <div class="col" id="col2">
+      <div class="spacer"></div>
+      <div class="spacer"></div>
+      <div class="node npu" id="n-orch" data-tip="JarvisAssistant" data-desc="Core orchestrator. Manages config, speech listener, Ollama client, tool registry, tool router, conversation state, streaming responses, and TTS playback.">
+        <span class="orch-badge">orchestrator</span>
+        <span class="node-icon" style="color:var(--purple)">🧩</span>
+        <div class="node-name">JarvisAssistant</div>
+        <div class="node-sub">assistant.py</div>
+      </div>
+      <div class="vline" style="height:12px;"></div>
+      <div class="node np" id="n-request" data-tip="Request Handler" data-desc="First stop after wake-word confirmation. Decides whether to take a deterministic fast path (time, weather, wiki) or escalate to the LLM-based ToolRouter.">
+        <span class="node-icon">📥</span>
+        <div class="node-name">Request Handler</div>
+        <div class="node-sub">direct vs. routed</div>
+      </div>
+    </div>
+
+    <!-- COL 3: Routing -->
+    <div class="col" id="col3">
+      <div class="spacer"></div>
+      <div class="spacer"></div>
+      <div class="spacer"></div>
+      <div class="node np" id="n-fast" data-tip="Deterministic Fast Path" data-desc="Bypasses the LLM tool router for high-confidence requests: current time, weather, Wikipedia. Repairs common STT mistakes (e.g. 'what timer is it' → 'what time is it').">
+        <span class="node-icon">🚀</span>
+        <div class="node-name">Fast Path</div>
+        <div class="node-sub">deterministic dispatch</div>
+      </div>
+      <div class="vline vline-pink"></div>
+      <div class="node nc" id="n-router" data-tip="LLM Tool Router" data-desc="Asks the local model to return strict JSON: use_tool, tool_name, arguments, confidence, reason. Repairs arguments and filters unsupported inputs. Threshold: 0.65.">
+        <span class="node-icon">🔀</span>
+        <div class="node-name">Tool Router</div>
+        <div class="node-sub">JSON · conf ≥ 0.65</div>
+      </div>
+      <div class="vline vline-green"></div>
+      <div class="node ng" id="n-registry" data-tip="Tool Registry" data-desc="Central registry exposing tool schemas to the router. All tools are Python functions registered at startup.">
+        <span class="node-icon">📚</span>
+        <div class="node-name">Tool Registry</div>
+        <div class="node-sub">registry.py</div>
+      </div>
+      <div class="vline vline-green"></div>
+      <div class="tool-grid">
+        <div class="tool-chip" id="t-weather" data-tip="get_weather" data-desc="Weather lookup via Open-Meteo + geocoding. No API key required."><span class="tool-chip-icon">🌤️</span>weather</div>
+        <div class="tool-chip" id="t-time" data-tip="get_current_time" data-desc="Timezone-aware datetime. Supports 'what time is it in Liverpool?'"><span class="tool-chip-icon">🕐</span>time</div>
+        <div class="tool-chip" id="t-search" data-tip="web_search" data-desc="Tavily if API key set, DuckDuckGo fallback."><span class="tool-chip-icon">🔍</span>web_search</div>
+        <div class="tool-chip" id="t-wiki" data-tip="wiki_summary" data-desc="Wikipedia summary lookup."><span class="tool-chip-icon">📖</span>wiki</div>
+        <div class="tool-chip" id="t-timer" data-tip="set_timer / list_timers / cancel_timer" data-desc="Non-blocking threaded timers. Labels, warnings, cancellation, alarm playback."><span class="tool-chip-icon">⏱️</span>timers</div>
+        <div class="tool-chip" id="t-calc" data-tip="calculate + convert_currency" data-desc="Safe calculator and live currency conversion."><span class="tool-chip-icon">🔢</span>calc/fx</div>
+      </div>
+    </div>
+
+    <!-- COL 4: Inference -->
+    <div class="col" id="col4">
+      <div class="spacer"></div>
+      <div class="spacer"></div>
+      <div class="spacer"></div>
+      <div class="model-stack" id="model-stack">
+        <div class="model-card fast" id="n-fast-model" data-tip="Fast model · qwen3:4b-instruct" data-desc="Default model for most voice interactions. Low latency. Used for tool routing and general responses.">
+          <div class="model-tag">FAST</div>
+          <div class="model-name">qwen3:4b-instruct</div>
+          <div class="model-sub">voice latency</div>
+        </div>
+        <div class="model-card smart" id="n-smart-model" data-tip="Smart model · qwen3:8b" data-desc="Used for complex reasoning and ambiguous requests where deeper understanding is needed.">
+          <div class="model-tag">SMART</div>
+          <div class="model-name">qwen3:8b</div>
+          <div class="model-sub">complex reasoning</div>
+        </div>
+        <div class="model-name" style="font-size:10px;color:var(--muted);font-family:var(--mono);text-align:center;margin-top:2px;">via ollama_client.py</div>
+      </div>
+      <div class="vline" style="height:12px;"></div>
+      <div class="node ngo" id="n-ollama" data-tip="Ollama · local inference" data-desc="Local LLM inference. HTTP client supports one-shot and streaming chat. Endpoint: localhost:11434/api/chat">
+        <span class="node-icon">🧠</span>
+        <div class="node-name">Ollama</div>
+        <div class="node-sub">localhost:11434</div>
+      </div>
+    </div>
+
+    <!-- COL 5: Output -->
+    <div class="col" id="col5">
+      <div class="node nc" id="n-output" data-tip="Audio Output" data-desc="Final spoken audio played via sounddevice. Jarvis can keep answering while timers run in parallel threads.">
+        <span class="node-icon">🎧</span>
+        <div class="node-name">Audio Output</div>
+        <div class="node-sub">sounddevice</div>
+      </div>
+      <div class="vline vline-cyan"></div>
+      <div class="node ngo" id="n-tts" data-tip="Kokoro TTS" data-desc="Local Kokoro TTS (hexgrad/Kokoro-82M). Cleans markdown, emojis, code blocks. Streams chunks: Jarvis starts speaking before LLM finishes. Voice: bm_george.">
+        <span class="node-icon">🔊</span>
+        <div class="node-name">Kokoro TTS</div>
+        <div class="node-sub">streaming chunks</div>
+      </div>
+      <div class="vline vline-gold" style="background:linear-gradient(to bottom,rgba(255,183,0,0.35),rgba(255,183,0,0.08));"></div>
+      <div class="node ngo" id="n-stream" data-tip="Response streaming" data-desc="LLM responses split into speakable chunks and piped to TTS as they arrive. Text is cleaned: emojis, markdown, code blocks, numbered lists all stripped for natural speech.">
+        <span class="node-icon">⚡</span>
+        <div class="node-name">Stream Splitter</div>
+        <div class="node-sub">chunk → speak</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="status-bar">
+    <div class="status-item"><div class="pulse pulse-cyan"></div> Idle · awaiting wake word</div>
+    <div class="status-item"><div class="pulse pulse-pink"></div> Fast path active</div>
+    <div class="status-item"><div class="pulse pulse-green"></div> Tool execution</div>
+    <div style="margin-left:auto">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">hover nodes for details</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tip">
+  <div class="tooltip-title" id="tip-title"></div>
+  <div class="tooltip-body" id="tip-body"></div>
+</div>
+
+<script>
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+const tip = document.getElementById('tip');
+
+function resize() {
+  cvs.width = window.innerWidth;
+  cvs.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); });
+
+// — Tooltip —
+const allNodes = document.querySelectorAll('[data-tip]');
+allNodes.forEach(el => {
+  el.addEventListener('mouseenter', e => {
+    document.getElementById('tip-title').textContent = el.dataset.tip;
+    document.getElementById('tip-body').textContent = el.dataset.desc || '';
+    tip.classList.add('show');
+    moveTip(e);
+  });
+  el.addEventListener('mousemove', moveTip);
+  el.addEventListener('mouseleave', () => tip.classList.remove('show'));
+});
+function moveTip(e) {
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + 230 > window.innerWidth) x = e.clientX - 234;
+  if (y + 80 > window.innerHeight) y = e.clientY - 90;
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+}
+
+// — Canvas curves —
+function getCenter(el) {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2 };
+}
+function getEdge(el, side) {
+  const r = el.getBoundingClientRect();
+  if (side === 'right')  return { x: r.right,  y: r.top + r.height/2 };
+  if (side === 'left')   return { x: r.left,   y: r.top + r.height/2 };
+  if (side === 'bottom') return { x: r.left + r.width/2, y: r.bottom };
+  if (side === 'top')    return { x: r.left + r.width/2, y: r.top };
+}
+
+function drawCurve(a, b, color, dashed = false, width = 1.5) {
+  if (!a || !b) return;
+  ctx.save();
+  ctx.beginPath();
+  if (dashed) ctx.setLineDash([5, 4]);
+  ctx.moveTo(a.x, a.y);
+  const mx = (a.x + b.x) / 2;
+  ctx.bezierCurveTo(mx, a.y, mx, b.y, b.x, b.y);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawArrow(a, b, color, dashed = false) {
+  if (!a || !b) return;
+  drawCurve(a, b, color, dashed);
+  // arrowhead
+  const angle = Math.atan2(b.y - a.y, b.x - a.x);
+  ctx.save();
+  ctx.translate(b.x, b.y);
+  ctx.rotate(angle);
+  ctx.beginPath();
+  ctx.moveTo(-7, -4);
+  ctx.lineTo(0, 0);
+  ctx.lineTo(-7, 4);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+  ctx.restore();
+}
+
+const CYAN  = 'rgba(0,229,255,0.3)';
+const PINK  = 'rgba(255,45,120,0.3)';
+const GREEN = 'rgba(0,229,160,0.3)';
+const GOLD  = 'rgba(255,183,0,0.3)';
+const PURP  = 'rgba(168,85,247,0.3)';
+
+const ids = ['n-mic','n-listener','n-whisper','n-wake','n-orch','n-request',
+             'n-fast','n-router','n-registry','n-ollama','n-tts','n-output',
+             'n-fast-model','n-smart-model','n-stream','model-stack'];
+
+function drawAll() {
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  const g = {};
+  ids.forEach(id => { const el = document.getElementById(id); if (el) g[id] = el; });
+
+  // Wake → Orchestrator
+  if (g['n-wake'] && g['n-orch']) {
+    const a = getEdge(g['n-wake'], 'right');
+    const b = getEdge(g['n-orch'], 'left');
+    drawArrow(a, b, PURP);
+  }
+  // Orchestrator → Request handler
+  if (g['n-orch'] && g['n-request']) {
+    const a = getEdge(g['n-orch'], 'bottom');
+    const b = getEdge(g['n-request'], 'top');
+    drawArrow(a, b, PURP, false, 1.2);
+  }
+  // Request → Fast path (pink dashed)
+  if (g['n-request'] && g['n-fast']) {
+    const a = getEdge(g['n-request'], 'right');
+    const b = getEdge(g['n-fast'], 'left');
+    drawArrow(a, b, PINK, true);
+  }
+  // Request → Tool Router (cyan)
+  if (g['n-request'] && g['n-router']) {
+    const a = getEdge(g['n-request'], 'right');
+    const b = getEdge(g['n-router'], 'left');
+    drawArrow(a, b, CYAN);
+  }
+  // Router → Registry
+  if (g['n-router'] && g['n-registry']) {
+    const a = getEdge(g['n-router'], 'bottom');
+    const b = getEdge(g['n-registry'], 'top');
+    drawArrow(a, b, GREEN);
+  }
+  // Fast path → Ollama (pink)
+  if (g['n-fast'] && g['n-ollama']) {
+    const a = getEdge(g['n-fast'], 'right');
+    const b = getEdge(g['n-ollama'], 'left');
+    drawArrow(a, b, PINK, true);
+  }
+  // Registry → Ollama (via tools - green)
+  if (g['n-registry'] && g['n-ollama']) {
+    const a = getEdge(g['n-registry'], 'right');
+    const b = getEdge(g['n-ollama'], 'left');
+    drawArrow(a, b, GREEN);
+  }
+  // Ollama → Stream Splitter (gold)
+  if (g['n-ollama'] && g['n-stream']) {
+    const a = getEdge(g['n-ollama'], 'right');
+    const b = getEdge(g['n-stream'], 'left');
+    drawArrow(a, b, GOLD);
+  }
+  // Model stack → Ollama
+  if (g['model-stack'] && g['n-ollama']) {
+    const a = getEdge(g['model-stack'], 'bottom');
+    const b = getEdge(g['n-ollama'], 'top');
+    drawCurve(a, b, 'rgba(255,183,0,0.2)', true, 1);
+  }
+}
+
+// — Particles —
+class Particle {
+  constructor(pathIds, color, speed = 0.002, offset = 0) {
+    this.pathIds = pathIds;
+    this.color = color;
+    this.speed = speed;
+    this.t = offset;
+    this.glow = color.replace('0.3', '0.9').replace('rgba', 'rgba');
+  }
+  update() {
+    this.t += this.speed;
+    const total = this.pathIds.length - 1;
+    if (this.t >= total) this.t = 0;
+  }
+  draw() {
+    const idx = Math.floor(this.t);
+    const lt = this.t - idx;
+    if (idx >= this.pathIds.length - 1) return;
+    const elA = document.getElementById(this.pathIds[idx]);
+    const elB = document.getElementById(this.pathIds[idx + 1]);
+    if (!elA || !elB) return;
+    const a = getEdge(elA, this.sideA(idx));
+    const b = getEdge(elB, this.sideB(idx));
+    if (!a || !b) return;
+
+    const mx = (a.x + b.x) / 2;
+    const u = 1 - lt, t2 = lt * lt, u2 = u * u, u3 = u2 * u, t3 = t2 * lt;
+    const cp1x = mx, cp1y = a.y, cp2x = mx, cp2y = b.y;
+    const x = u3*a.x + 3*u2*lt*cp1x + 3*u*t2*cp2x + t3*b.x;
+    const y = u3*a.y + 3*u2*lt*cp1y + 3*u*t2*cp2y + t3*b.y;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = this.glow;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI*2);
+    ctx.fillStyle = this.glow;
+    ctx.fill();
+    ctx.restore();
+  }
+  sideA(idx) {
+    // simple heuristic: if next node is to the right, go right; else bottom
+    const elA = document.getElementById(this.pathIds[idx]);
+    const elB = document.getElementById(this.pathIds[idx+1]);
+    if (!elA || !elB) return 'right';
+    const rA = elA.getBoundingClientRect(), rB = elB.getBoundingClientRect();
+    if (Math.abs(rA.left - rB.left) < 40) return rB.top > rA.top ? 'bottom' : 'top';
+    return rB.left > rA.left ? 'right' : 'left';
+  }
+  sideB(idx) {
+    const elA = document.getElementById(this.pathIds[idx]);
+    const elB = document.getElementById(this.pathIds[idx+1]);
+    if (!elA || !elB) return 'left';
+    const rA = elA.getBoundingClientRect(), rB = elB.getBoundingClientRect();
+    if (Math.abs(rA.left - rB.left) < 40) return rB.top > rA.top ? 'top' : 'bottom';
+    return rB.left > rA.left ? 'left' : 'right';
+  }
+}
+
+// Main LLM path: mic→listener→whisper→wake→orch→request→router→registry→ollama→stream→tts→output
+const llmPath = ['n-mic','n-listener','n-whisper','n-wake','n-orch','n-request','n-router','n-registry','n-ollama','n-stream','n-tts','n-output'];
+// Fast path: mic→listener→whisper→wake→orch→request→fast→ollama→stream→tts→output
+const fastPath = ['n-mic','n-listener','n-whisper','n-wake','n-orch','n-request','n-fast','n-ollama','n-stream','n-tts','n-output'];
+
+let particles = [];
+function initParticles() {
+  particles = [
+    new Particle(llmPath, CYAN, 0.0018, 0),
+    new Particle(llmPath, CYAN, 0.0018, 4),
+    new Particle(llmPath, CYAN, 0.0018, 8),
+    new Particle(fastPath, PINK, 0.003, 1.5),
+    new Particle(fastPath, PINK, 0.003, 5),
+  ];
+}
+
+function loop() {
+  drawAll();
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(loop);
+}
+
+window.onload = () => {
+  initParticles();
+  loop();
+};
+window.addEventListener('resize', () => { resize(); });
+</script>
+</body>
+</html>

@@ -4,6 +4,64 @@ import { projects } from '../data/projects';
 import SEOHead from './SEOHead';
 import { trackProjectView, trackEvent } from '../utils/analytics';
 
+const SectionText: React.FC<{ value: string; previewLength?: number; minHiddenLength?: number }> = ({
+  value,
+  previewLength = 240,
+  minHiddenLength = 180,
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const shouldCollapse = value.length > previewLength + minHiddenLength;
+  const preview = shouldCollapse ? `${value.slice(0, previewLength).trimEnd()}...` : value;
+
+  return (
+    <>
+      <p>{expanded || !shouldCollapse ? value : preview}</p>
+      {shouldCollapse && (
+        <button
+          type="button"
+          className="btn-text"
+          onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded}
+        >
+          {expanded ? 'Show less' : 'Show more'}
+        </button>
+      )}
+    </>
+  );
+};
+
+const SectionList: React.FC<{ items: string[]; defaultVisibleCount?: number; minHiddenItems?: number }> = ({
+  items,
+  defaultVisibleCount = 3,
+  minHiddenItems = 4,
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  if (!items || items.length === 0) return null;
+
+  const visible = expanded ? items : items.slice(0, defaultVisibleCount);
+  const shouldCollapse = items.length - defaultVisibleCount >= minHiddenItems;
+
+  return (
+    <>
+      <ul>
+        {visible.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+      {shouldCollapse && (
+        <button
+          type="button"
+          className="btn-text"
+          onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded}
+        >
+          {expanded ? 'Show less' : `Show ${items.length - defaultVisibleCount} more`}
+        </button>
+      )}
+    </>
+  );
+};
+
 // Small helper: collapsible list for long arrays
 const ProjectDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,28 +92,6 @@ const ProjectDetail: React.FC = () => {
     );
   }
 
-  const CollapsibleList: React.FC<{ items: string[]; defaultVisibleCount?: number }> = ({ items, defaultVisibleCount = 5 }) => {
-    const [expanded, setExpanded] = useState(false);
-    if (!items || items.length === 0) return null;
-
-    const visible = expanded ? items : items.slice(0, defaultVisibleCount);
-
-    return (
-      <div>
-        <ul>
-          {visible.map((it, i) => (
-            <li key={i}>{it}</li>
-          ))}
-        </ul>
-        {items.length > defaultVisibleCount && (
-          <button className="btn-text" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>
-            {expanded ? 'Show less' : `Show ${items.length - defaultVisibleCount} more`}
-          </button>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="project-detail">
       <SEOHead 
@@ -84,18 +120,29 @@ const ProjectDetail: React.FC = () => {
       {/* Main Content */}
       <section className="project-content">
         <div className="container">
+          <h2 className="project-detail-title small-header-title">{project.title}</h2>
+
+          {/* small visual divider */}
+          <div className="section-divider" aria-hidden="true" />
+
+          {project.htmlSimulation && (
+            <div className="project-simulation-container">
+              <iframe
+                src={project.htmlSimulation}
+                title={`${project.title} interactive pipeline simulation`}
+                className="project-simulation-iframe"
+                loading="lazy"
+              />
+            </div>
+          )}
+
           <div className="project-layout two-column-layout">
             {/* Left Column - Main Content */}
             <div className="project-main">
-              <h2 className="project-detail-title small-header-title" >{project.title}</h2>
-
-              {/* small visual divider */}
-              <div className="section-divider" aria-hidden="true" />
-              
               {project.content.data && (
                 <div className="project-section">
                   <h3>Project Data</h3>
-                  <p>{project.content.data}</p>
+                  <SectionText value={project.content.data} />
                 </div>
               )}
 
@@ -106,13 +153,9 @@ const ProjectDetail: React.FC = () => {
                     <div key={section} style={{ marginBottom: '1rem' }}>
                       <h4 style={{ color: '#00d4ff', marginBottom: '0.5rem' }}>{section}</h4>
                       {Array.isArray(body) ? (
-                        <ul>
-                          {body.map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
+                        <SectionList items={body} defaultVisibleCount={2} minHiddenItems={4} />
                       ) : (
-                        <p>{body}</p>
+                        <SectionText value={body} previewLength={180} minHiddenLength={160} />
                       )}
                     </div>
                   ))}
@@ -120,14 +163,14 @@ const ProjectDetail: React.FC = () => {
               ) : project.content.process && (
                 <div className="project-section">
                   <h3>Development Process</h3>
-                  <CollapsibleList items={project.content.process} />
+                  <SectionList items={project.content.process} defaultVisibleCount={3} minHiddenItems={4} />
                 </div>
               )}
 
               {project.content.keyFindings && (
                 <div className="project-section">
                   <h3>Key Findings</h3>
-                  <CollapsibleList items={project.content.keyFindings} defaultVisibleCount={4} />
+                  <SectionList items={project.content.keyFindings} defaultVisibleCount={2} minHiddenItems={4} />
                 </div>
               )}
 
@@ -137,11 +180,7 @@ const ProjectDetail: React.FC = () => {
                   {Object.entries(project.content.findings).map(([section, bullets]) => (
                     <div key={section} style={{ marginBottom: '1rem' }}>
                       <h4 style={{ color: '#00d4ff', marginBottom: '0.5rem' }}>{section}</h4>
-                      <ul>
-                        {bullets.map((b, i) => (
-                          <li key={i}>{b}</li>
-                        ))}
-                      </ul>
+                      <SectionList items={bullets} defaultVisibleCount={2} minHiddenItems={4} />
                     </div>
                   ))}
                 </div>
@@ -150,11 +189,7 @@ const ProjectDetail: React.FC = () => {
               {project.content.limitations && (
                 <div className="project-section">
                   <h3>Limitations</h3>
-                  <ul>
-                    {project.content.limitations.map((limitation, index) => (
-                      <li key={index}>{limitation}</li>
-                    ))}
-                  </ul>
+                  <SectionList items={project.content.limitations} defaultVisibleCount={2} minHiddenItems={4} />
                 </div>
               )}
 
@@ -193,6 +228,7 @@ const ProjectDetail: React.FC = () => {
                   </video>
                 </div>
               )}
+
             </div>
 
             {/* Right Column - Images */}
@@ -257,6 +293,22 @@ const ProjectDetail: React.FC = () => {
             height: auto;
           }
 
+          .project-content .container {
+            max-width: 1600px;
+          }
+
+          .project-layout.two-column-layout {
+            gap: 56px;
+          }
+
+          .project-layout.two-column-layout .project-main {
+            flex: 2.1;
+          }
+
+          .project-layout.two-column-layout .project-sidebar {
+            flex: 1.4;
+          }
+
           .project-sidebar {
             position: relative;
             z-index: 0;
@@ -268,6 +320,24 @@ const ProjectDetail: React.FC = () => {
             max-width: 1400px; /* Further increased maximum width for larger displays */
             margin: 0 auto; /* Center the image horizontally */
             display: block; /* Ensure proper centering */
+          }
+
+          .project-simulation-container {
+            width: 100%;
+            margin: 0 0 40px 0;
+          }
+
+          .project-simulation-iframe {
+            width: 100%;
+            min-height: 1100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            background: #06080f;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+          }
+
+          .section-preview {
+            display: block;
           }
         `}
       </style>
