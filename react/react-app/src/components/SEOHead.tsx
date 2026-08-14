@@ -15,10 +15,10 @@ interface SEOHeadProps {
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
-  title = "Amir Mohammadi - Data Scientist & AI Engineer",
-  description = "Experienced Data Scientist and AI Engineer specializing in Machine Learning, Deep Learning, Computer Vision, NLP, and Reinforcement Learning. 5+ years experience with Python, SQL, Power BI, and advanced analytics.",
+  title = "Amir Mohammadikarbalaei - Data Scientist & AI Engineer",
+  description = "Data Scientist and AI Engineer working on NLP, LLMs and machine learning at Unilever. MSc Data Science, University of Bath. Python, PyTorch, Hugging Face, SQL and MLflow.",
   keywords = [
-    "Amir Mohammadi",
+    "Amir Mohammadikarbalaei",
     "Data Scientist", 
     "AI Engineer",
     "Machine Learning",
@@ -36,27 +36,27 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     "UK Data Scientist"
   ],
   image = "/media/data-science-new-banner.jpg",
-  url = "https://amirmohammadikarbalai.github.io/DataScience.github.io/",
+  url = "https://amir-data.vercel.app/",
   type = "website",
-  author = "Amir Mohammadi Karbalaei",
+  author = "Amir Mohammadikarbalaei",
   publishedTime,
   modifiedTime,
   schema
 }) => {
-  const siteUrl = url || "https://amirmohammadikarbalai.github.io/DataScience.github.io/";
+  const siteUrl = url || "https://amir-data.vercel.app/";
   const fullImageUrl = image?.startsWith('http') ? image : `${siteUrl}${image?.replace(/^\//, '')}`;
   
   const defaultSchema = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "name": "Amir Mohammadi Karbalaei",
+    "name": "Amir Mohammadikarbalaei",
     "jobTitle": "Data Scientist & AI Engineer",
     "description": description,
     "url": siteUrl,
     "image": fullImageUrl,
     "sameAs": [
       "https://github.com/AmirMohammadiKarbalaei",
-      "https://www.linkedin.com/in/amir-mohammadikarbalaei-65b958193"
+      "https://www.linkedin.com/in/amir-mohammadik/"
     ],
     "worksFor": {
       "@type": "Organization",
@@ -92,7 +92,6 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="author" content={author} />
       <meta name="robots" content="index, follow" />
       <meta name="language" content="English" />
-      <meta name="revisit-after" content="7 days" />
       
       {/* Open Graph Meta Tags */}
       <meta property="og:title" content={title} />
@@ -101,15 +100,14 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta property="og:url" content={url} />
       <meta property="og:image" content={fullImageUrl} />
       <meta property="og:image:alt" content={`${author} - Data Scientist Portfolio`} />
-      <meta property="og:site_name" content="Amir Mohammadi - Data Science Portfolio" />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:site_name" content="Amir Mohammadikarbalaei - Data Science Portfolio" />
+      <meta property="og:locale" content="en_GB" />
       
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={fullImageUrl} />
-      <meta name="twitter:creator" content="@AmirDataScience" />
       
       {/* Additional Meta Tags */}
       {publishedTime && <meta property="article:published_time" content={publishedTime} />}

@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://amirmohammadikarbalai.github.io/DataScience.github.io/sitemap.xml
+Sitemap: https://amir-data.vercel.app/sitemap.xml
 
 # Crawl-delay (optional, helps prevent server overload)
 Crawl-delay: 1

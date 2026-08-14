@@ -1,7 +1,7 @@
 import { projects } from '../data/projects';
 
 export const generateSitemap = () => {
-  const baseUrl = 'https://amirmohammadikarbalai.github.io/DataScience.github.io';
+  const baseUrl = 'https://amir-data.vercel.app';
   const currentDate = new Date().toISOString().split('T')[0];
   
   const urls = [
@@ -39,7 +39,7 @@ ${urls.map(url => `  <url>
 };
 
 export const generateRobotsTxt = () => {
-  const baseUrl = 'https://amirmohammadikarbalai.github.io/DataScience.github.io';
+  const baseUrl = 'https://amir-data.vercel.app';
   
   return `User-agent: *
 Allow: /
