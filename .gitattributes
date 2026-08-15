@@ -1,0 +1,16 @@
+# Normalise line endings. Without this, files committed from Windows and from
+# other machines show up as whole-file diffs even when nothing changed, which
+# buries real edits.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.mp4 binary
+*.m4a binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
