@@ -23,12 +23,12 @@ export const generateProjectSchema = (project: any) => {
     "dateCreated": "2024", // Update with actual project dates
     "keywords": project.tags.join(", "),
     "genre": project.category,
-    "url": `https://amirmohammadikarbalai.github.io/DataScience.github.io/project/${project.id}`,
+    "url": `https://amir-data.vercel.app/project/${project.id}`,
     "image": project.image,
     "isPartOf": {
       "@type": "WebSite",
       "name": "Amir Mohammadi - Data Science Portfolio",
-      "url": "https://amirmohammadikarbalai.github.io/DataScience.github.io/"
+      "url": "https://amir-data.vercel.app/"
     }
   };
 };
