@@ -8,55 +8,43 @@ const Experience: React.FC = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const timeline = timelineRef.current;
+    if (!timeline) return;
+
+    const items = Array.from(timeline.querySelectorAll<HTMLElement>('.timeline-item'));
+
+    // Stagger by the item's own position, not its index within the observer
+    // batch. Scrolling normally delivers one entry at a time, so batch index
+    // was always 0 and nothing ever staggered.
+    const positions = new Map(items.map((item, index) => [item, index]));
+    let firstReveal = -1;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry, index) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              entry.target.classList.add('visible');
-            }, index * 200); // Staggered animation
-          }
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const position = positions.get(entry.target as HTMLElement) ?? 0;
+          if (firstReveal === -1) firstReveal = position;
+          const delay = Math.min(Math.max(position - firstReveal, 0), 4) * 120;
+          window.setTimeout(() => entry.target.classList.add('visible'), delay);
+          // Reveal once; without this the timeout re-fires on every re-entry.
+          observer.unobserve(entry.target);
         });
       },
-      {
-        threshold: 0.1,
-      }
+      { threshold: 0.1 }
     );
 
-    if (timelineRef.current) {
-      const timelineItems = timelineRef.current.querySelectorAll('.timeline-item');
-      timelineItems.forEach((item) => observer.observe(item));
-    }
-
-    // Add scroll progress functionality
-    const handleScroll = () => {
-      const timeline = timelineRef.current?.querySelector('.timeline::before') as HTMLElement;
-      if (timeline) {
-        const scrollTop = window.pageYOffset;
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / docHeight) * 100;
-        timeline.style.background = `linear-gradient(180deg, #00d4ff 0%, #5b73f0 ${Math.min(scrollPercent, 100)}%, transparent ${Math.min(scrollPercent, 100)}%)`;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (timelineRef.current) {
-        const timelineItems = timelineRef.current.querySelectorAll('.timeline-item');
-        timelineItems.forEach((item) => observer.unobserve(item));
-      }
-    };
+    items.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div className="experience-page">
       <SEOHead 
-        title="Professional Experience - Amir Mohammadi | Data Scientist Career Journey"
-        description="Explore Amir Mohammadi's professional journey as a Data Scientist and AI Engineer. From Unilever Customer Operations to Y Combinator startup experience, featuring 5+ years in machine learning, healthcare AI, and data analytics."
+        title="Professional Experience - Amir Mohammadikarbalaei | Data Scientist Career Journey"
+        description="Amir Mohammadikarbalaei's professional journey as a Data Scientist and AI Engineer, from a Y Combinator healthcare AI startup to NLP and machine learning at Unilever, alongside an MSc in Data Science at the University of Bath."
         keywords={[
-          "Amir Mohammadi Experience",
+          "Amir Mohammadikarbalaei Experience",
           "Data Scientist Career",
           "AI Engineer Experience", 
           "Unilever Data Scientist",
@@ -68,7 +56,7 @@ const Experience: React.FC = () => {
           "UK Data Scientist",
           "Career Timeline"
         ]}
-        url="https://amirmohammadikarbalai.github.io/DataScience.github.io/experience"
+        url="https://amir-data.vercel.app/experience"
       />
       <Navigation />
       <ParticleBackground />
@@ -86,28 +74,21 @@ const Experience: React.FC = () => {
                 <span className="stat-number">4+</span>
                 <span className="stat-label">Years Experience</span>
               </div>
-              {/* <div className="stat-item">
-                <span className="stat-number">7</span>
-                <span className="stat-label">Companies</span>
-              </div> */}
-              <div className="stat-item">
-                <span className="stat-number">35+</span>
-                <span className="stat-label">Projects Delivered</span>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Experience Timeline */}
-      <section className="timeline-section">
+      <section className="timeline-section" aria-labelledby="timeline-heading">
         <div className="container">
+          <h2 id="timeline-heading" className="sr-only">Career timeline</h2>
           <div className="timeline" ref={timelineRef}>
             <div className="timeline-item">
               <div className="timeline-date">Jun 2025 - Present</div>
               <div className="timeline-content">
                 <div className="company-logo">
-                  <i className="fas fa-industry"></i>
+                  <i aria-hidden="true" className="fas fa-industry"></i>
                 </div>
                 <div className="job-header">
                   <h3>Customer Operations and Una Bot Analyst</h3>
@@ -116,36 +97,45 @@ const Experience: React.FC = () => {
                 <h4 className="company-name">Unilever · Full-time</h4>
                 <div className="location">Port Sunlight, UK · Hybrid</div>
                 <p>
-                  Working at one of the world's leading consumer goods companies, focusing on customer operations 
-                  and AI bot analytics to enhance customer experience and operational efficiency.
+                  NLP and analytics on millions of ServiceNow and Moveworks records in Unilever's
+                  global Employee Technology function.
                 </p>
+                <ul className="responsibilities">
+                  <li>Built an automated knowledge article validation system in Python using NLP, saving <strong>1,300 hours</strong> of manual review a year.</li>
+                  <li>Developed a quality scoring framework across <strong>15,000+ knowledge articles</strong> using metadata, content signals and semantic similarity.</li>
+                  <li>Built ticket volume forecasting with ensemble methods and automated weekly MLflow retraining, holding average error <strong>under 10%</strong>.</li>
+                  <li>Drove <strong>12% agent escalation deflection</strong> by diagnosing user experience friction with the automation team.</li>
+                </ul>
                 <div className="timeline-tags">
-                  <span className="timeline-tag">Customer Operations</span>
-                  <span className="timeline-tag">AI Analytics</span>
+                  <span className="timeline-tag">NLP</span>
+                  <span className="timeline-tag">MLflow</span>
+                  <span className="timeline-tag">Forecasting</span>
+                  <span className="timeline-tag">ServiceNow</span>
                   <span className="timeline-tag">Process Optimisation</span>
                 </div>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-date">Dec 2025 - June 2025</div>
+              <div className="timeline-date">Feb 2025 - May 2025</div>
               <div className="timeline-content">
                 <div className="company-logo">
-                  <i className="fas fa-university"></i>
+                  <i aria-hidden="true" className="fas fa-university"></i>
                 </div>
                 <h3>Research Assistant</h3>
                 <h4 className="company-name">School of Management, University of Bath · Part-time</h4>
                 <div className="location">Bath, UK</div>
                 <ul className="responsibilities">
-                  <li>Built Python tools to automate large-scale data extraction and processing.</li>
-                  <li>Applied NLP to structure unstructured text into analysis‑ready datasets.</li>
-                  <li>Partnered with researchers to design pipelines and validate data quality.</li>
+                  <li>Built the data pipeline for a School of Management research project analysing US patent text.</li>
+                  <li>Took 700K+ USPTO records a year from raw bulk XML to a queryable database in one command, spread across CPU cores with batched writes to survive multi-year runs.</li>
+                  <li>Wrote the classification stage with NLTK part-of-speech tagging and linguistic feature extraction, plus a labelled validation set built from an external benchmark to test it against.</li>
                 </ul>
                 <div className="timeline-tags">
                   <span className="timeline-tag">Natural Language Processing (NLP)</span>
-                  <span className="timeline-tag">Machine Learning</span>
-                  <span className="timeline-tag">Data Science</span>
-                  <span className="timeline-tag">Data Collection</span>
+                  <span className="timeline-tag">Data Pipelines</span>
+                  <span className="timeline-tag">SQL</span>
+                  <span className="timeline-tag">CLI Tooling</span>
+                  <span className="timeline-tag">NLTK</span>
                 </div>
               </div>
             </div>
@@ -154,7 +144,7 @@ const Experience: React.FC = () => {
               <div className="timeline-date">Nov 2024 - Dec 2024</div>
               <div className="timeline-content">
                 <div className="company-logo">
-                  <i className="fas fa-rocket"></i>
+                  <i aria-hidden="true" className="fas fa-rocket"></i>
                 </div>
                 <h3>Technical Lead</h3>
                 <h4 className="company-name">Enterprise Bath · Part-time</h4>
@@ -167,6 +157,9 @@ const Experience: React.FC = () => {
                   <li>Designed an end‑to‑end data pipeline integrating multiple sources for automated attendance tracking.</li>
                   <li>Built a Power BI dashboard to provide real‑time engagement insights for stakeholders.</li>
                 </ul>
+                <Link to="/project/beat" className="timeline-project-link">
+                  See the project <i aria-hidden="true" className="fas fa-arrow-right"></i>
+                </Link>
                 <div className="timeline-tags">
                   <span className="timeline-tag">Software Development</span>
                   <span className="timeline-tag">Project Delivery</span>
@@ -181,25 +174,23 @@ const Experience: React.FC = () => {
               <div className="timeline-date">Dec 2023 - Feb 2024</div>
               <div className="timeline-content">
                 <div className="company-logo">
-                  <i className="fas fa-brain"></i>
+                  <i aria-hidden="true" className="fas fa-brain"></i>
                 </div>
                 <div className="job-header">
                   <h3>Data Scientist - AI Healthcare Applications</h3>
                   <div className="achievement-badge startup">Y Combinator</div>
                 </div>
-                <h4 className="company-name">Simplifine (YC S24) · Part-time</h4>
+                <h4 className="company-name">Nightingaile, later Simplifine (Y Combinator) · Part-time</h4>
                 <div className="location">San Francisco, California, United States · Remote</div>
                 <p>
-                  Worked in a dynamic Y Combinator-funded startup environment, developing cutting-edge localised 
-                  language models (LLMs) specifically designed for healthcare professionals. Led Windows application 
-                  development that significantly improved documentation, diagnosis, and patient communication processes.
+                  Built localised language models for healthcare professionals at an early-stage startup,
+                  and was main developer on the Windows application that put them in front of doctors.
                 </p>
-             
                 <ul className="responsibilities">
-                  <li>Developed cutting-edge localised language models (LLMs) for healthcare professionals</li>
-                  <li>Main developer for Windows application improving documentation and diagnosis processes</li>
-                  <li>Contributed to securing Y Combinator funding and positioning startup for future success</li>
-                  <li>Enhanced patient communication processes for doctors through AI-powered solutions</li>
+                  <li>Developed localised large language models tailored to healthcare professionals</li>
+                  <li>Main developer for the Windows application supporting documentation, diagnosis and patient communication workflows</li>
+                  <li>Contributed to the product that helped secure <strong>$500K</strong> in Y Combinator funding</li>
+                  <li>Worked with multidisciplinary teams on user needs and clinical domain requirements</li>
                 </ul>
                 <div className="timeline-tags">
                   <span className="timeline-tag">Data Science</span>
@@ -215,7 +206,7 @@ const Experience: React.FC = () => {
               <div className="timeline-date">Oct 2023 - Jan 2024</div>
               <div className="timeline-content">
                 <div className="company-logo">
-                  <i className="fas fa-chart-line"></i>
+                  <i aria-hidden="true" className="fas fa-chart-line"></i>
                 </div>
                 <div className="job-header">
                   <h3>Data Analytics Trainee</h3>
@@ -248,7 +239,7 @@ const Experience: React.FC = () => {
               <div className="timeline-date">Sep 2020 - Oct 2023</div>
               <div className="timeline-content">
                 <div className="company-logo">
-                  <i className="fas fa-laptop-code"></i>
+                  <i aria-hidden="true" className="fas fa-laptop-code"></i>
                 </div>
                 <h3>Independent Data Scientist</h3>
                 <h4 className="company-name">Personal Projects</h4>
@@ -257,11 +248,11 @@ const Experience: React.FC = () => {
                   deep learning, computer vision, and competitive programming challenges.
                 </p>
                 <ul className="responsibilities">
-                  <li>Utilised time series forecasting and classification techniques to detect and analyse EEG biopotential signals</li>
+                  <li>Utilised time series forecasting and classification techniques to detect and analyse <Link to="/project/eeg-detection" className="timeline-inline-link">EEG biopotential signals</Link></li>
                   <li>Applied unsupervised learning to cluster retail customers enabling targeted marketing strategies</li>
                   <li>Implemented Q-learning to train autonomous agents for Gym environment games</li>
-                  <li>Competed in Kaggle "Detecting Sleep State" competition with thorough EDA and feature engineering</li>
-                  <li>Developed advanced models including diabetes classification and custom hand gesture recognition with YOLO5</li>
+                  <li>Competed in the Kaggle <Link to="/project/detect-sleep-states" className="timeline-inline-link">"Detecting Sleep State"</Link> competition with thorough EDA and feature engineering</li>
+                  <li>Developed advanced models including <Link to="/project/diabetes-classification" className="timeline-inline-link">diabetes classification</Link> and custom hand gesture recognition with YOLOv5</li>
                 </ul>
                 <div className="timeline-tags">
                   <span className="timeline-tag">Machine Learning</span>
@@ -273,32 +264,40 @@ const Experience: React.FC = () => {
               </div>
             </div>
 
-            <div className="timeline-item">
-              <div className="timeline-date">Jul 2019 - Sep 2019</div>
-              <div className="timeline-content">
-                <div className="company-logo">
-                  <i className="fas fa-cogs"></i>
-                </div>
-                <h3>Student Mechanical Engineer</h3>
-                <h4 className="company-name">AVID Technology Group Limited</h4>
-                <div className="location">Cramlington</div>
-                <p>
-                  Engineering internship focusing on software review, manufacturing quality control, 
-                  and product lifecycle management.
-                </p>
-                <ul className="responsibilities">
-                  <li>Conducted software review of OpenModelica and Xcos Scilab for modeling and simulating dynamic systems</li>
-                  <li>Enhanced product longevity by flagging significant manufacturing concern regarding impeller surface finish</li>
-                  <li>Gained valuable experience in project and product life cycle management</li>
-                </ul>
-                <div className="timeline-tags">
-                  <span className="timeline-tag">Project Delivery</span>
-                  <span className="timeline-tag">Quality Control</span>
-                  <span className="timeline-tag">Engineering</span>
-                  <span className="timeline-tag">Process Improvement</span>
-                </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Education */}
+      <section className="education-section" aria-labelledby="education-heading">
+        <div className="container">
+          <h2 id="education-heading" className="section-title">Education</h2>
+          <div className="education-grid">
+            <article className="education-card">
+              <div className="education-icon">
+                <i aria-hidden="true" className="fas fa-graduation-cap"></i>
               </div>
-            </div>
+              <div className="education-body">
+                <h3>MSc Data Science</h3>
+                <h4 className="education-institution">University of Bath</h4>
+                <p className="education-note">
+                  Dissertation on efficient fine-tuning of large language models.
+                </p>
+              </div>
+            </article>
+
+            <article className="education-card">
+              <div className="education-icon">
+                <i aria-hidden="true" className="fas fa-cogs"></i>
+              </div>
+              <div className="education-body">
+                <h3>
+                  BEng (Hons) Mechanical Engineering
+                  <span className="education-grade">First Class</span>
+                </h3>
+                <h4 className="education-institution">Newcastle University</h4>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -364,10 +363,10 @@ const Experience: React.FC = () => {
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           title="Back to Top"
         >
-          <i className="fas fa-arrow-up"></i>
+          <i aria-hidden="true" className="fas fa-arrow-up"></i>
         </button>
         <Link to="/" className="floating-btn back-home" title="Back to Home">
-          <i className="fas fa-home"></i>
+          <i aria-hidden="true" className="fas fa-home"></i>
         </Link>
       </div>
 
@@ -375,7 +374,7 @@ const Experience: React.FC = () => {
       <section className="back-to-home">
         <div className="container">
           <Link to="/" className="back-home-btn">
-            <i className="fas fa-arrow-left"></i>
+            <i aria-hidden="true" className="fas fa-arrow-left"></i>
             Back to Home
           </Link>
         </div>
