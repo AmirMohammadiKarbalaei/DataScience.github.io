@@ -81,6 +81,28 @@ const ProjectDetail: React.FC = () => {
     }
   }, [id, project]);
 
+  // Let an embedded simulation report its own height, so the iframe fits its
+  // content instead of relying on a fixed min-height that is wrong at some
+  // widths. Simulations that never post a message keep the CSS default.
+  const [simulationHeight, setSimulationHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    setSimulationHeight(null);
+
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      const data = event.data as { type?: string; height?: number } | null;
+      if (!data || data.type !== 'simulation:height') return;
+      const height = Number(data.height);
+      if (Number.isFinite(height)) {
+        setSimulationHeight(Math.min(4000, Math.max(320, Math.ceil(height))));
+      }
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [id]);
+
   if (!project) {
     return (
       <div className="project-detail">
@@ -105,7 +127,7 @@ const ProjectDetail: React.FC = () => {
           "AI Project",
           "Portfolio"
         ]}
-        url={`https://amirmohammadikarbalai.github.io/DataScience.github.io/project/${project.id}`}
+        url={`https://amir-data.vercel.app/project/${project.id}`}
         type="article"
         image={project.image}
       />
@@ -132,6 +154,7 @@ const ProjectDetail: React.FC = () => {
                 title={`${project.title} interactive pipeline simulation`}
                 className="project-simulation-iframe"
                 loading="lazy"
+                style={simulationHeight ? { height: simulationHeight, minHeight: 0 } : undefined}
               />
             </div>
           )}
@@ -262,7 +285,7 @@ const ProjectDetail: React.FC = () => {
               <i className="fab fa-github"></i>
             </a>
             <a
-              href="https://www.linkedin.com/in/amir-mohammadikarbalaei-65b958193"
+              href="https://www.linkedin.com/in/amir-mohammadik/"
               target="_blank"
               rel="noopener noreferrer"
               className="social-link"
