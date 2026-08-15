@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { projects } from '../data/projects';
 import LottieAnimation from './LottieAnimation';
@@ -7,6 +7,19 @@ import ParticleBackground from './ParticleBackground';
 import Preloader from './Preloader';
 import SEOHead from './SEOHead';
 import { trackContactInteraction, trackEvent } from '../utils/analytics';
+
+// Filter row is generated from this list rather than hardcoded, so counts can
+// never drift from the data. Each filter matches a project if the project carries
+// ANY of its keys, which keeps the row short: nine single-tag filters was too many,
+// and several returned a single result.
+const CATEGORY_FILTERS: { key: string; label: string; icon: string; match: string[] }[] = [
+  { key: 'aiml', label: 'AI & Machine Learning', icon: 'fas fa-brain',
+    match: ['AI', 'ML', 'RL', 'TimeSeries', 'CV'] },
+  { key: 'nlp',  label: 'NLP & LLMs',            icon: 'fas fa-robot',
+    match: ['NLP', 'LLM'] },
+  { key: 'data', label: 'Data & BI',             icon: 'fas fa-chart-bar',
+    match: ['DA', 'BI'] },
+];
 
 const Home: React.FC = () => {
   const [filter, setFilter] = useState('all');
@@ -18,12 +31,12 @@ const Home: React.FC = () => {
   const skillsRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   
-  const titles = [
-    'Data Scientist',
-    'AI Engineer', 
-    'Machine Learning Expert',
-    'Analytics Professional'
-  ];
+  // useMemo keeps the array identity stable across renders. Without it the typing
+  // effect below re-runs on every state tick and spawns overlapping timer chains.
+  const titles = useMemo(
+    () => ['a Data Scientist', 'an AI Engineer', 'a ML Engineer'],
+    []
+  );
 
   // Skills section no longer uses progress bars; simple chips are displayed.
 
@@ -67,6 +80,7 @@ const Home: React.FC = () => {
   useEffect(() => {
   let currentText = '';
   let isDeleting = false;
+  let timer: ReturnType<typeof setTimeout>;
     
     const typeEffect = () => {
       const fullText = titles[titleIndex];
@@ -90,10 +104,12 @@ const Home: React.FC = () => {
         typeSpeed = 500;
       }
       
-      setTimeout(typeEffect, typeSpeed);
+      // Reassigning the same handle means the cleanup below always clears the
+      // pending timeout, not just the initial one.
+      timer = setTimeout(typeEffect, typeSpeed);
     };
-    
-    const timer = setTimeout(typeEffect, 1000);
+
+    timer = setTimeout(typeEffect, 1000);
     return () => clearTimeout(timer);
   }, [titleIndex, titles]);
 
@@ -152,9 +168,10 @@ const Home: React.FC = () => {
     };
   }, [quickActionsOpen]);
 
-  const filteredProjects = filter === 'all' 
-    ? projects 
-    : projects.filter(project => project.category.includes(filter));
+  const activeFilter = CATEGORY_FILTERS.find(f => f.key === filter);
+  const filteredProjects = !activeFilter
+    ? projects
+    : projects.filter(p => p.category.some(c => activeFilter.match.includes(c)));
 
   // Map skill names to Font Awesome icons for visual variety
   const getSkillIcon = (name: string) => {
@@ -177,7 +194,7 @@ const Home: React.FC = () => {
     if (s.includes('statistical')) return 'fas fa-superscript';
     if (s.includes('explainability') || s.includes('shap') || s.includes('lime')) return 'fas fa-lightbulb';
     if (s.includes('matplotlib') || s.includes('seaborn') || s.includes('visualis')) return 'fas fa-chart-area';
-    if (s.includes('mlops')) return 'fas fa-cogs';
+    if (s.includes('mlops') || s.includes('mlflow')) return 'fas fa-cogs';
     return 'fas fa-circle';
   };
 
@@ -191,42 +208,42 @@ const Home: React.FC = () => {
   return (
     <div>
       <SEOHead 
-        title="Amir Mohammadi - Data Scientist & AI Engineer | Portfolio"
-        description="Experienced Data Scientist and AI Engineer with 5+ years expertise in Machine Learning, Deep Learning, Computer Vision, NLP, and Reinforcement Learning. Browse my portfolio of 25+ data science projects including fraud detection, EEG analysis, and robotic locomotion."
+        title="Amir Mohammadikarbalaei - Data Scientist & AI Engineer | Portfolio"
+        description="Data Scientist and AI Engineer working on NLP, LLMs and machine learning at Unilever. MSc Data Science, University of Bath. Portfolio of applied ML projects in NLP, deep learning, computer vision and reinforcement learning."
         keywords={[
-          "Amir Mohammadi",
-          "Data Scientist", 
+          "Amir Mohammadikarbalaei",
+          "Data Scientist",
           "AI Engineer",
           "Machine Learning Engineer",
+          "NLP Engineer",
+          "LLM Engineer",
           "Deep Learning",
-          "Computer Vision", 
+          "PyTorch",
+          "Hugging Face",
+          "PEFT",
+          "LoRA",
+          "Computer Vision",
           "Natural Language Processing",
           "Reinforcement Learning",
-          "Python Developer",
-          "SQL Expert",
-          "Power BI Developer",
-          "Data Analytics",
-          "Artificial Intelligence",
+          "Python",
+          "SQL",
+          "MLflow",
           "UK Data Scientist",
-          "Unilever Data Scientist",
-          "Bath University",
-          "Data Science Portfolio",
-          "ML Projects",
-          "AI Portfolio"
+          "University of Bath",
+          "Data Science Portfolio"
         ]}
-        url="https://amirmohammadikarbalai.github.io/DataScience.github.io/"
+        url="https://amir-data.vercel.app/"
         schema={{
           "@context": "https://schema.org",
           "@type": "Person",
-          "name": "Amir Mohammadi Karbalaei",
-          "alternateName": "Amir Mohammadi",
+          "name": "Amir Mohammadikarbalaei",
           "jobTitle": ["Data Scientist", "AI Engineer", "Machine Learning Engineer"],
-          "description": "Experienced Data Scientist and AI Engineer with 5+ years expertise in Machine Learning, Deep Learning, Computer Vision, NLP, and Reinforcement Learning.",
-          "url": "https://amirmohammadikarbalai.github.io/DataScience.github.io/",
-          "image": "https://amirmohammadikarbalai.github.io/DataScience.github.io/media/data-science-new-banner.jpg",
+          "description": "Data Scientist and AI Engineer working on NLP, LLMs and machine learning at Unilever. MSc Data Science, University of Bath.",
+          "url": "https://amir-data.vercel.app/",
+          "image": "https://amir-data.vercel.app/media/data-science-new-banner.jpg",
           "sameAs": [
             "https://github.com/AmirMohammadiKarbalaei",
-            "https://www.linkedin.com/in/amir-mohammadikarbalaei-65b958193"
+            "https://www.linkedin.com/in/amir-mohammadik/"
           ],
           "worksFor": {
             "@type": "Organization",
@@ -247,6 +264,10 @@ const Home: React.FC = () => {
             "Reinforcement Learning",
             "Python Programming",
             "SQL",
+            "PyTorch",
+            "Hugging Face Transformers",
+            "Large Language Models",
+            "MLflow",
             "Power BI",
             "Data Analytics",
             "Statistical Analysis"
@@ -254,12 +275,13 @@ const Home: React.FC = () => {
           "hasCredential": [
             {
               "@type": "EducationalOccupationalCredential",
-              "name": "5+ Years Data Science Experience"
+              "credentialCategory": "degree",
+              "name": "MSc Data Science, University of Bath"
             }
           ],
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "https://amirmohammadikarbalai.github.io/DataScience.github.io/"
+            "@id": "https://amir-data.vercel.app/"
           }
         }}
       />
@@ -284,43 +306,28 @@ const Home: React.FC = () => {
 
         <div className="header-content">
           <div className="hero-text">
-            {/* <h1 className="header-title small-header-title">
-              Hi, I'm <br />
-              <span className="gradient-text">Amir</span>
-            </h1> */}
+            <h1 className="visually-hidden">
+              Amir Mohammadikarbalaei - Data Scientist and AI Engineer
+            </h1>
             <div className="typing-container">
-              <span className="typing-prefix">I'm a </span>
+              <span className="typing-prefix">I'm </span>
               <span className="typing-text">{currentTitle}</span>
               <span className="cursor">|</span>
             </div>
             <p className="hero-description">
-              Transforming data into actionable insights through advanced analytics, 
-              machine learning, and AI solutions. Currently at Unilever, driving 
-              customer operations excellence.
+              Building machine learning, NLP and LLM-powered solutions that deliver
+              real-world impact. Currently at Unilever, working on NLP and analytics
+              for employee-facing chatbot and service desk systems.
             </p>
             <div className="hero-buttons">
-              <a href="#about" className="btn-primary">
-                <i className="fas fa-user"></i>
-                About Me
-              </a>
-              <a href="#projects" className="btn-secondary">
+              <a href="#projects" className="btn-primary">
                 <i className="fas fa-rocket"></i>
                 View Projects
               </a>
-            </div>
-          </div>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <span className="hero-stat-number">4+</span>
-              <span className="hero-stat-label">Years Experience</span>
-            </div>
-            <div className="hero-stat">
-              <span className="hero-stat-number">35+</span>
-              <span className="hero-stat-label">Projects</span>
-            </div>
-            <div className="hero-stat">
-              <span className="hero-stat-number">5</span>
-              <span className="hero-stat-label">Companies</span>
+              <a href="#about" className="btn-secondary">
+                <i className="fas fa-user"></i>
+                About Me
+              </a>
             </div>
           </div>
         </div>
@@ -329,7 +336,7 @@ const Home: React.FC = () => {
       {/* About Section */}
       <section id="about" className="about-section" aria-labelledby="about-title">
         <div className="container">
-          <h2 className="section-title">About Me</h2>
+          <h2 id="about-title" className="section-title">About Me</h2>
           <div className="about-content" ref={aboutRef}>
             <div className="profile-container">
               <img
@@ -340,7 +347,7 @@ const Home: React.FC = () => {
               <div className="profile-badges">
                 <div className="profile-badge">
                   <i className="fas fa-map-marker-alt"></i>
-                  Port Sunlight, UK
+                  Liverpool, UK
                 </div>
                 <div className="profile-badge">
                   <i className="fas fa-briefcase"></i>
@@ -520,7 +527,7 @@ const Home: React.FC = () => {
       <section id="projects" className="projects-section" aria-labelledby="projects-title">
         <div className="projects-header-container">
           <div className="projects-header">
-            <h2 className="section-title">Projects</h2>
+            <h2 id="projects-title" className="section-title">Projects</h2>
           </div>
         </div>
         <div className="container">
@@ -539,30 +546,21 @@ const Home: React.FC = () => {
                 All Projects
                 <span className="project-count">({projects.length})</span>
               </button>
-              <button
-                className={`filter-btn ${filter === 'AI' ? 'active' : ''}`}
-                onClick={() => setFilter('AI')}
-              >
-                <i className="fas fa-brain"></i>
-                Artificial Intelligence
-                <span className="project-count">({projects.filter(p => p.category.includes('AI')).length})</span>
-              </button>
-              <button
-                className={`filter-btn ${filter === 'DA' ? 'active' : ''}`}
-                onClick={() => setFilter('DA')}
-              >
-                <i className="fas fa-chart-bar"></i>
-                Data Analysis
-                <span className="project-count">({projects.filter(p => p.category.includes('DA')).length})</span>
-              </button>
-              <button
-                className={`filter-btn ${filter === 'BI' ? 'active' : ''}`}
-                onClick={() => setFilter('BI')}
-              >
-                <i className="fas fa-business-time"></i>
-                Business Intelligence
-                <span className="project-count">({projects.filter(p => p.category.includes('BI')).length})</span>
-              </button>
+              {CATEGORY_FILTERS.map(({ key, label, icon, match }) => {
+                const count = projects.filter(p => p.category.some(c => match.includes(c))).length;
+                if (count === 0) return null;   // never render an empty filter
+                return (
+                  <button
+                    key={key}
+                    className={`filter-btn ${filter === key ? 'active' : ''}`}
+                    onClick={() => setFilter(key)}
+                  >
+                    <i className={icon}></i>
+                    {label}
+                    <span className="project-count">({count})</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -615,22 +613,24 @@ const Home: React.FC = () => {
       {/* Contact Section */}
       <section id="contact" className="contact-section" aria-labelledby="contact-title">
         <div className="container">
-          <h2 className="contact-title">Get In Touch!</h2>
+          <h2 id="contact-title" className="contact-title">Get In Touch!</h2>
           <div className="social-links">
             <a
               href="https://github.com/AmirMohammadiKarbalaei"
               target="_blank"
               rel="noopener noreferrer"
               className="social-link"
+              aria-label="GitHub profile"
               onClick={() => trackContactInteraction('github')}
             >
               <i className="fab fa-github"></i>
             </a>
             <a
-              href="https://www.linkedin.com/in/amir-mohammadikarbalaei-65b958193"
+              href="https://www.linkedin.com/in/amir-mohammadik/"
               target="_blank"
               rel="noopener noreferrer"
               className="social-link"
+              aria-label="LinkedIn profile"
               onClick={() => trackContactInteraction('linkedin')}
             >
               <i className="fab fa-linkedin"></i>
@@ -638,6 +638,7 @@ const Home: React.FC = () => {
             <a
               href="mailto:a.mohammadikarbalaei@gmail.com"
               className="social-link"
+              aria-label="Email Amir"
               onClick={() => trackContactInteraction('email')}
             >
               <i className="fas fa-envelope"></i>
