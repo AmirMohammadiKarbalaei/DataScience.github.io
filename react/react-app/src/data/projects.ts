@@ -1,3 +1,13 @@
+/*
+ * Projects hidden from the portfolio (commented out below, not deleted):
+ *   top-sellers          Amazon Top 50 books. 550-row Kaggle set, no model, no code link.
+ *   fraud-detection      Body is a pasted README; ships a ROC curve but quotes no AUC.
+ *   global-unemployment  Descriptive stats on a public dataset, no model.
+ *   disaster-tweets      TF-IDF + Naive Bayes at ~78% on a tutorial dataset.
+ *   business-analysis    3,000-row sales report, no code link.
+ * Uncomment any of them to bring it back.
+ */
+
 export interface Project {
   id: string;
   title: string;
@@ -23,6 +33,51 @@ export interface Project {
 
 export const projects: Project[] = [
 {
+  id: 'proxyon-pii-masking',
+  title: 'PII Masking Proxy for LLM Chat',
+  description: 'A privacy layer that sits between users and a hosted LLM. Detects and masks personal data with a hybrid transformer plus regex pipeline, so raw PII never leaves the organisation.',
+  image: '/media/proxyon/proxyon.png',
+  animation: '/media/animation/piid.json',
+  htmlSimulation: '/media/proxyon/proxyon-masking-demo.html',
+  tags: ['LLM', 'NLP', 'Privacy', 'GDPR'],
+  category: ['AI', 'NLP', 'LLM', 'ML'],
+  githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Proxyon',
+  content: {
+    data: 'Organisations want to use hosted LLMs but cannot send customer data to a third party API. Proxyon sits in front of the model: user text is scanned for personal data, every detected value is replaced with a stable placeholder such as [EMAIL_ADDRESS_1], and only the masked text is sent to the provider. The original values are held locally and restored in the response, so the conversation reads normally to the user while the provider never sees raw PII.',
+    processSections: {
+      'Objective': 'Make hosted LLMs usable on data that contains personal information, without relying on the model provider for confidentiality, and without degrading the quality of the conversation.',
+      'Approach': [
+        'Hybrid detection: a GLiNER zero-shot transformer handles context-dependent entities such as names, organisations, addresses and banking identifiers, while deterministic regex extractors act as a backstop for the structural PII the model is least reliable on (emails, IPv4, UK postcodes, UK phone numbers, address blocks, dates and dates of birth).',
+        'Closed label set: detections are mapped into 23 canonical PII types through an explicit allowlist, so an unexpected model label can never reach the output. Every downstream stage is keyed on those canonical names.',
+        'Deterministic overlap resolution: transformer and regex spans overlap constantly (a postcode inside an address, an account number inside an IBAN). A priority table plus a greedy resolver sorted by priority, span length, confidence and position selects one span per region, giving the same answer for the same input every time.',
+        'Offset-based masking: replacement works on character offsets and runs right to left, so repeated or ambiguous substrings cannot corrupt the output the way find-and-replace would.',
+        'Stable tagging with dedupe: values are normalised per label before tagging, so the same email written five different ways collapses to one placeholder and downstream systems can reason about it as one entity.',
+        'Validation: Luhn checks on card numbers and IBAN mod-97 checks adjust confidence on structurally valid matches.',
+        'Evaluation harness: a scoring module compares detections against a labelled test bundle and reports recall, type accuracy and false positives, using a lenient matcher with a tunable similarity threshold so near-miss boundaries are not scored as failures.',
+        'Deployed application: a Streamlit app with authentication, a chat interface backed by Gemini, an admin portal with per-entity masking policies, and usage analytics.'
+      ],
+      'Tools': 'Python, GLiNER, Hugging Face Transformers, PyTorch, Google Gemini API, Streamlit, regex, pytest-style test bundle, Docker devcontainer.'
+    },
+    keyFindings: [
+      'A transformer alone is not sufficient for PII masking: structural identifiers such as UK postcodes, phone numbers, emails and IP addresses are caught far more reliably by deterministic patterns, while names, organisations and banking identifiers need the model. The value is in the combination and in the rules that arbitrate between them.',
+      'Overlap resolution is where the real design decisions live. Encoding them as an explicit priority table rather than burying them in code makes the behaviour auditable, which matters for anything touching compliance.',
+      'Working on character offsets rather than string replacement removes a whole class of silent corruption bugs when the same value appears more than once.',
+      'Normalising before tagging means repeated values share a placeholder, which preserves the coreference the LLM needs to answer sensibly about masked entities.',
+      'Building the scoring harness first made every subsequent change measurable rather than a matter of opinion.'
+    ],
+    limitations: [
+      'The deterministic layer covers the formats that stay consistent across sources (emails, IP addresses, postcodes, phone numbers, dates); banking identifiers are left to the model, which keeps the rule set small at the cost of depending on it there.',
+      'Overlap resolution is greedy and priority-driven rather than globally optimal, traded deliberately for determinism and a rule table that can be audited.',
+      'Normalisation before tagging is intentionally aggressive: it favours one stable placeholder per entity over separating values that differ only in punctuation.',
+      'Pattern coverage is tuned to UK formats, so other locales would need their own patterns.',
+      'Validators adjust confidence rather than discarding matches, so a value that fails a checksum is still masked rather than let through.'
+    ],
+    images: [
+      { src: '/media/proxyon/proxyon-policies.png', caption: 'Admin portal: six data-protection policies, each toggling a group of PII types. Turning one off removes those entities from masking on every request, including the chat page.' }
+    ]
+  }
+},
+   {
   id: 'local-ai-voice-assistant',
   title: 'Jarvis: Local AI Voice Assistant with Tool Routing',
   description: 'A privacy-first voice assistant combining local speech recognition, LLM reasoning, JSON-based tool routing, real-time APIs, and text-to-speech. No cloud required.',
@@ -98,6 +153,47 @@ export const projects: Project[] = [
         ]
     }
   },{
+  id: 'patent-text-pipeline',
+  title: 'Patent Text Pipeline at USPTO Scale',
+  description: 'A command-line pipeline that turns a year of USPTO bulk archives into a queryable dataset: selective XML parsing, structured extraction, an NLTK classification stage and batched writes, built for a university research group.',
+  image: '/media/patent-pipeline/patent-pipeline.png',
+  animation: '/media/animation/patent.json',
+  tags: ['Python', 'NLTK', 'SQL', 'CLI', 'Data Engineering'],
+  category: ['NLP', 'DA'],
+  content: {
+    data: 'Built during a research assistantship at the University of Bath School of Management, for a study analysing the text of US patents. The USPTO publishes grants and applications as annual bulk XML archives running to hundreds of thousands of documents, most of which are irrelevant to any given study. The research team needed specific sections extracted from the ones that are relevant, classified, and placed somewhere they could query, repeatedly, as the study extended to further years. The work was less about the classification than about everything required to run it over a corpus that size on a single machine without supervision.',
+    processSections: {
+      'Objective': 'Turn annual USPTO bulk archives into a structured dataset the research team can query, at a volume that rules out manual collection, without a cluster or a database server for them to maintain after the assistantship ended.',
+      'Approach': [
+        'Cheap rejection before expensive parsing. Most documents in a bulk archive carry no examples section at all. A length threshold and a case-insensitive scan for section markers discard those before the XML parser is invoked, so parsing cost is spent only on documents that can contribute.',
+        'Sequence listings excluded by detection rather than by hope. Biotech patents embed sequence markup that dwarfs the text of interest and yields nothing useful; identifying and skipping those documents removes the worst of the parse-time outliers.',
+        'Two extraction paths with an explicit fallback. Where a document has a clean examples heading, extraction walks its sibling nodes; where it does not, and the format is not enforced so often it does not, extraction falls back to a full heading and paragraph scan. Either path alone silently loses records.',
+        'Concurrency split by the shape of the work. XML parsing runs in a thread pool under an asyncio loop; part-of-speech tagging runs in a process pool sized from the host, because tagging is CPU-bound and would gain nothing from threads.',
+        'Cooperative cancellation. A shared stop event is checked between expensive steps rather than once per document, so an interrupted multi-hour run stops promptly instead of completing whatever is already in flight.',
+        'Batched writes through SQLAlchemy. Writing per document produced lock contention that failed long runs outright; batching removed it and made unattended multi-year processing viable.',
+        'Stage isolation. Download, unzip and process are independently runnable, so a failure part way through a multi-year job resumes at the stage that failed rather than restarting from the download.',
+        'Auditable classification output. Each document retains a per-category breakdown, and anything unclassified retains a reason code, so an unexpected classification rate is a list of cases to inspect rather than a number to argue about.',
+        'Validation harness that builds a labelled test set from an external published benchmark, so classifier output can be scored against known ground truth instead of assumed correct.'
+      ],
+      'Tools': 'Python, NLTK, BeautifulSoup and lxml, SQLAlchemy, SQLite, pandas, asyncio, multiprocessing and concurrent.futures, argparse.'
+    },
+    keyFindings: [
+      'Runtime over a corpus this size is dominated by documents that turn out to be irrelevant. Rejecting them on a string check before invoking the parser did more for total throughput than any optimisation inside the parsing itself.',
+      'Document structure in bulk patent data is not guaranteed. The examples heading the extraction was first designed around is absent often enough that the fallback path, not the primary one, determines how much of the corpus is actually recovered.',
+      'Per-document database writes do not survive parallel processing. Batching them was the difference between a job that failed partway and one that ran a full year unattended.',
+      'Retaining a reason code for every unclassified document converted an unexplained classification rate into a diagnosable one, which mattered more to the researchers than raising the rate would have.'
+    ],
+    limitations: [
+      'The classification stage is rule-based rather than learned: transparent and cheap to run, but bounded by the rules it encodes and requiring revision rather than retraining.',
+      'The extraction is written against the USPTO bulk XML format specifically. Another patent office would need its own parser, though the surrounding pipeline would carry over.',
+      'The code is not public. It was built for a research group under confidentiality, so this page covers the engineering rather than the study it supports.'
+    ],
+    images: [
+      { src: '/media/patent-pipeline/patent-pipeline-stages.png', caption: 'Checks run in order of cost. A length threshold, a section-marker scan and a sequence-listing check discard most of the archive before the XML parser is ever invoked, so the expensive stages only see documents that can contribute.' },
+      { src: '/media/patent-pipeline/patent-cli.png', caption: 'One entry point handles a single year, a year range, or files already on disk. Stages are individually selectable, so an interrupted job resumes where it stopped rather than restarting.' }
+    ]
+  }
+},{
     id: 'eeg-detection',
     title: 'EEG Detection - Neurological Disability Hand Function',
     description: 'Leverage Deep Learning and 1D-UNet segmentation models on Electroencephalogram (EEG) data to accurately identify and predict hand movements, achieving top-tier AUC scores.',
@@ -144,7 +240,133 @@ export const projects: Project[] = [
         }
       ]
     }
-  },{
+  },
+  
+  // --- Removed from the portfolio: see notes at the top of this file. ---
+  // {
+  // id: 'business-analysis',
+  // title: 'Business Analysis',
+  // description: 'Analysing orders dataset from a business comprising of over 3000 data points spanning from 2011 to 2016.',
+  // image: '/media/Business analysis/Overview.png',
+  // animation: '/media/animation/customer.json',
+  // tags: ['BI', 'DA', 'Dashboard'],
+  // category: ['DA', 'BI'],
+  // content: {
+  // data: 'The dataset spans from 2011 to 2016 and encompasses business trading activities across three countries and 31 states. With over 3000 data points encompassing information such as customer age and gender, product details, product categories, dates, and more.',
+  // findings: {
+  // Overview: [
+  // 'France constitutes the majority of the orders, comprising 88% of total orders, while other countries contribute approximately 6%.',
+  // 'Customer demographics reveal an even distribution of gender, with a significant presence of young adults and adults, suggesting a need for targeted marketing strategies.',
+  // 'Order volumes have shown a progressive increase over time, with clear seasonality observed, potentially influenced by external factors.'
+  // ],
+  // Profit: [
+  // 'The business has generated a total profit of 904k pounds, with an average profit per product sold of 193 pounds.',
+  // 'Some products, such as AWC Logo caps and certain jerseys, yield negative profits, warranting further investigation into underlying causes.',
+  // 'Mountain bikes emerge as the highest profit-generating products, with road bikes following closely behind.'
+  // ],
+  // Orders: [
+  // 'A progressive increase in orders can be seen, expecting nearly 2000 orders annually by 2020.',
+  // 'Accessories, particularly patch kits, dominate product lineup, notably in 2014 and 2016.',
+  // 'Normal age distribution with female customers slightly younger; average customer age increasing suggests marketing focus shift.'
+  // ]
+  // },
+  // process: [
+  // 'Load and clean the orders dataset and harmonise country/state labels.',
+  // 'Aggregate transactions by country, year and product categories to compute revenue and profit metrics.',
+  // 'Visualise orders over time to identify seasonality and growth trends.',
+  // 'Analyse product-level profitability to highlight loss-making SKUs for further investigation.'
+  // ],
+  // limitations: [
+  // 'Lack of customer-related information prevents deeper analysis such as retention rates and lifetime value.',
+  // 'Some product metadata is inconsistent across years which required manual harmonisation.',
+  // 'Geographic granularity is limited for some deliveries, restricting fine-grained regional analysis.'
+  // ],
+  // images: [
+  // { src: '/media/Business analysis/Overview.png', caption: 'Overview' },
+  // { src: '/media/Business analysis/Orders.png', caption: 'Orders' },
+  // { src: '/media/Business analysis/Profit.png', caption: 'Profit' }
+  // ]
+  // }
+  // },
+  {
+    id: 'beat',
+    title: 'BEAT: RFID Attendance System for Bath Enterprise',
+    description: 'An end-to-end attendance system reading RFID cards over the PC/SC protocol, resolving identities against the university LDAP directory, and writing to a cloud PostgreSQL database with Power BI reporting.',
+    image: '/media/BEAT/bathenterprise.png',
+    tags: ['PowerShell', 'PostgreSQL', 'AWS', 'LDAP', 'RFID', 'Power BI'],
+    category: ['BI', 'DA'],
+    content: {
+      data: 'Enterprise Bath runs an extra-curricular programme of events, mentoring and competitions for student entrepreneurs, and had no reliable way to measure who was attending. Sign-in was manual and the resulting data was too patchy to act on. BEAT replaced it with card-tap attendance: students tap their existing university card on a reader, the system resolves who they are against the university directory, records the event to a database, and surfaces engagement trends in Power BI. It runs on Windows and macOS, with 400+ students tracked and manual reporting effort reduced by around 80%.',
+      processSections: {
+        'Objective': 'Replace manual sign-in sheets with automated, GDPR-compliant attendance capture using the university cards students already carry, and turn the resulting data into something staff could actually act on.',
+        'How it works': [
+          'Card reading at the protocol level: rather than relying on a vendor SDK, the system talks to an OMNIKEY 5427 G2 reader through the Windows PC/SC smartcard API, establishing a context, enumerating readers and transmitting raw APDU commands to retrieve each card UID.',
+          'Identity resolution: card holders are looked up against the University of Bath LDAP directory through a C# helper invoked from PowerShell, with connectivity tested at startup so a directory outage fails loudly rather than silently producing anonymous records.',
+          'Debounce and state tracking: a five-minute cooldown per card prevents double-taps creating duplicate rows, and per-card state determines whether a tap is a Start or an End event, so a single reader handles both arrival and departure.',
+          'Persistence: attendance is written to PostgreSQL hosted on AWS RDS over an SSL-required connection, using Npgsql loaded from locally restored .NET assemblies.',
+          'Cross-platform dispatch: an entry point detects the operating system and routes to the Windows or macOS implementation, with a fallback path if detection fails.',
+          'Reporting: Power BI dashboards give staff an attendance overview and engagement analysis without touching the database.',
+          'Configuration and secrets: non-secret settings live in a committed config file, while database credentials load from a git-ignored secrets file or from environment variables, which take precedence. Missing settings fail at startup naming exactly which values are absent.',
+          'Synthetic data: a Python generator produces realistic student records so the system can be developed and demonstrated without touching real personal data.'
+        ],
+        'Tools': 'PowerShell 7, C#, PC/SC (winscard) interop, LDAP, PostgreSQL, AWS RDS, Aiven, Npgsql, Power BI, Python.'
+      },
+      keyFindings: [
+        'Tracked attendance for 400+ students and cut manual reporting effort by around 80%.',
+        'Working against the PC/SC API directly rather than a vendor SDK kept the system dependent only on a documented standard, so it is not tied to one model of reader.',
+        'Most of the engineering effort went into the unglamorous parts: debouncing repeated taps, deciding whether a tap means arrival or departure, and failing clearly when the directory or database is unreachable. Those are what determine whether the data is trustworthy.',
+        'Handling personal data made configuration a design problem rather than an afterthought: credentials are kept out of the repository entirely and attendance records never enter version control.',
+        'Generating synthetic student data early meant the system could be built and demonstrated without ever handling real records during development.'
+      ],
+      limitations: [
+        'Card reading is tied to the PC/SC stack, so the Windows and macOS paths are separate implementations rather than one shared code path.',
+        'Attendance state is held in memory during a session, so a restart resets Start and End tracking for cards already tapped that day.',
+        'Reporting is manual refresh in Power BI rather than a live connection.'
+      ],
+      images: [
+        { src: '/media/BEAT/Overview.png', caption: 'Power BI attendance overview' },
+        { src: '/media/BEAT/Analysis.png', caption: 'Engagement analysis dashboard' },
+        { src: '/media/BEAT/bathenterprise.png', caption: 'Bath Enterprise' }
+      ]
+    }
+  },
+   {
+  id: 'barebonesnn',
+  title: 'BareBonesNN: Autodiff and Neural Nets from Scratch',
+  description: 'A scalar automatic differentiation engine and multi-layer perceptron built in pure Python with no ML framework, packaged and published to PyPI with tests and a release pipeline.',
+  image: '/media/barebonesnn/barebonesnn.png',
+  animation: '/media/animation/barebonesnn.json',
+  tags: ['Python', 'Autodiff', 'PyPI', 'CI/CD'],
+  category: ['AI', 'ML'],
+  githubUrl: 'https://github.com/AmirMohammadiKarbalaei/BareBonesNN',
+  content: {
+    data: 'Backpropagation is easy to use and hard to actually understand while a framework is doing it for you. BareBonesNN rebuilds it from first principles: a Value class that records every operation into a computational graph, derives its own local gradient, and propagates gradients backwards through a topological sort of the graph. Neuron, Layer and MLP are then built on top of that single primitive. Installable with pip install barebonesnn.',
+    processSections: {
+      'Objective': 'Understand automatic differentiation properly by implementing it, then treat the result as a real library rather than a notebook: packaged, tested, documented and published.',
+      'Approach': [
+        'Computational graph: each Value holds its data, its gradient, the child nodes it was produced from, and the operation that produced it, so the full graph is reconstructable from any output node.',
+        'Local gradients as closures: every operator (add, multiply, power, divide, negate, subtract, tanh, exp) attaches its own _backward function implementing the chain rule for that node, keeping each derivative next to the operation it belongs to.',
+        'Reverse-mode differentiation: backward() builds a topological ordering of the graph, seeds the output gradient, then walks the ordering in reverse so every node is visited only after everything depending on it.',
+        'Operator overloading with reflected variants (__radd__, __rmul__) so Value composes naturally with plain Python numbers.',
+        'Network layer: Neuron holds weights and a bias, Layer composes neurons, MLP composes layers, and parameters() exposes the full parameter set for gradient inspection and updates.',
+        'Packaging and release: setuptools build producing wheel and sdist, published to PyPI, with a GitHub Actions workflow that builds and publishes automatically on release using trusted publishing.',
+        'Testing: unit tests covering the Value primitive and each network component, verifying forward values against hand-computed expectations.'
+      ],
+      'Tools': 'Python, NumPy, setuptools, PyPI, GitHub Actions, unittest, type annotations, MIT licence.'
+    },
+    keyFindings: [
+      'Writing the backward pass by hand makes the cost model of deep learning concrete: the graph must be held in memory in full before gradients can flow, which is exactly why activation memory dominates training footprint in real frameworks.',
+      'Attaching each derivative to the operation that produced it keeps the implementation small and makes adding a new operator a local change rather than a modification to the engine.',
+      'Topological ordering is the whole trick of reverse-mode autodiff: without it, a node can be visited before all of its dependents have contributed their gradient.',
+      'Treating a learning project as a shipped package (versioning, tests, automated release) turned out to be as instructive as the maths.'
+    ],
+    limitations: [
+      'Scalar-valued rather than tensor-valued, so it is intended for understanding rather than for training anything at scale.',
+      'The activation set is deliberately small (tanh, exp) and there is no optimiser, batching or GPU support.',
+      'The design follows the standard teaching formulation of scalar reverse-mode autodiff; the contribution here is the implementation, packaging and release engineering rather than the algorithm.'
+    ]
+  }
+},{
     id: 'detect-sleep-states',
     title: 'Detect Sleep States - Child Mind Institute',
     description: 'Detect sleep onset and wake from wrist-worn accelerometer data to determine a person\'s sleep state.',
@@ -191,6 +413,93 @@ export const projects: Project[] = [
       ]
     }
   },
+  // --- Removed from the portfolio: see notes at the top of this file. ---
+  // {
+  // id: 'fraud-detection',
+  // title: 'Fraud Detection',
+  // description: 'Detect fraudulent transactions in financial data using machine learning algorithms.',
+  // image: '/media/FraudDetection/ConfusionMatrix.png',
+  // animation: '/media/animation/fraud_animation.json',
+  // tags: ['ML', 'Classification'],
+  // category: ['AI'],
+  // githubUrl: 'https://github.com/AmirMohammadiKarbalaei/FraudDetection',
+  // content: {
+  // data: 'The FraudDetection System is a Python-based solution designed to identify and mitigate fraudulent transactions within financial datasets. By leveraging state-of-the-art machine learning algorithms and comprehensive data preprocessing techniques, this system ensures the accurate detection of fraudulent activities.',
+  // process: [
+  // 'Data Preprocessing: Robust data preprocessing including missing value handling, categorical encoding and numeric normalisation.',
+  // 'Model Training & Comparison: Trained and compared Random Forest and a deep learning model (FraudDetectionModel).',
+  // 'Evaluation & Persistence: Evaluated models using precision/recall/F1 and implemented model persistence for reuse in production.'
+  // ],
+  // processSections: {
+  // 'Overview': 'Python-based fraud detection system that combines feature engineering, classical ML and deep learning to identify suspicious transactions in financial datasets.',
+  // 'Key Features': [
+  // 'Robust data preprocessing capabilities, including handling of missing values, encoding of categorical variables, and normalisation of numerical features.',
+  // 'Integration of multiple machine learning models, including a deep learning model (FraudDetectionModel) and a random forest model (FraudDetectionRFModel), tailored for high-performance fraud detection.',
+  // 'Comprehensive model evaluation metrics, including accuracy, precision, recall, and F1 score, to rigorously assess the effectiveness of each model.',
+  // 'Support for saving and loading trained models, enabling seamless deployment and reuse in various operational environments.'
+  // ],
+  // 'System Requirements': [
+  // 'Python',
+  // 'Pandas for data manipulation and analysis',
+  // 'Numpy for numerical computations',
+  // 'Torch for deep learning',
+  // 'Scikit-Learn for machine learning',
+  // 'Matplotlib and Seaborn for data visualisation'
+  // ],
+  // 'Usage Instructions': [
+  // 'Download the relevant dataset (e.g., Fraud.csv) and place it in the designated Fraud_data directory. Utilise the DataPreprocessing module to prepare the data for model training.',
+  // 'Train a deep learning model using the FraudDetectionModel class and the random forest model using the FraudDetectionRFModel class to detect fraudulent transactions.',
+  // 'Apply the ModelEvaluation module to thoroughly assess the performance of each trained model using various metrics.',
+  // 'Save the trained models with the ModelSaving module, and load them when required using the ModelLoading module for continued analysis.'
+  // ],
+  // 'Example Use Cases': [
+  // 'Employ the system to detect and prevent fraudulent transactions within a financial dataset, safeguarding financial operations.',
+  // 'Utilise the system to perform comparative analysis of different machine learning models, optimising the approach to fraud detection tasks.'
+  // ]
+  // },
+  // keyFindings: [
+  // 'Multiple modelling approaches improve robustness to different fraud patterns.',
+  // 'Careful preprocessing and class imbalance handling are critical for performance.',
+  // 'Model persistence enables simple deployment and integration into downstream systems.'
+  // ],
+  // images: [
+  // { src: '/media/FraudDetection/modeleval.png', caption: 'Model Evaluation' },
+  // { src: '/media/FraudDetection/ROC-AUC.png', caption: 'ROC-AUC' },
+  // { src: '/media/FraudDetection/ConfusionMatrix.png', caption: 'Confusion Matrix' }
+  // ]
+  // }
+  // },
+  {
+    id: 'daily-link-ai',
+    title: 'DailyLinkAI',
+    description: 'Your Personalised Daily News Recommender.',
+    image: '/media/DailyLinkAI/app_screenshot.png',
+    animation: '/media/animation/news.json',
+    tags: ['NLP', 'ML'], 
+    category: ['NLP', 'AI'],
+    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/DailyLinkai',
+    streamlitUrl: 'https://dailylinkai.streamlit.app',
+    content: {
+        data: 'DailyLinkAI curates a personalised daily news feed by analysing article content from reputable sources such as BBC and SkyNews. The application uses NLP embeddings and retrieval techniques to recommend contextually relevant articles based on user interests.',
+        processSections: {
+          'Article Collection': 'Articles are scraped from trusted sources (sitemaps/RSS) and stored with metadata to ensure comprehensive coverage.',
+          'Content Analysis': [
+            'Text is cleaned and converted to embeddings (BERT-based) so that semantic similarity can be computed across articles.',
+            'The system employs RAG (Retrieval-Augmented Generation) to find and suggest articles with the closest vector matches, ensuring recommendations are contextually relevant to the user\'s interests.'
+          ],
+          'Deployment': 'Streamlit application provides an intuitive front-end and a lightweight backend designed for scalability and fast responses.'
+        },
+        keyFindings: [
+          'Personalised News Feed: Tailored news recommendations based on user interests and interactions.',
+          'Comprehensive Coverage: Articles from diverse, reputable sources covering various angles of important topics.',
+          'Intelligent Recommendations: Utilises state-of-the-art embedding techniques and similarity scoring to suggest articles that align with user preferences.',
+          'Scalable and Efficient: Lightweight backend system for fast and reliable news delivery.'
+        ],
+        images: [
+          { src: '/media/DailyLinkAI/app_screenshot.png', caption: 'Streamlit App' }
+        ]
+    }
+  },
   {
     id: 'diabetes-classification',
     title: 'Diabetes Classification',
@@ -198,7 +507,7 @@ export const projects: Project[] = [
     image: '/media/diabetes/EDA.png',
     animation: '/media/animation/diabetes.json',
     tags: ['ML', 'Classification', 'EDA'],
-    category: ['AI', 'TimeSeries'],
+    category: ['AI', 'ML'],
     githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Pima-Indians-Diabetes',
     streamlitUrl: 'https://pima-indians-diabetes-k6mzyppban6rqolb5mtrdc.streamlit.app/?embed=true&embed_options=dark_theme',
     content: {
@@ -231,178 +540,6 @@ export const projects: Project[] = [
         { src: '/media/diabetes/NNloss.png', caption: 'NN Model Loss (train/val/test)' },
         { src: '/media/diabetes/NNacc.png', caption: 'NN Model Accuracy (train/val/test)' }
       ]
-    }
-  },
-  
-  {
-    id: 'business-analysis',
-    title: 'Business Analysis',
-    description: 'Analysing orders dataset from a business comprising of over 3000 data points spanning from 2011 to 2016.',
-    image: '/media/Business analysis/Overview.png',
-    animation: '/media/animation/customer.json',
-    tags: ['BI', 'DA', 'Dashboard'],
-    category: ['AI', 'ML'],
-    content: {
-      data: 'The dataset spans from 2011 to 2016 and encompasses business trading activities across three countries and 31 states. With over 3000 data points encompassing information such as customer age and gender, product details, product categories, dates, and more.',
-      findings: {
-        Overview: [
-          'France constitutes the majority of the orders, comprising 88% of total orders, while other countries contribute approximately 6%.',
-          'Customer demographics reveal an even distribution of gender, with a significant presence of young adults and adults, suggesting a need for targeted marketing strategies.',
-          'Order volumes have shown a progressive increase over time, with clear seasonality observed, potentially influenced by external factors.'
-        ],
-        Profit: [
-          'The business has generated a total profit of 904k pounds, with an average profit per product sold of 193 pounds.',
-          'Some products, such as AWC Logo caps and certain jerseys, yield negative profits, warranting further investigation into underlying causes.',
-          'Mountain bikes emerge as the highest profit-generating products, with road bikes following closely behind.'
-        ],
-        Orders: [
-          'A progressive increase in orders can be seen, expecting nearly 2000 orders annually by 2020.',
-          'Accessories, particularly patch kits, dominate product lineup, notably in 2014 and 2016.',
-          'Normal age distribution with female customers slightly younger; average customer age increasing suggests marketing focus shift.'
-        ]
-      },
-      process: [
-        'Load and clean the orders dataset and harmonise country/state labels.',
-        'Aggregate transactions by country, year and product categories to compute revenue and profit metrics.',
-        'Visualise orders over time to identify seasonality and growth trends.',
-        'Analyse product-level profitability to highlight loss-making SKUs for further investigation.'
-      ],
-      limitations: [
-        'Lack of customer-related information prevents deeper analysis such as retention rates and lifetime value.',
-        'Some product metadata is inconsistent across years which required manual harmonisation.',
-        'Geographic granularity is limited for some deliveries, restricting fine-grained regional analysis.'
-      ],
-      images: [
-        { src: '/media/Business analysis/Overview.png', caption: 'Overview' },
-        { src: '/media/Business analysis/Orders.png', caption: 'Orders' },
-        { src: '/media/Business analysis/Profit.png', caption: 'Profit' }
-      ]
-    }
-  },
-  {
-    id: 'beat',
-    title: 'BEAT - Attendance Tracking System',
-    description: 'Creating a secure and scalable attendance tracking system for Bath Enterprise.',
-    image: '/media/BEAT/bathenterprise.png',
-    tags: ['Power BI', 'AWS', 'Software Dev', 'Shell-Scripting'],
-    category: ['ML', 'BI', 'DA'],
-    content: {
-      data: 'Enterprise Bath is a University of Bath department which offers advice, business mentors, competitions, masterclasses, expert talks, placements and networking opportunities to aspiring entrepreneurs and intrapreneurs through an extra-curricular programme of events. This project aimed to create a secure and scalable attendance tracking system to enhance engagement and data accessibility for the entrepreneurial community.',
-      processSections: {
-        Concept: 'The project objective was to create a secure and scalable attendance tracking system tailored for Enterprise Bath to improve event management and participant engagement.',
-        'Technologies & Features': [
-          'A GDPR-compliant PostgreSQL database for secure and efficient attendance data management.',
-          'Automated data collection using LDAP queries and RFID card readers for accurate tracking.',
-          'A responsive Power BI dashboard for real-time attendance analysis and reporting.',
-          'Cloud-based technology for scalability and seamless integration.',
-          'Comprehensive documentation for ease of maintenance and long-term usability.'
-        ],
-        Process: [
-          'Designing and implementing a PostgreSQL database optimised for performance and data protection.',
-          'Setting up secure, automated data collection pipelines using LDAP and RFID technologies.',
-          'Creating intuitive Power BI visualisations tailored to the needs of stakeholders.'
-        ],
-        Outcome: 'The system successfully streamlined attendance tracking, providing insightful analytics and ensuring data security. It was well-received by the entrepreneurial community for its usability and efficiency.'
-      },
-      keyFindings: [
-        'Successfully streamlined attendance tracking with automated data collection',
-        'Achieved GDPR compliance for secure data management',
-        'Integrated LDAP queries and RFID card readers for accurate tracking',
-        'Provided real-time attendance analysis through Power BI dashboard',
-        'Enhanced engagement and data accessibility for entrepreneurial community',
-        'Implemented cloud-based technology for scalability and seamless integration'
-      ],
-      images: [
-        { src: '/media/BEAT/bathenterprise.png', caption: 'Bath Enterprise Logo' },
-        { src: '/media/BEAT/Analysis.png', caption: 'Analysis Dashboard' },
-        { src: '/media/BEAT/Overview.png', caption: 'System Overview' }
-      ]
-    }
-  },
-  {
-    id: 'fraud-detection',
-    title: 'Fraud Detection',
-    description: 'Detect fraudulent transactions in financial data using machine learning algorithms.',
-    image: '/media/FraudDetection/ConfusionMatrix.png',
-    animation: '/media/animation/fraud_animation.json',
-    tags: ['ML', 'Classification'],
-    category: ['AI'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/FraudDetection',
-    content: {
-      data: 'The FraudDetection System is a Python-based solution designed to identify and mitigate fraudulent transactions within financial datasets. By leveraging state-of-the-art machine learning algorithms and comprehensive data preprocessing techniques, this system ensures the accurate detection of fraudulent activities.',
-      process: [
-        'Data Preprocessing: Robust data preprocessing including missing value handling, categorical encoding and numeric normalisation.',
-        'Model Training & Comparison: Trained and compared Random Forest and a deep learning model (FraudDetectionModel).',
-        'Evaluation & Persistence: Evaluated models using precision/recall/F1 and implemented model persistence for reuse in production.'
-      ],
-      processSections: {
-        'Overview': 'Python-based fraud detection system that combines feature engineering, classical ML and deep learning to identify suspicious transactions in financial datasets.',
-        'Key Features': [
-          'Robust data preprocessing capabilities, including handling of missing values, encoding of categorical variables, and normalisation of numerical features.',
-          'Integration of multiple machine learning models, including a deep learning model (FraudDetectionModel) and a random forest model (FraudDetectionRFModel), tailored for high-performance fraud detection.',
-          'Comprehensive model evaluation metrics, including accuracy, precision, recall, and F1 score, to rigorously assess the effectiveness of each model.',
-          'Support for saving and loading trained models, enabling seamless deployment and reuse in various operational environments.'
-        ],
-        'System Requirements': [
-          'Python',
-          'Pandas for data manipulation and analysis',
-          'Numpy for numerical computations',
-          'Torch for deep learning',
-          'Scikit-Learn for machine learning',
-          'Matplotlib and Seaborn for data visualisation'
-        ],
-        'Usage Instructions': [
-          'Download the relevant dataset (e.g., Fraud.csv) and place it in the designated Fraud_data directory. Utilise the DataPreprocessing module to prepare the data for model training.',
-          'Train a deep learning model using the FraudDetectionModel class and the random forest model using the FraudDetectionRFModel class to detect fraudulent transactions.',
-          'Apply the ModelEvaluation module to thoroughly assess the performance of each trained model using various metrics.',
-          'Save the trained models with the ModelSaving module, and load them when required using the ModelLoading module for continued analysis.'
-        ],
-        'Example Use Cases': [
-          'Employ the system to detect and prevent fraudulent transactions within a financial dataset, safeguarding financial operations.',
-          'Utilise the system to perform comparative analysis of different machine learning models, optimising the approach to fraud detection tasks.'
-        ]
-      },
-      keyFindings: [
-        'Multiple modelling approaches improve robustness to different fraud patterns.',
-        'Careful preprocessing and class imbalance handling are critical for performance.',
-        'Model persistence enables simple deployment and integration into downstream systems.'
-      ],
-      images: [
-        { src: '/media/FraudDetection/modeleval.png', caption: 'Model Evaluation' },
-        { src: '/media/FraudDetection/ROC-AUC.png', caption: 'ROC-AUC' },
-        { src: '/media/FraudDetection/ConfusionMatrix.png', caption: 'Confusion Matrix' }
-      ]
-    }
-  },
-  {
-    id: 'daily-link-ai',
-    title: 'DailyLinkAI',
-    description: 'Your Personalised Daily News Recommender.',
-    image: '/media/DailyLinkAI/app_screenshot.png',
-    animation: '/media/animation/news.json',
-    tags: ['NLP', 'ML'], 
-    category: ['NLP', 'AI'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/DailyLinkai',
-    streamlitUrl: 'https://dailylinkai.streamlit.app',
-    content: {
-        data: 'DailyLinkAI curates a personalised daily news feed by analysing article content from reputable sources such as BBC and SkyNews. The application uses NLP embeddings and retrieval techniques to recommend contextually relevant articles based on user interests.',
-        processSections: {
-          'Article Collection': 'Articles are scraped from trusted sources (sitemaps/RSS) and stored with metadata to ensure comprehensive coverage.',
-          'Content Analysis': [
-            'Text is cleaned and converted to embeddings (BERT-based) so that semantic similarity can be computed across articles.',
-            'The system employs RAG (Retrieval-Augmented Generation) to find and suggest articles with the closest vector matches, ensuring recommendations are contextually relevant to the user\'s interests.'
-          ],
-          'Deployment': 'Streamlit application provides an intuitive front-end and a lightweight backend designed for scalability and fast responses.'
-        },
-        keyFindings: [
-          'Personalised News Feed: Tailored news recommendations based on user interests and interactions.',
-          'Comprehensive Coverage: Articles from diverse, reputable sources covering various angles of important topics.',
-          'Intelligent Recommendations: Utilises state-of-the-art embedding techniques and similarity scoring to suggest articles that align with user preferences.',
-          'Scalable and Efficient: Lightweight backend system for fast and reliable news delivery.'
-        ],
-        images: [
-          { src: '/media/DailyLinkAI/app_screenshot.png', caption: 'Streamlit App' }
-        ]
     }
   },
   // {
@@ -441,32 +578,33 @@ export const projects: Project[] = [
   //     ]
   //   }
   // },
-  {
-    id: 'disaster-tweets',
-    title: 'Disaster Tweets',
-    description: 'Predict which Tweets are about real disasters and which ones are not.',
-    image: '/media/disaster_tweets/disaster.png',
-    animation: '/media/animation/nlp.json',
-    tags: ['NLP', 'ML'],
-    category: ['NLP', 'AI'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/kaggle-NLP-Disaster-Tweets',
-    content: {
-      data: 'The ubiquitousness of smartphones enables people to announce an emergency they\'re observing in real-time. Because of this, more agencies are interested in programatically monitoring Twitter (i.e. disaster relief organisations and news agencies). But, it\'s not always clear whether a person\'s words are actually announcing a disaster. The aim of this project is to build a machine learning model that predicts which Tweets are about real disasters and which ones aren\'t.',
-      processSections: {
-        'Data Understanding': 'Each sample contains tweet text, an optional keyword and an optional location. The dataset was inspected for missing values and distribution of classes.',
-        'Data Cleaning & Preparation': 'Removed punctuation, lower-cased text, removed non-English tokens, and vectorised text using TF-IDF. Split into train/test sets with stratification.',
-        'Modeling': [
-          'Implemented Naive Bayes and baseline models for quick iteration.',
-          'Evaluated using accuracy and F1; Naive Bayes produced ~78% test accuracy on the cleaned dataset.'
-        ]
-      },
-      images: [
-        { src: '/media/disaster_tweets/Model Eval.jpg', caption: 'XGBoost evaluation' },
-        { src: '/media/disaster_tweets/not a disaster.png', caption: 'Document-Term Matrix for not a disaster' },
-        { src: '/media/disaster_tweets/disaster.png', caption: 'Document-Term Matrix for a disaster' }
-      ]
-    }
-  },
+  // --- Removed from the portfolio: see notes at the top of this file. ---
+  // {
+  // id: 'disaster-tweets',
+  // title: 'Disaster Tweets',
+  // description: 'Predict which Tweets are about real disasters and which ones are not.',
+  // image: '/media/disaster_tweets/disaster.png',
+  // animation: '/media/animation/nlp.json',
+  // tags: ['NLP', 'ML'],
+  // category: ['NLP', 'AI'],
+  // githubUrl: 'https://github.com/AmirMohammadiKarbalaei/kaggle-NLP-Disaster-Tweets',
+  // content: {
+  // data: 'The ubiquitousness of smartphones enables people to announce an emergency they\'re observing in real-time. Because of this, more agencies are interested in programatically monitoring Twitter (i.e. disaster relief organisations and news agencies). But, it\'s not always clear whether a person\'s words are actually announcing a disaster. The aim of this project is to build a machine learning model that predicts which Tweets are about real disasters and which ones aren\'t.',
+  // processSections: {
+  // 'Data Understanding': 'Each sample contains tweet text, an optional keyword and an optional location. The dataset was inspected for missing values and distribution of classes.',
+  // 'Data Cleaning & Preparation': 'Removed punctuation, lower-cased text, removed non-English tokens, and vectorised text using TF-IDF. Split into train/test sets with stratification.',
+  // 'Modeling': [
+  // 'Implemented Naive Bayes and baseline models for quick iteration.',
+  // 'Evaluated using accuracy and F1; Naive Bayes produced ~78% test accuracy on the cleaned dataset.'
+  // ]
+  // },
+  // images: [
+  // { src: '/media/disaster_tweets/Model Eval.jpg', caption: 'XGBoost evaluation' },
+  // { src: '/media/disaster_tweets/not a disaster.png', caption: 'Document-Term Matrix for not a disaster' },
+  // { src: '/media/disaster_tweets/disaster.png', caption: 'Document-Term Matrix for a disaster' }
+  // ]
+  // }
+  // },
   {
     id: 'business-data-analytics',
     title: 'Business Data Analytics',
@@ -523,42 +661,43 @@ export const projects: Project[] = [
   //   }
   // },
   
-  {
-    id: 'top-sellers',
-    title: 'Amazon Top 50 Bestselling Books',
-    description: 'Analysis of Amazon\'s Top 50 bestselling books from 2009 to 2019.',
-    image: '/media/Amazon Top50 Books/BoxPlot.png',
-    animation: '/media/animation/book.json',
-    tags: ['DA', 'Visualisation'],
-    category: ['DA'],
-    content: {
-      data: 'Dataset on Amazon\'s Top 50 bestselling books from 2009 to 2019. Contains 550 books, data has been categorised into fiction and non-fiction using Goodreads.',
-      processSections: {
-        'Data': 'The dataset encompasses essential columns including Book Name, Author, User Rating, Reviews, Genre, Price, and Year, spanning from 2009 to 2019. This comprehensive dataset provides a rich foundation for in-depth analysis and correlation studies. By meticulously analysing the complex interrelationships among these data columns, significant insights can be extracted.',
-        'Key Findings': [
-          'Ratings generally increase over the years, indicating improved book quality.',
-          'User ratings skew towards higher values, with most books receiving 4 to 5 stars.',
-          'Number of Reviews are predominantly lower than 20000, with a long tail of books accumulating high review counts.',
-          'Prices vary, but most books are priced below $20.',
-          'Non-fiction titles are more prevalent among bestsellers.',
-          'Non-fiction books have slightly higher median prices and wider price ranges.',
-          'User ratings show minimal differences between fiction and non-fiction, but fiction books exhibit wider variability.',
-          'Fiction books tend to accumulate more reviews, with a wider range in counts.',
-          'A weak positive correlation exists between user ratings and review counts.',
-          'There is also a weak positive correlation between user rating and price.',
-          'There\'s a moderate negative correlation between review counts and price, indicating lower-priced books tend to receive more reviews.',
-          'There is a moderate positive correlation observed between review counts and year of publication, suggesting that newer books tend to attract more reviews.',
-          'The average reviews are increasing year by year from 2012 to 2019.'
-        ],
-        'Conclusion': 'Overall, these findings emphasise the intricate mix of factors affecting user ratings, reviews, and prices in the book world. Elements such as book quality, genre popularity, and pricing strategies all come into play. However, it\'s essential to remember that correlation doesn\'t equal causation. While books with more reviews often have higher ratings, it doesn\'t necessarily mean one directly causes the other. Other factors, like the book\'s inherent quality or its genre\'s popularity, likely contribute significantly to these observed trends.'
-      },
-      images: [
-        { src: '/media/Amazon Top50 Books/BoxPlot.png', caption: 'Box Plot Analysis' },
-        { src: '/media/Amazon Top50 Books/data distribution.png', caption: 'Data Distribution' },
-        { src: '/media/Amazon Top50 Books/Relationship.png', caption: 'Relationship Analysis' }
-      ]
-    }
-  },
+  // --- Removed from the portfolio: see notes at the top of this file. ---
+  // {
+  // id: 'top-sellers',
+  // title: 'Amazon Top 50 Bestselling Books',
+  // description: 'Analysis of Amazon\'s Top 50 bestselling books from 2009 to 2019.',
+  // image: '/media/Amazon Top50 Books/BoxPlot.png',
+  // animation: '/media/animation/book.json',
+  // tags: ['DA', 'Visualisation'],
+  // category: ['DA'],
+  // content: {
+  // data: 'Dataset on Amazon\'s Top 50 bestselling books from 2009 to 2019. Contains 550 books, data has been categorised into fiction and non-fiction using Goodreads.',
+  // processSections: {
+  // 'Data': 'The dataset encompasses essential columns including Book Name, Author, User Rating, Reviews, Genre, Price, and Year, spanning from 2009 to 2019. This comprehensive dataset provides a rich foundation for in-depth analysis and correlation studies. By meticulously analysing the complex interrelationships among these data columns, significant insights can be extracted.',
+  // 'Key Findings': [
+  // 'Ratings generally increase over the years, indicating improved book quality.',
+  // 'User ratings skew towards higher values, with most books receiving 4 to 5 stars.',
+  // 'Number of Reviews are predominantly lower than 20000, with a long tail of books accumulating high review counts.',
+  // 'Prices vary, but most books are priced below $20.',
+  // 'Non-fiction titles are more prevalent among bestsellers.',
+  // 'Non-fiction books have slightly higher median prices and wider price ranges.',
+  // 'User ratings show minimal differences between fiction and non-fiction, but fiction books exhibit wider variability.',
+  // 'Fiction books tend to accumulate more reviews, with a wider range in counts.',
+  // 'A weak positive correlation exists between user ratings and review counts.',
+  // 'There is also a weak positive correlation between user rating and price.',
+  // 'There\'s a moderate negative correlation between review counts and price, indicating lower-priced books tend to receive more reviews.',
+  // 'There is a moderate positive correlation observed between review counts and year of publication, suggesting that newer books tend to attract more reviews.',
+  // 'The average reviews are increasing year by year from 2012 to 2019.'
+  // ],
+  // 'Conclusion': 'Overall, these findings emphasise the intricate mix of factors affecting user ratings, reviews, and prices in the book world. Elements such as book quality, genre popularity, and pricing strategies all come into play. However, it\'s essential to remember that correlation doesn\'t equal causation. While books with more reviews often have higher ratings, it doesn\'t necessarily mean one directly causes the other. Other factors, like the book\'s inherent quality or its genre\'s popularity, likely contribute significantly to these observed trends.'
+  // },
+  // images: [
+  // { src: '/media/Amazon Top50 Books/BoxPlot.png', caption: 'Box Plot Analysis' },
+  // { src: '/media/Amazon Top50 Books/data distribution.png', caption: 'Data Distribution' },
+  // { src: '/media/Amazon Top50 Books/Relationship.png', caption: 'Relationship Analysis' }
+  // ]
+  // }
+  // },
   
   
   // {
@@ -592,40 +731,41 @@ export const projects: Project[] = [
   //     ]
   //   }
   // },
-  {
-    id: 'global-unemployment',
-    title: 'Global Unemployment',
-    description: 'Analysing Unemployment Trends Across Age Groups and Genders (2014-2024).',
-    image: '/media/Global Unemployment/Average Unemployment Rate for age groups.png',
-    animation: '/media/animation/globe.json',
-    tags: ['DA', 'Visualisation'],
-    category: ['DA'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Global_Unemployment',
-    content: {
-      data: 'Understanding the shifts in global unemployment dynamics remains paramount for policymakers, economists, and researchers alike. Spanning from 2014 to 2024, this dataset presents a comprehensive analysis of unemployment trends across diverse demographic dimensions. The central focus lies in examining the data by country, age group, and gender, thereby providing valuable insights into the myriad factors influencing labor markets worldwide.',
-      process: [
-        'Data collection covering unemployment rates from 2014 to 2024 across multiple countries',
-        'Analysis by country, gender, and age group dimensions',
-        'Statistical analysis to identify patterns and correlations between demographics',
-        'Visualisation of trends and comparative analysis across regions',
-        'Impact assessment of global events (COVID-19) on unemployment rates'
-      ],
-      keyFindings: [
-        'Djibouti had the highest unemployment rates from 2014 to 2024',
-        'Palestinian Territories showed drastic increase from 2014-2018, plateauing until 2021',
-        'Cambodia had the lowest unemployment rate with an average as low as 0.4%',
-        'Significant COVID-19 impact with noticeable spike in unemployment rates for all countries from 2020-2021',
-        'Youth unemployment (15-24 age group) is approximately 2.5 times higher than other age groups',
-        'Female unemployment rates consistently higher than male rates due to unequal opportunities',
-        'Strong positive correlation between gender unemployment trends over time'
-      ],
-      images: [
-        { src: '/media/Global Unemployment/Lowest unemployement countries.png', caption: 'Countries with Lowest Unemployment Rate' },
-        { src: '/media/Global Unemployment/Highest unemployement countries.png', caption: 'Countries with Highest Unemployment Rate' },
-        { src: '/media/Global Unemployment/Unemployment Rate for age groups boxplot.png', caption: 'Unemployment Rate for Age Groups' },
-        { src: '/media/Global Unemployment/Gendre unemployment rates.png', caption: 'Unemployment Rate For Each Gender Over Time' }
-      ]
-    }
-  }
+  // --- Removed from the portfolio: see notes at the top of this file. ---
+  // {
+  // id: 'global-unemployment',
+  // title: 'Global Unemployment',
+  // description: 'Analysing Unemployment Trends Across Age Groups and Genders (2014-2024).',
+  // image: '/media/Global Unemployment/Average Unemployment Rate for age groups.png',
+  // animation: '/media/animation/globe.json',
+  // tags: ['DA', 'Visualisation'],
+  // category: ['DA'],
+  // githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Global_Unemployment',
+  // content: {
+  // data: 'Understanding the shifts in global unemployment dynamics remains paramount for policymakers, economists, and researchers alike. Spanning from 2014 to 2024, this dataset presents a comprehensive analysis of unemployment trends across diverse demographic dimensions. The central focus lies in examining the data by country, age group, and gender, thereby providing valuable insights into the myriad factors influencing labor markets worldwide.',
+  // process: [
+  // 'Data collection covering unemployment rates from 2014 to 2024 across multiple countries',
+  // 'Analysis by country, gender, and age group dimensions',
+  // 'Statistical analysis to identify patterns and correlations between demographics',
+  // 'Visualisation of trends and comparative analysis across regions',
+  // 'Impact assessment of global events (COVID-19) on unemployment rates'
+  // ],
+  // keyFindings: [
+  // 'Djibouti had the highest unemployment rates from 2014 to 2024',
+  // 'Palestinian Territories showed drastic increase from 2014-2018, plateauing until 2021',
+  // 'Cambodia had the lowest unemployment rate with an average as low as 0.4%',
+  // 'Significant COVID-19 impact with noticeable spike in unemployment rates for all countries from 2020-2021',
+  // 'Youth unemployment (15-24 age group) is approximately 2.5 times higher than other age groups',
+  // 'Female unemployment rates consistently higher than male rates due to unequal opportunities',
+  // 'Strong positive correlation between gender unemployment trends over time'
+  // ],
+  // images: [
+  // { src: '/media/Global Unemployment/Lowest unemployement countries.png', caption: 'Countries with Lowest Unemployment Rate' },
+  // { src: '/media/Global Unemployment/Highest unemployement countries.png', caption: 'Countries with Highest Unemployment Rate' },
+  // { src: '/media/Global Unemployment/Unemployment Rate for age groups boxplot.png', caption: 'Unemployment Rate for Age Groups' },
+  // { src: '/media/Global Unemployment/Gendre unemployment rates.png', caption: 'Unemployment Rate For Each Gender Over Time' }
+  // ]
+  // }
+  // }
  
 ];
