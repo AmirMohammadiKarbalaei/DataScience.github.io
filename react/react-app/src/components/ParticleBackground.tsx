@@ -28,7 +28,10 @@ const ParticleBackground: React.FC = () => {
 
     const createParticles = () => {
       const particles: Particle[] = [];
-      const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
+      // Density by area, capped: linking is pairwise, so an uncapped 4K
+      // screen (~550 particles) meant ~150,000 distance checks every frame.
+      // 160 keeps a 1080p screen's look (~140) and bounds the worst case.
+      const particleCount = Math.min(160, Math.floor((canvas.width * canvas.height) / 15000));
 
       for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -60,28 +63,39 @@ const ParticleBackground: React.FC = () => {
       particlesRef.current.forEach(particle => {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 212, 255, ${particle.opacity})`;
+        // The site accent at reduced strength: the field sits behind content,
+        // so it reads as texture rather than a second light source.
+        ctx.fillStyle = `rgba(91, 184, 204, ${particle.opacity * 0.6})`;
         ctx.fill();
       });
 
-      // Connect nearby particles
-      particlesRef.current.forEach((particle, i) => {
-        particlesRef.current.slice(i + 1).forEach(otherParticle => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 100) {
+      // Connect nearby particles. Plain index loops (the old slice() made a
+      // new array per particle, every frame) and squared distances, so the
+      // square root is only taken for the few pairs that actually link.
+      const particles = particlesRef.current;
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i];
+        for (let j = i + 1; j < particles.length; j++) {
+          const b = particles[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const distanceSq = dx * dx + dy * dy;
+          if (distanceSq < 10000) {
+            const distance = Math.sqrt(distanceSq);
             ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(91, 115, 240, ${0.2 * (1 - distance / 100)})`;
-            ctx.lineWidth = 0.5;
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = `rgba(200, 210, 220, ${0.12 * (1 - distance / 100)})`;
             ctx.stroke();
           }
-        });
-      });
+        }
+      }
     };
+
+    // With reduced motion the field is drawn once and held still, so the
+    // background keeps its look without anything drifting.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const animate = () => {
       updateParticles();
@@ -91,11 +105,16 @@ const ParticleBackground: React.FC = () => {
 
     resizeCanvas();
     createParticles();
-    animate();
+    if (reduceMotion) {
+      drawParticles();
+    } else {
+      animate();
+    }
 
     const handleResize = () => {
       resizeCanvas();
       createParticles();
+      if (reduceMotion) drawParticles();
     };
 
     window.addEventListener('resize', handleResize);
@@ -112,6 +131,7 @@ const ParticleBackground: React.FC = () => {
     <canvas
       ref={canvasRef}
       className="particle-canvas"
+      aria-hidden="true"
       style={{
         position: 'fixed',
         top: 0,
