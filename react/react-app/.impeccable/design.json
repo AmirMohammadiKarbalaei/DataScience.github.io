@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T15:45:00Z",
+  "title": "Design System: Amir Mohammadikarbalaei — Data Science Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "signal-teal": {
+        "role": "primary",
+        "displayName": "Signal Teal",
+        "canonical": "oklch(73.3% 0.092 213)",
+        "tonalRamp": [
+          "#001122",
+          "#002d3f",
+          "#004e60",
+          "#007083",
+          "#3394a8",
+          "#5dbace",
+          "#82def2",
+          "#a3ffff"
+        ]
+      },
+      "void-black": {
+        "role": "neutral",
+        "displayName": "Void Black",
+        "canonical": "#0a0a0f",
+        "tonalRamp": [
+          "#0b0b10",
+          "#232329",
+          "#424248",
+          "#626269",
+          "#85858d",
+          "#aaaab1",
+          "#cdcdd5",
+          "#edeef6"
+        ]
+      },
+      "nebula-navy": {
+        "role": "neutral",
+        "displayName": "Nebula Navy",
+        "canonical": "#1a1a2e",
+        "tonalRamp": [
+          "#09081b",
+          "#212236",
+          "#3f4057",
+          "#606179",
+          "#82849d",
+          "#a7a8c3",
+          "#cacbe7",
+          "#eaecff"
+        ]
+      },
+      "abyss-blue": {
+        "role": "neutral",
+        "displayName": "Abyss Blue",
+        "canonical": "#16213e",
+        "tonalRamp": [
+          "#030823",
+          "#172240",
+          "#344161",
+          "#546384",
+          "#7686a9",
+          "#9aaad0",
+          "#bdcef4",
+          "#ddeeff"
+        ]
+      },
+      "glass-surface": {
+        "role": "neutral",
+        "displayName": "Glass Surface",
+        "canonical": "rgba(0, 0, 0, 0.4)"
+      },
+      "signal-hairline": {
+        "role": "neutral",
+        "displayName": "Signal Hairline",
+        "canonical": "rgba(91, 184, 204, 0.2)"
+      },
+      "signal-wash": {
+        "role": "neutral",
+        "displayName": "Signal Wash",
+        "canonical": "rgba(91, 184, 204, 0.1)"
+      },
+      "starlight-white": {
+        "role": "neutral",
+        "displayName": "Starlight White",
+        "canonical": "#ffffff"
+      },
+      "soft-silver": {
+        "role": "neutral",
+        "displayName": "Soft Silver",
+        "canonical": "#e0e0e0"
+      },
+      "mist-grey": {
+        "role": "neutral",
+        "displayName": "Mist Grey",
+        "canonical": "#b0b0b0",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#424242",
+          "#636363",
+          "#868686",
+          "#ababab",
+          "#cecece",
+          "#eeeeee"
+        ]
+      },
+      "ice-text": {
+        "role": "neutral",
+        "displayName": "Ice Text",
+        "canonical": "#e6faff"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page header titles in white with a fading teal hairline underline."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Centred white section titles, no framing glyphs."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "The typing line, split at the centre: grey I'm, teal role, cursor after the last letter."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Hero description in mist grey, max 600px."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All running copy."
+      },
+      "prompt": {
+        "displayName": "Prompt",
+        "purpose": "Mono subtitle and domain list prefixed with a teal '> '."
+      },
+      "readout": {
+        "displayName": "Readout",
+        "purpose": "Stat numbers on the Experience page, in white."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Mono project tags; filters use mono at 0.9rem."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-rest",
+        "value": "0 8px 32px rgba(0, 0, 0, 0.3)",
+        "purpose": "Cards, skills sheet, scrolled navbar."
+      },
+      {
+        "name": "control-depth",
+        "value": "0 8px 25px rgba(0, 0, 0, 0.35)",
+        "purpose": "Primary button and small controls at rest."
+      },
+      {
+        "name": "card-lift",
+        "value": "0 20px 60px rgba(0, 0, 0, 0.35)",
+        "purpose": "Project card hover and keyboard focus."
+      },
+      {
+        "name": "portrait",
+        "value": "0 16px 48px rgba(0, 0, 0, 0.45)",
+        "purpose": "Profile image, with a 1px white 14% ring."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-default",
+        "value": "all 0.3s ease",
+        "purpose": "Default for hovers across buttons, chips, links."
+      },
+      {
+        "name": "ease-card",
+        "value": "all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)",
+        "purpose": "Project card lift and scale."
+      },
+      {
+        "name": "light-sweep",
+        "value": "left 0.5s ease",
+        "purpose": "Faint teal band crossing buttons and chips on hover."
+      },
+      {
+        "name": "cursor-blink",
+        "value": "blink 1s infinite",
+        "purpose": "Typing hero cursor."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "992px"
+      },
+      {
+        "name": "xl",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Flat teal action with void-black text; lifts on hover.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">View Projects</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 10px; padding: 18px 45px; background: #5bb8cc; color: #0a0a0f; text-decoration: none; border-radius: 8px; font-family: Inter, sans-serif; font-weight: 600; font-size: 1rem; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 25px rgba(0,0,0,0.35); transition: all 0.3s ease; } .ds-btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.35); } .ds-btn-primary:focus-visible { outline: 2px solid #5bb8cc; outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Teal-outlined capsule that floods teal on hover.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">About Me</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; gap: 10px; padding: 15px 30px; background: transparent; color: #5bb8cc; border: 2px solid #5bb8cc; border-radius: 30px; text-decoration: none; font-family: Inter, sans-serif; font-weight: 600; transition: all 0.3s ease; } .ds-btn-secondary:hover { background: #5bb8cc; color: #0a0a0f; transform: translateY(-3px); } .ds-btn-secondary:focus-visible { outline: 2px solid #5bb8cc; outline-offset: 3px; }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "Glass capsule per project domain; active state is a flat teal tint.",
+      "html": "<div style=\"display:flex;gap:10px;flex-wrap:wrap\"><button class=\"ds-filter ds-filter--active\">All Projects <span>11</span></button><button class=\"ds-filter\">NLP &amp; LLMs <span>4</span></button></div>",
+      "css": ".ds-filter { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(0,0,0,0.4); border: 2px solid rgba(91,184,204,0.3); border-radius: 25px; color: #b0b0b0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; } .ds-filter span { opacity: 0.7; } .ds-filter:hover { border-color: rgba(91,184,204,0.6); color: #5bb8cc; transform: translateY(-2px); } .ds-filter--active { background: rgba(91,184,204,0.12); border-color: #5bb8cc; color: #5bb8cc; } .ds-filter:focus-visible { outline: 2px solid #5bb8cc; outline-offset: 3px; }"
+    },
+    {
+      "name": "Skill Pill",
+      "kind": "chip",
+      "refersTo": "skill-pill",
+      "description": "Round glass token for a tool, text only.",
+      "html": "<span class=\"ds-pill\">PostgreSQL</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; padding: 10px 16px; border-radius: 999px; background: rgba(0,0,0,0.35); border: 1px solid rgba(91,184,204,0.25); color: #e6faff; font-family: Inter, sans-serif; font-weight: 600; letter-spacing: 0.2px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: transform 0.2s ease; } .ds-pill:hover { transform: translateY(-2px); }"
+    },
+    {
+      "name": "Domain Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Mono project tag coloured by the 20% Tag Rule: hue at 20% fill, solid hue border.",
+      "html": "<div style=\"display:flex;gap:10px;flex-wrap:wrap\"><span class=\"ds-tag\" style=\"background:rgba(255,20,147,0.2);border-color:#ff1493\">NLP</span><span class=\"ds-tag\" style=\"background:rgba(0,230,19,0.2);border-color:#00e613\">LLM</span><span class=\"ds-tag\">Neutral</span></div>",
+      "css": ".ds-tag { padding: 6px 14px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; color: #fff; font-family: 'JetBrains Mono', monospace; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); transition: transform 0.2s ease; } .ds-tag:hover { transform: translateY(-2px); }"
+    },
+    {
+      "name": "Project Card",
+      "kind": "card",
+      "refersTo": "card-project",
+      "description": "Glass readout that lifts and brightens its hairline on hover and keyboard focus.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card__img\"></div><div class=\"ds-card__body\"><h3>Patent Text Pipeline at USPTO Scale</h3><p>A command-line pipeline that turns a year of USPTO bulk archives into a queryable dataset.</p></div></article>",
+      "css": ".ds-card { max-width: 340px; display: flex; flex-direction: column; background: rgba(0,0,0,0.4); border: 1px solid rgba(91,184,204,0.2); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: #fff; font-family: Inter, sans-serif; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); } .ds-card__img { height: 160px; background: #16213e; } .ds-card__body { padding: 20px; } .ds-card h3 { margin: 0 0 10px; font-size: 1.2rem; font-weight: 600; } .ds-card p { margin: 0; color: #b0b0b0; line-height: 1.6; font-size: 0.95rem; } .ds-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 60px rgba(0,0,0,0.35); border-color: rgba(91,184,204,0.6); }"
+    },
+    {
+      "name": "Section Heading",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Plain white section title, no framing glyphs.",
+      "html": "<h2 class=\"ds-heading\">Projects</h2>",
+      "css": ".ds-heading { margin: 0; text-align: center; font-family: Inter, sans-serif; font-size: 3.5rem; font-weight: 700; color: #fff; }"
+    },
+    {
+      "name": "Typing Hero Line",
+      "kind": "custom",
+      "refersTo": "title",
+      "description": "Grey I'm, teal typed role, cursor after the last letter. Confirmed identity element.",
+      "html": "<div class=\"ds-typing\"><span class=\"ds-typing__prefix\">I'm</span><span class=\"ds-typing__role\">a Data Engineer<span class=\"ds-typing__cursor\">|</span></span></div>",
+      "css": ".ds-typing { display: flex; align-items: center; height: 48px; font-family: Inter, sans-serif; font-size: 1.5rem; font-weight: 500; } .ds-typing__prefix { flex: 1; text-align: right; color: #b0b0b0; } .ds-typing__role { flex: 1; margin-left: 0.5rem; color: #5bb8cc; white-space: nowrap; } .ds-typing__cursor { font-weight: 300; animation: ds-blink 1s infinite; } @keyframes ds-blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Signal Lab, restrained",
+    "overview": "The site is an instrument panel for someone who works with data. The background is a dark field (void black into nebula navy into abyss blue), ruled with a barely-there grid every 50px. Particles drift across it as faint texture. Every surface is a glass readout: black at 40% opacity, blurred 20px, edged with a teal hairline. Content sits inside these readouts the way values sit inside instruments.\n\nColour is spent sparingly. Type is white and grey. A single muted teal marks what is live or actionable: the typing role and cursor, the primary action, links, active filters, focus and the scroll trace. There are no gradients on text or fills and no coloured glows. Depth comes from ordinary dark shadows and a lift on hover. The per-domain tag colours are the one deliberate burst of colour, and they exist to show breadth. Monospace prompts (`> ` on the domain line and skill labels, `function Contact()` on the closing heading)`) mark the operator's voice, so the portfolio reads as a working lab rather than a brochure.\n\nMotion lives in the hero and in response to touch, never in looping decoration. Every piece of it stands still under `prefers-reduced-motion`, except the typing line, which the owner chose to keep running.",
+    "keyCharacteristics": [
+      "Dark field, faint 50px grid, drifting particle texture behind everything.",
+      "One accent, Signal Teal, used flat and sparingly. No gradient text, no glow.",
+      "Glass readouts: `rgba(0,0,0,0.4)` + 20px blur + teal hairline border.",
+      "Inter for speech, JetBrains Mono for the instrument's voice (prompts, tags, filters, numbers).",
+      "Touch = lift + brighter hairline + deeper neutral shadow.",
+      "A colour-coded tag spectrum that maps the breadth of ML domains at a glance."
+    ],
+    "rules": [
+      {
+        "name": "The One Accent Rule",
+        "body": "Signal Teal is the only accent, always flat. No gradient text, no gradient fills, no second accent hue. Emphasis comes from white, weight and size.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Glow Rule",
+        "body": "Shadows are neutral (`rgba(0, 0, 0, …)`) with a real offset. Coloured or zero-offset halos are decoration and do not ship.",
+        "section": "colors"
+      },
+      {
+        "name": "The 20% Tag Rule",
+        "body": "Every new tag gets a distinct hue at 20% fill with a solid border, so the spectrum reads as a legend and never as a set of competing buttons. Untagged hues fall back to the neutral glass tag.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark-on-Accent Rule",
+        "body": "Text on a Signal Teal fill is void black, never white. White on the accent fails WCAG; void black clears it comfortably.",
+        "section": "colors"
+      },
+      {
+        "name": "The Console Voice Rule",
+        "body": "Mono appears only where the instrument speaks: prompts, closing glyphs, tags, filters, numbers. It never appears in body copy.",
+        "section": "typography"
+      },
+      {
+        "name": "The Plain Heading Rule",
+        "body": "Every section heading, Contact included, is plain white text. The owner removed the < Title /> and function Contact() code framing; don't bring code-syntax decoration back to headings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lift Rule",
+        "body": "Every interactive surface answers hover in two ways at once. It rises (−2px for chips and tags, −3px for buttons, −5px for social links, −8px with 1.02 scale for project cards), and its hairline brightens to 60% teal. A hover that only changes colour is incomplete.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glass-Over-Grid Rule",
+        "body": "Panels are translucent black with backdrop blur. The grid and particles must remain faintly visible through them.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep Signal Teal flat and rare: live, actionable or code-syntax elements only.",
+      "Do set headings in white and get emphasis from weight and size.",
+      "Do build every panel as glass: {colors.glass-surface}, 20px backdrop blur, {colors.signal-hairline} border, 16px corners.",
+      "Do answer hover with lift plus a brighter hairline.",
+      "Do give every new project tag its own hue under the 20% Tag Rule.",
+      "Do keep the typing hero and the particle field. They are confirmed parts of the identity.",
+      "Do keep all copy in British English (optimisation, visualisation, colour)."
+    ],
+    "donts": [
+      "Don't use gradient text or gradient fills, anywhere.",
+      "Don't add coloured or zero-offset glows. Shadows are neutral.",
+      "Don't introduce a second accent hue. Violet, purple and pink are gone for good.",
+      "Don't put white text on a teal fill. Use void black.",
+      "Don't set body paragraphs in JetBrains Mono.",
+      "Don't add floating navigation beyond the navbar and one back-to-top button.",
+      "Don't add looping animation outside the hero."
+    ]
+  }
+}
