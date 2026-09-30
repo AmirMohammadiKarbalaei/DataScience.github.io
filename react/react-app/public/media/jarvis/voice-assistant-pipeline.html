@@ -1,341 +1,171 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis: how a request moves through the pipeline</title>
+<!-- The same faces as the portfolio, so the diagram reads as part of the page. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
-
+  /* The portfolio's system: one teal accent on a flat dark field, white and
+     grey type. Paths are told apart by line style (solid or dashed), not by
+     a hue per path. No gradients, glows, emoji or pulsing status dots. */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #06080f;
-    --surface: rgba(255,255,255,0.04);
-    --surface-hi: rgba(255,255,255,0.07);
-    --border: rgba(255,255,255,0.08);
-    --border-hi: rgba(255,255,255,0.18);
-    --cyan: #00e5ff;
-    --cyan-dim: rgba(0,229,255,0.12);
-    --pink: #ff2d78;
-    --pink-dim: rgba(255,45,120,0.12);
-    --gold: #ffb700;
-    --gold-dim: rgba(255,183,0,0.12);
-    --green: #00e5a0;
-    --green-dim: rgba(0,229,160,0.12);
-    --purple: #a855f7;
-    --purple-dim: rgba(168,85,247,0.12);
-    --text: #e8ecf1;
-    --muted: rgba(232,236,241,0.45);
-    --mono: 'DM Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --bg: #0d0f18;
+    --teal: #5bb8cc;
+    --teal-line: rgba(91,184,204,0.45);
+    --line: rgba(255,255,255,0.12);
+    --line-hi: rgba(255,255,255,0.22);
+    --text: #ffffff;
+    --soft: #e0e0e0;
+    --muted: #b0b0b0;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: Inter, system-ui, sans-serif;
   }
 
   body {
     background: var(--bg);
-    color: var(--text);
+    color: var(--soft);
     font-family: var(--sans);
-    min-height: 100vh;
     overflow-x: hidden;
     user-select: none;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* — Background mesh — */
-  .mesh {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(0,229,255,0.05) 0%, transparent 70%),
-      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255,45,120,0.05) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 60% at 60% 10%, rgba(168,85,247,0.04) 0%, transparent 70%);
-  }
+  /* The connecting lines are drawn on a canvas behind the components. */
+  canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-  /* — Canvas for curves — */
-  canvas {
-    position: fixed; inset: 0; z-index: 1; pointer-events: none;
-  }
-
-  /* — Layout — */
   .shell {
     position: relative; z-index: 10;
     max-width: 1100px;
     margin: 0 auto;
-    padding: 36px 24px 48px;
+    padding: 32px 24px 36px;
   }
 
-  /* — Header — */
-  .hdr {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 40px;
-  }
-  .hdr-logo {
-    width: 44px; height: 44px; border-radius: 12px;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
-    box-shadow: 0 0 24px rgba(0,229,255,0.25);
-  }
-  .hdr-text h1 {
-    font-family: var(--sans); font-size: 22px; font-weight: 800;
-    letter-spacing: 2px; text-transform: uppercase;
-    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    line-height: 1;
-  }
-  .hdr-text p {
-    font-family: var(--mono); font-size: 11px; color: var(--muted);
-    margin-top: 4px; letter-spacing: 0.5px;
-  }
+  /* Header */
+  .hdr { margin-bottom: 20px; }
+  .hdr h1 { font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; line-height: 1.3; }
+  .hdr p { font-size: 14px; color: var(--muted); margin-top: 4px; }
 
-  /* — Legend — */
-  .legend {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    margin-bottom: 32px;
-  }
-  .leg-item {
-    display: flex; align-items: center; gap: 6px;
-    font-family: var(--mono); font-size: 11px; color: var(--muted);
-  }
-  .leg-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-  }
+  /* Key: line styles, not colours */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 28px; }
+  .leg-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .leg-line { width: 24px; height: 0; border-top: 2px solid var(--teal); }
+  .leg-line.dashed { border-top: 2px dashed var(--soft); }
+  .leg-line.plain { border-top: 1.5px solid var(--line-hi); }
 
-  /* — Grid layout — */
-  .pipeline {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0;
-    position: relative;
-  }
-
-  /* — Lane labels — */
-  .lane-labels {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0;
-    margin-bottom: 12px;
-  }
+  /* Lanes */
+  .lane-labels { display: grid; grid-template-columns: repeat(5, 1fr); margin-bottom: 14px; }
   .lane-lbl {
-    font-family: var(--mono); font-size: 10px;
-    color: var(--muted); text-align: center;
-    letter-spacing: 1px; text-transform: uppercase;
-    padding: 0 8px;
-    border-top: 1px solid var(--border);
-    padding-top: 8px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    text-align: center; padding: 8px 8px 0; border-top: 1px solid var(--line);
   }
+  .pipeline { display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0 8px; position: relative; }
 
-  /* — Node columns — */
-  .col {
-    display: flex; flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding: 0 8px;
-    position: relative;
-  }
-
-  /* — Nodes — */
+  /* Components */
   .node {
     position: relative;
-    width: 100%; max-width: 168px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    padding: 11px 14px;
-    cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-    backdrop-filter: blur(8px);
-  }
-  .node:hover {
-    transform: translateY(-2px) scale(1.02);
-    background: var(--surface-hi);
-  }
-  .node-icon {
-    font-size: 16px; margin-bottom: 4px; display: block;
-    line-height: 1;
-  }
-  .node-name {
-    font-family: var(--sans); font-size: 12px; font-weight: 600;
-    color: var(--text); line-height: 1.3;
-  }
-  .node-sub {
-    font-family: var(--mono); font-size: 10px; color: var(--muted);
-    margin-top: 3px; line-height: 1.4;
-  }
-
-  /* — Color variants — */
-  .nc { border-color: rgba(0,229,255,0.25); }
-  .nc:hover { border-color: var(--cyan); box-shadow: 0 4px 20px rgba(0,229,255,0.15), inset 0 0 16px rgba(0,229,255,0.06); }
-  .nc .node-icon { color: var(--cyan); }
-
-  .np { border-color: rgba(255,45,120,0.25); }
-  .np:hover { border-color: var(--pink); box-shadow: 0 4px 20px rgba(255,45,120,0.15), inset 0 0 16px rgba(255,45,120,0.06); }
-  .np .node-icon { color: var(--pink); }
-
-  .ng { border-color: rgba(0,229,160,0.25); }
-  .ng:hover { border-color: var(--green); box-shadow: 0 4px 20px rgba(0,229,160,0.15), inset 0 0 16px rgba(0,229,160,0.06); }
-  .ng .node-icon { color: var(--green); }
-
-  .ngo { border-color: rgba(255,183,0,0.25); }
-  .ngo:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(255,183,0,0.15), inset 0 0 16px rgba(255,183,0,0.06); }
-  .ngo .node-icon { color: var(--gold); }
-
-  .npu { border-color: rgba(168,85,247,0.25); }
-  .npu:hover { border-color: var(--purple); box-shadow: 0 4px 20px rgba(168,85,247,0.15), inset 0 0 16px rgba(168,85,247,0.06); }
-  .npu .node-icon { color: var(--purple); }
-
-  /* — Central orchestrator — */
-  .orch-wrap {
-    grid-column: 3;
-    display: flex; flex-direction: column; align-items: center; gap: 0;
-  }
-  .orch {
-    position: relative; z-index: 5;
-    width: 100%; max-width: 168px;
-    border-radius: 14px;
-    border: 1.5px solid rgba(168,85,247,0.5);
-    background: rgba(168,85,247,0.08);
-    padding: 14px 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 0 32px rgba(168,85,247,0.12);
-  }
-  .orch:hover {
-    transform: translateY(-2px) scale(1.03);
-    border-color: var(--purple);
-    box-shadow: 0 8px 40px rgba(168,85,247,0.25), inset 0 0 24px rgba(168,85,247,0.1);
-  }
-  .orch-badge {
-    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
-    background: var(--purple); color: #fff;
-    font-family: var(--mono); font-size: 9px; font-weight: 500;
-    padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-
-  /* — Tool grid inside col — */
-  .tool-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-    width: 100%; max-width: 220px;
-  }
-  .tool-chip {
-    border-radius: 8px; border: 1px solid var(--border);
-    background: var(--surface);
-    padding: 7px 8px;
-    font-family: var(--mono); font-size: 10px; color: var(--muted);
-    display: flex; align-items: center; gap: 5px;
-    cursor: pointer; transition: all 0.15s ease;
-  }
-  .tool-chip:hover {
-    border-color: rgba(0,229,160,0.4); color: var(--green);
-    background: var(--green-dim);
-  }
-  .tool-chip-icon { font-size: 13px; flex-shrink: 0; }
-
-  /* — Model cards — */
-  .model-stack {
-    display: flex; flex-direction: column; gap: 8px;
-    width: 100%; max-width: 168px;
-  }
-  .model-card {
-    border-radius: 10px; border: 1px solid var(--border);
-    background: var(--surface);
+    width: 100%; max-width: 172px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg);
     padding: 10px 12px;
-    cursor: pointer; transition: all 0.15s ease;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
   }
-  .model-card.fast { border-color: rgba(255,183,0,0.3); }
-  .model-card.fast:hover { border-color: var(--gold); background: var(--gold-dim); box-shadow: 0 4px 16px rgba(255,183,0,0.12); }
-  .model-card.smart { border-color: rgba(168,85,247,0.3); }
-  .model-card.smart:hover { border-color: var(--purple); background: var(--purple-dim); box-shadow: 0 4px 16px rgba(168,85,247,0.12); }
-  .model-tag {
-    font-family: var(--mono); font-size: 9px; font-weight: 500;
-    letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px;
-    display: inline-block; margin-bottom: 5px;
-  }
-  .fast .model-tag { background: var(--gold-dim); color: var(--gold); }
-  .smart .model-tag { background: var(--purple-dim); color: var(--purple); }
-  .model-name { font-family: var(--mono); font-size: 11px; color: var(--text); font-weight: 500; }
-  .model-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .node:hover { border-color: var(--teal-line); transform: translateY(-1px); }
+  [data-tip]:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .node-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .node-sub { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
 
-  /* — Vertical connector lines — */
-  .vline {
-    width: 1px; height: 20px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.04));
-    margin: 2px auto;
-    flex-shrink: 0;
-  }
-  .vline-cyan { background: linear-gradient(to bottom, rgba(0,229,255,0.35), rgba(0,229,255,0.08)); }
-  .vline-pink { background: linear-gradient(to bottom, rgba(255,45,120,0.35), rgba(255,45,120,0.08)); }
-  .vline-green { background: linear-gradient(to bottom, rgba(0,229,160,0.35), rgba(0,229,160,0.08)); }
+  /* The orchestrator is the one component that coordinates the rest. */
+  #n-orch { border-color: var(--teal-line); }
 
-  /* — Spacer for alignment — */
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; max-width: 220px; }
+  .tool-chip {
+    border-radius: 6px; border: 1px solid var(--line); background: var(--bg);
+    padding: 6px 8px; font-family: var(--mono); font-size: 12px; color: var(--muted);
+    cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .tool-chip:hover { border-color: var(--teal-line); color: var(--soft); }
+
+  .model-stack { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 172px; }
+  .model-card {
+    border-radius: 8px; border: 1px solid var(--line); background: var(--bg);
+    padding: 9px 12px; cursor: pointer; transition: border-color 0.15s ease;
+  }
+  .model-card:hover { border-color: var(--teal-line); }
+  .model-tag { font-family: var(--mono); font-size: 12px; color: var(--teal); margin-bottom: 3px; }
+  .model-name { font-family: var(--mono); font-size: 12px; color: var(--text); font-weight: 500; }
+  .model-sub { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .via { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: center; margin-top: 2px; }
+
+  .vline { width: 1px; height: 20px; background: var(--line-hi); margin: 2px auto; flex-shrink: 0; }
+  .vline-main { background: var(--teal-line); }
+
   .spacer { height: 20px; }
-  .spacer-sm { height: 8px; }
 
-  /* — Status bar — */
-  .status-bar {
-    margin-top: 40px;
-    border-top: 1px solid var(--border);
-    padding-top: 20px;
-    display: flex; flex-wrap: wrap; gap: 20px; align-items: center;
-  }
-  .status-item {
-    display: flex; align-items: center; gap: 6px;
-    font-family: var(--mono); font-size: 11px; color: var(--muted);
-  }
-  .pulse {
-    width: 6px; height: 6px; border-radius: 50%;
-    animation: pulseAnim 2s ease-in-out infinite;
-  }
-  @keyframes pulseAnim {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.3); }
-  }
-  .pulse-cyan { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
-  .pulse-pink { background: var(--pink); box-shadow: 0 0 6px var(--pink); }
-  .pulse-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
-
-  /* — Tooltip — */
+  /* Tooltip */
   .tooltip {
     position: fixed; z-index: 100;
-    background: rgba(10,14,25,0.95);
-    border: 1px solid var(--border-hi);
-    border-radius: 10px; padding: 10px 14px;
-    pointer-events: none; opacity: 0;
-    transition: opacity 0.15s ease;
-    max-width: 220px;
-    backdrop-filter: blur(16px);
+    background: #151826; border: 1px solid var(--line-hi); border-radius: 8px;
+    padding: 10px 12px; pointer-events: none; opacity: 0; transition: opacity 0.15s ease;
+    max-width: 240px;
   }
   .tooltip.show { opacity: 1; }
-  .tooltip-title { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .tooltip-body { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.5; }
+  .tooltip-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tooltip-body { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
-  /* — Animated highlight — */
-  .highlight {
-    position: absolute; inset: -1px; border-radius: 13px;
-    pointer-events: none; opacity: 0;
-    box-shadow: 0 0 0 2px var(--cyan);
-    transition: opacity 0.2s ease;
+  /* Phones: five lanes cannot sit side by side, so they stack in reading
+     order, each under its own lane name, joined by a short teal connector.
+     The canvas curves assume columns, so they give way to the in-lane lines. */
+  @media (max-width: 720px) {
+    .shell { padding: 24px 16px 28px; }
+    .hdr h1 { font-size: 18px; }
+    .legend { margin-bottom: 20px; }
+    /* The key describes the canvas curves, which are not drawn here. */
+    canvas, .lane-labels, .spacer, .legend { display: none; }
+    .pipeline { grid-template-columns: 1fr; }
+    .col { gap: 8px; padding: 0; }
+    .col::before {
+      content: attr(data-lane);
+      align-self: stretch;
+      font-family: var(--mono); font-size: 12px; color: var(--muted);
+      padding-top: 8px; border-top: 1px solid var(--line); margin-bottom: 4px;
+    }
+    .col + .col { margin-top: 28px; }
+    .col + .col::after {
+      content: ''; position: absolute; top: -24px; left: 50%;
+      width: 1px; height: 18px; background: var(--teal-line);
+    }
+    /* Output reads top to bottom here: splitter, TTS, then the speaker. */
+    #col5 { flex-direction: column-reverse; }
+    #col5::before { order: 99; }
+    .node, .model-stack { max-width: 320px; }
+    .tool-grid { max-width: 320px; }
   }
-  .node:hover .highlight { opacity: 1; }
 </style>
 </head>
 <body>
 
-<div class="mesh"></div>
 <canvas id="cvs"></canvas>
 
 <div class="shell">
 
   <div class="hdr">
-    <div class="hdr-logo">🤖</div>
-    <div class="hdr-text">
-      <h1>Jarvis</h1>
-      <p>Local AI Voice Assistant · Pipeline Architecture</p>
-    </div>
+    <h1>How a request moves through Jarvis</h1>
+    <p>From the microphone to the spoken reply, all on one machine. Hover, tap or tab to a component for details.</p>
   </div>
 
   <div class="legend">
-    <div class="leg-item"><div class="leg-dot" style="background:var(--cyan)"></div> Main LLM path</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--pink)"></div> Fast / deterministic path</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div> Tool execution</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div> Streaming output</div>
+    <div class="leg-item"><span class="leg-line"></span>Main path, through the LLM tool router</div>
+    <div class="leg-item"><span class="leg-line dashed"></span>Fast path for common requests</div>
+    <div class="leg-item"><span class="leg-line plain"></span>Tool calls and streamed output</div>
   </div>
 
   <div class="lane-labels">
@@ -349,139 +179,116 @@
   <div class="pipeline" id="pipeline">
 
     <!-- COL 1: Voice Input -->
-    <div class="col" id="col1">
+    <div class="col" id="col1" data-lane="Voice input">
       <div class="node nc" id="n-mic" data-tip="Microphone" data-desc="Captures raw audio from the system microphone via sounddevice. Device index is configurable in .env.">
-        <span class="node-icon">🎤</span>
         <div class="node-name">Microphone</div>
         <div class="node-sub">sounddevice capture</div>
       </div>
-      <div class="vline vline-cyan"></div>
+      <div class="vline vline-main"></div>
       <div class="node nc" id="n-listener" data-tip="SpeechListener" data-desc="Uses speech_recognition for audio capture, silence detection, and phrase segmentation. Configurable pause threshold and energy threshold.">
-        <span class="node-icon">🎙️</span>
         <div class="node-name">SpeechListener</div>
         <div class="node-sub">speech_recognition</div>
       </div>
-      <div class="vline vline-cyan"></div>
+      <div class="vline vline-main"></div>
       <div class="node nc" id="n-whisper" data-tip="Faster-Whisper" data-desc="Local STT transcription via faster-whisper. Runs on CUDA with float16. Model: small.en by default. No cloud dependency.">
-        <span class="node-icon">📝</span>
         <div class="node-name">Faster-Whisper</div>
         <div class="node-sub">small.en · cuda fp16</div>
       </div>
-      <div class="vline vline-cyan"></div>
+      <div class="vline vline-main"></div>
       <div class="node nc" id="n-wake" data-tip="Wake-word handler" data-desc="Checks transcribed text for wake words (hey jarvis, ok jarvis, etc.), stop words, and shutdown commands. Manages conversation state activation.">
-        <span class="node-icon">⚡</span>
         <div class="node-name">Wake Word</div>
         <div class="node-sub">state activation</div>
       </div>
     </div>
 
     <!-- COL 2: Orchestration -->
-    <div class="col" id="col2">
+    <div class="col" id="col2" data-lane="Orchestration">
       <div class="spacer"></div>
       <div class="spacer"></div>
       <div class="node npu" id="n-orch" data-tip="JarvisAssistant" data-desc="Core orchestrator. Manages config, speech listener, Ollama client, tool registry, tool router, conversation state, streaming responses, and TTS playback.">
-        <span class="orch-badge">orchestrator</span>
-        <span class="node-icon" style="color:var(--purple)">🧩</span>
         <div class="node-name">JarvisAssistant</div>
-        <div class="node-sub">assistant.py</div>
+        <div class="node-sub">assistant.py · orchestrator</div>
       </div>
       <div class="vline" style="height:12px;"></div>
       <div class="node np" id="n-request" data-tip="Request Handler" data-desc="First stop after wake-word confirmation. Decides whether to take a deterministic fast path (time, weather, wiki) or escalate to the LLM-based ToolRouter.">
-        <span class="node-icon">📥</span>
         <div class="node-name">Request Handler</div>
         <div class="node-sub">direct vs. routed</div>
       </div>
     </div>
 
     <!-- COL 3: Routing -->
-    <div class="col" id="col3">
+    <div class="col" id="col3" data-lane="Request routing">
       <div class="spacer"></div>
       <div class="spacer"></div>
       <div class="spacer"></div>
       <div class="node np" id="n-fast" data-tip="Deterministic Fast Path" data-desc="Bypasses the LLM tool router for high-confidence requests: current time, weather, Wikipedia. Repairs common STT mistakes (e.g. 'what timer is it' → 'what time is it').">
-        <span class="node-icon">🚀</span>
         <div class="node-name">Fast Path</div>
         <div class="node-sub">deterministic dispatch</div>
       </div>
-      <div class="vline vline-pink"></div>
+      <div class="vline"></div>
       <div class="node nc" id="n-router" data-tip="LLM Tool Router" data-desc="Asks the local model to return strict JSON: use_tool, tool_name, arguments, confidence, reason. Repairs arguments and filters unsupported inputs. Threshold: 0.65.">
-        <span class="node-icon">🔀</span>
         <div class="node-name">Tool Router</div>
         <div class="node-sub">JSON · conf ≥ 0.65</div>
       </div>
-      <div class="vline vline-green"></div>
+      <div class="vline"></div>
       <div class="node ng" id="n-registry" data-tip="Tool Registry" data-desc="Central registry exposing tool schemas to the router. All tools are Python functions registered at startup.">
-        <span class="node-icon">📚</span>
         <div class="node-name">Tool Registry</div>
         <div class="node-sub">registry.py</div>
       </div>
-      <div class="vline vline-green"></div>
+      <div class="vline"></div>
       <div class="tool-grid">
-        <div class="tool-chip" id="t-weather" data-tip="get_weather" data-desc="Weather lookup via Open-Meteo + geocoding. No API key required."><span class="tool-chip-icon">🌤️</span>weather</div>
-        <div class="tool-chip" id="t-time" data-tip="get_current_time" data-desc="Timezone-aware datetime. Supports 'what time is it in Liverpool?'"><span class="tool-chip-icon">🕐</span>time</div>
-        <div class="tool-chip" id="t-search" data-tip="web_search" data-desc="Tavily if API key set, DuckDuckGo fallback."><span class="tool-chip-icon">🔍</span>web_search</div>
-        <div class="tool-chip" id="t-wiki" data-tip="wiki_summary" data-desc="Wikipedia summary lookup."><span class="tool-chip-icon">📖</span>wiki</div>
-        <div class="tool-chip" id="t-timer" data-tip="set_timer / list_timers / cancel_timer" data-desc="Non-blocking threaded timers. Labels, warnings, cancellation, alarm playback."><span class="tool-chip-icon">⏱️</span>timers</div>
-        <div class="tool-chip" id="t-calc" data-tip="calculate + convert_currency" data-desc="Safe calculator and live currency conversion."><span class="tool-chip-icon">🔢</span>calc/fx</div>
+        <div class="tool-chip" id="t-weather" data-tip="get_weather" data-desc="Weather lookup via Open-Meteo + geocoding. No API key required.">weather</div>
+        <div class="tool-chip" id="t-time" data-tip="get_current_time" data-desc="Timezone-aware datetime. Supports 'what time is it in Liverpool?'">time</div>
+        <div class="tool-chip" id="t-search" data-tip="web_search" data-desc="Tavily if API key set, DuckDuckGo fallback.">web_search</div>
+        <div class="tool-chip" id="t-wiki" data-tip="wiki_summary" data-desc="Wikipedia summary lookup.">wiki</div>
+        <div class="tool-chip" id="t-timer" data-tip="set_timer / list_timers / cancel_timer" data-desc="Non-blocking threaded timers. Labels, warnings, cancellation, alarm playback.">timers</div>
+        <div class="tool-chip" id="t-calc" data-tip="calculate + convert_currency" data-desc="Safe calculator and live currency conversion.">calc/fx</div>
       </div>
     </div>
 
     <!-- COL 4: Inference -->
-    <div class="col" id="col4">
+    <div class="col" id="col4" data-lane="Inference">
       <div class="spacer"></div>
       <div class="spacer"></div>
       <div class="spacer"></div>
       <div class="model-stack" id="model-stack">
         <div class="model-card fast" id="n-fast-model" data-tip="Fast model · qwen3:4b-instruct" data-desc="Default model for most voice interactions. Low latency. Used for tool routing and general responses.">
-          <div class="model-tag">FAST</div>
+          <div class="model-tag">fast model</div>
           <div class="model-name">qwen3:4b-instruct</div>
           <div class="model-sub">voice latency</div>
         </div>
         <div class="model-card smart" id="n-smart-model" data-tip="Smart model · qwen3:8b" data-desc="Used for complex reasoning and ambiguous requests where deeper understanding is needed.">
-          <div class="model-tag">SMART</div>
+          <div class="model-tag">smart model</div>
           <div class="model-name">qwen3:8b</div>
           <div class="model-sub">complex reasoning</div>
         </div>
-        <div class="model-name" style="font-size:10px;color:var(--muted);font-family:var(--mono);text-align:center;margin-top:2px;">via ollama_client.py</div>
+        <div class="via">via ollama_client.py</div>
       </div>
       <div class="vline" style="height:12px;"></div>
       <div class="node ngo" id="n-ollama" data-tip="Ollama · local inference" data-desc="Local LLM inference. HTTP client supports one-shot and streaming chat. Endpoint: localhost:11434/api/chat">
-        <span class="node-icon">🧠</span>
         <div class="node-name">Ollama</div>
         <div class="node-sub">localhost:11434</div>
       </div>
     </div>
 
     <!-- COL 5: Output -->
-    <div class="col" id="col5">
+    <div class="col" id="col5" data-lane="Output">
       <div class="node nc" id="n-output" data-tip="Audio Output" data-desc="Final spoken audio played via sounddevice. Jarvis can keep answering while timers run in parallel threads.">
-        <span class="node-icon">🎧</span>
         <div class="node-name">Audio Output</div>
         <div class="node-sub">sounddevice</div>
       </div>
-      <div class="vline vline-cyan"></div>
+      <div class="vline vline-main"></div>
       <div class="node ngo" id="n-tts" data-tip="Kokoro TTS" data-desc="Local Kokoro TTS (hexgrad/Kokoro-82M). Cleans markdown, emojis, code blocks. Streams chunks: Jarvis starts speaking before LLM finishes. Voice: bm_george.">
-        <span class="node-icon">🔊</span>
         <div class="node-name">Kokoro TTS</div>
         <div class="node-sub">streaming chunks</div>
       </div>
-      <div class="vline vline-gold" style="background:linear-gradient(to bottom,rgba(255,183,0,0.35),rgba(255,183,0,0.08));"></div>
+      <div class="vline"></div>
       <div class="node ngo" id="n-stream" data-tip="Response streaming" data-desc="LLM responses split into speakable chunks and piped to TTS as they arrive. Text is cleaned: emojis, markdown, code blocks, numbered lists all stripped for natural speech.">
-        <span class="node-icon">⚡</span>
         <div class="node-name">Stream Splitter</div>
         <div class="node-sub">chunk → speak</div>
       </div>
     </div>
 
-  </div>
-
-  <div class="status-bar">
-    <div class="status-item"><div class="pulse pulse-cyan"></div> Idle · awaiting wake word</div>
-    <div class="status-item"><div class="pulse pulse-pink"></div> Fast path active</div>
-    <div class="status-item"><div class="pulse pulse-green"></div> Tool execution</div>
-    <div style="margin-left:auto">
-      <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">hover nodes for details</span>
-    </div>
   </div>
 
 </div>
@@ -505,24 +312,47 @@ resize();
 window.addEventListener('resize', () => { resize(); });
 
 // — Tooltip —
+// Every component is reachable by mouse, keyboard and touch. Each is
+// focusable and carries its description as its accessible name, so a screen
+// reader hears the same detail the tooltip shows; focus and tap show the tip
+// beside the component, hover follows the pointer.
 const allNodes = document.querySelectorAll('[data-tip]');
-allNodes.forEach(el => {
-  el.addEventListener('mouseenter', e => {
-    document.getElementById('tip-title').textContent = el.dataset.tip;
-    document.getElementById('tip-body').textContent = el.dataset.desc || '';
-    tip.classList.add('show');
-    moveTip(e);
-  });
-  el.addEventListener('mousemove', moveTip);
-  el.addEventListener('mouseleave', () => tip.classList.remove('show'));
-});
-function moveTip(e) {
-  let x = e.clientX + 14, y = e.clientY + 14;
-  if (x + 230 > window.innerWidth) x = e.clientX - 234;
-  if (y + 80 > window.innerHeight) y = e.clientY - 90;
+let pinnedTip = null;
+function fillTip(el) {
+  document.getElementById('tip-title').textContent = el.dataset.tip;
+  document.getElementById('tip-body').textContent = el.dataset.desc || '';
+  tip.classList.add('show');
+}
+function placeAt(x, y) {
+  if (x + 250 > window.innerWidth) x = Math.max(8, window.innerWidth - 250);
+  if (y + 90 > window.innerHeight) y = Math.max(8, y - 110);
   tip.style.left = x + 'px';
   tip.style.top = y + 'px';
 }
+function tipBeside(el) {
+  const r = el.getBoundingClientRect();
+  placeAt(r.left, r.bottom + 8);
+}
+function hideTip() { if (!pinnedTip) tip.classList.remove('show'); }
+allNodes.forEach(el => {
+  el.tabIndex = 0;
+  el.setAttribute('role', 'button');
+  el.setAttribute('aria-label', el.dataset.tip + '. ' + (el.dataset.desc || ''));
+  el.addEventListener('mouseenter', e => { if (!pinnedTip) { fillTip(el); moveTip(e); } });
+  el.addEventListener('mousemove', e => { if (!pinnedTip) moveTip(e); });
+  el.addEventListener('mouseleave', hideTip);
+  el.addEventListener('focus', () => { if (!pinnedTip) { fillTip(el); tipBeside(el); } });
+  el.addEventListener('blur', hideTip);
+  // Tap (or click) pins the tip until the next tap or Escape.
+  el.addEventListener('click', e => {
+    e.stopPropagation();
+    pinnedTip = pinnedTip === el ? null : el;
+    if (pinnedTip) { fillTip(el); tipBeside(el); } else tip.classList.remove('show');
+  });
+});
+document.addEventListener('click', () => { pinnedTip = null; tip.classList.remove('show'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { pinnedTip = null; tip.classList.remove('show'); } });
+function moveTip(e) { placeAt(e.clientX + 14, e.clientY + 14); }
 
 // — Canvas curves —
 function getCenter(el) {
@@ -570,11 +400,10 @@ function drawArrow(a, b, color, dashed = false) {
   ctx.restore();
 }
 
-const CYAN  = 'rgba(0,229,255,0.3)';
-const PINK  = 'rgba(255,45,120,0.3)';
-const GREEN = 'rgba(0,229,160,0.3)';
-const GOLD  = 'rgba(255,183,0,0.3)';
-const PURP  = 'rgba(168,85,247,0.3)';
+const TEAL    = 'rgba(91,184,204,0.6)';    // main path
+const FAST    = 'rgba(224,224,224,0.5)';   // fast path, drawn dashed
+const NEUTRAL = 'rgba(255,255,255,0.2)';   // tool calls and streamed output
+const CYAN = TEAL, PINK = FAST, PURP = TEAL, GREEN = NEUTRAL, GOLD = NEUTRAL;
 
 const ids = ['n-mic','n-listener','n-whisper','n-wake','n-orch','n-request',
              'n-fast','n-router','n-registry','n-ollama','n-tts','n-output',
@@ -648,7 +477,7 @@ class Particle {
     this.color = color;
     this.speed = speed;
     this.t = offset;
-    this.glow = color.replace('0.3', '0.9').replace('rgba', 'rgba');
+    this.dot = color === FAST ? '#e0e0e0' : '#5bb8cc';
   }
   update() {
     this.t += this.speed;
@@ -672,18 +501,10 @@ class Particle {
     const x = u3*a.x + 3*u2*lt*cp1x + 3*u*t2*cp2x + t3*b.x;
     const y = u3*a.y + 3*u2*lt*cp1y + 3*u*t2*cp2y + t3*b.y;
 
-    ctx.save();
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI*2);
-    ctx.fillStyle = '#fff';
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = this.glow;
+    ctx.arc(x, y, 2.5, 0, Math.PI*2);
+    ctx.fillStyle = this.dot;
     ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x, y, 2, 0, Math.PI*2);
-    ctx.fillStyle = this.glow;
-    ctx.fill();
-    ctx.restore();
   }
   sideA(idx) {
     // simple heuristic: if next node is to the right, go right; else bottom
@@ -713,16 +534,17 @@ let particles = [];
 function initParticles() {
   particles = [
     new Particle(llmPath, CYAN, 0.0018, 0),
-    new Particle(llmPath, CYAN, 0.0018, 4),
-    new Particle(llmPath, CYAN, 0.0018, 8),
     new Particle(fastPath, PINK, 0.003, 1.5),
-    new Particle(fastPath, PINK, 0.003, 5),
   ];
 }
 
+// On phones the canvas is hidden (the lanes stack), so skip drawing to it.
+const stacked = window.matchMedia('(max-width: 720px)');
 function loop() {
-  drawAll();
-  particles.forEach(p => { p.update(); p.draw(); });
+  if (!stacked.matches) {
+    drawAll();
+    particles.forEach(p => { p.update(); p.draw(); });
+  }
   requestAnimationFrame(loop);
 }
 
@@ -731,6 +553,22 @@ window.onload = () => {
   loop();
 };
 window.addEventListener('resize', () => { resize(); });
+
+// Report our height to the host page so the iframe fits the diagram instead
+// of a fixed minimum. Harmless when opened standalone.
+(function reportHeight(){
+  let last = 0;
+  const send = () => {
+    const h = Math.ceil(document.querySelector('.shell').getBoundingClientRect().height);
+    if (Math.abs(h - last) < 2) return;
+    last = h;
+    parent.postMessage({ type: 'simulation:height', height: h }, '*');
+  };
+  send();
+  window.addEventListener('load', send);
+  if (window.ResizeObserver) new ResizeObserver(send).observe(document.querySelector('.shell'));
+  window.addEventListener('resize', send);
+})();
 </script>
 </body>
 </html>

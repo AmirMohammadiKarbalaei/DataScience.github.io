@@ -3,156 +3,102 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Proxyon — what the provider actually receives</title>
+<title>Proxyon: what the provider actually receives</title>
+<!-- The same faces as the portfolio, so the demo reads as part of the page
+     rather than a separate product dropped into it. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
+  /* The portfolio's palette: one teal accent, white and grey type on a flat
+     dark field. No gradients, no second grid, no extra hues. */
   :root{
-    --bg-1:#0a0a0f; --bg-2:#1a1a2e; --bg-3:#16213e;
-    --cyan:#00d4ff; --violet:#5b73f0; --mint:#00ffaa;
-    --text:#e8ecf5; --muted:#98a3bd; --faint:#6c7897;
-    --card:rgba(255,255,255,.035); --line:rgba(255,255,255,.10);
-    --identity:#7aa7ff; --contact:#ffc266; --financial:#38e0a6;
-    --location:#b18cff; --temporal:#4fd6e8; --technical:#ff8a8a;
+    --bg:#0d0f18;
+    --teal:#5bb8cc;
+    --teal-wash:rgba(91,184,204,.12);
+    --teal-line:rgba(91,184,204,.35);
+    --text:#ffffff;
+    --soft:#e0e0e0;
+    --muted:#b0b0b0;
+    --line:rgba(255,255,255,.10);
+    --warn:#e0b25c;
+    --sans:Inter,system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
-    background:linear-gradient(135deg,var(--bg-1) 0%,var(--bg-2) 50%,var(--bg-3) 100%);
-    background-attachment:fixed;
-    color:var(--text);
-    font:400 15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--soft);
+    font:400 15px/1.6 var(--sans);
     -webkit-font-smoothing:antialiased;
-    padding:26px 32px 14px;
+    padding:32px 36px 28px;
   }
-  body::before{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-    background-image:linear-gradient(rgba(0,212,255,.045) 1px,transparent 1px),
-                     linear-gradient(90deg,rgba(0,212,255,.045) 1px,transparent 1px);
-    background-size:50px 50px;
-  }
-  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto}
+  .wrap{max-width:1180px;margin:0 auto}
 
-  h1{font-size:27px;line-height:1.25;margin:0 0 6px;letter-spacing:-.02em;font-weight:700}
-  h1 .accent{background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .lede{color:var(--muted);margin:0 0 4px;max-width:76ch}
-  .rule{width:120px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--cyan),transparent);margin:13px 0 20px}
+  h1{font-size:24px;line-height:1.3;margin:0 0 8px;letter-spacing:-.015em;font-weight:600;color:var(--text)}
+  .lede{color:var(--muted);margin:0 0 28px;max-width:70ch}
 
-  /* pipeline rail */
-  .rail{display:flex;align-items:stretch;gap:8px;margin:0 0 20px;flex-wrap:wrap}
-  .step{
-    flex:1 1 150px;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:8px 12px;min-width:0;
-  }
-  .step b{display:block;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--cyan);margin-bottom:3px}
-  .step span{display:block;font-size:12.5px;line-height:1.45;color:var(--faint)}
-  .step.out b{color:var(--mint)}
+  /* The five stages as a plain numbered sequence: the order is the point. */
+  .stages{list-style:none;margin:0 0 28px;padding:16px 0 0;border-top:1px solid var(--line);
+          display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}
+  .stages li{min-width:0}
+  .stages .n{font:500 12px/1 var(--mono);color:var(--teal);margin-right:6px}
+  .stages b{font-weight:600;color:var(--text);font-size:15px}
+  .stages p{margin:4px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
 
-  /* panels */
-  .panels{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:24px}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 20px 18px;min-width:0}
-  .panel.masked{border-color:rgba(0,255,170,.32);background:rgba(0,255,170,.035)}
-  .panel h2{font-size:12.5px;letter-spacing:.11em;text-transform:uppercase;margin:0 0 3px;font-weight:700}
-  .panel h2 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;vertical-align:middle}
-  .panel .who{font-size:12.5px;color:var(--faint);margin:0 0 12px}
-  .body{font-size:14.5px;line-height:1.75;color:#cfd7e8}
-  .body p{margin:0 0 11px}
+  /* Before and after, side by side. */
+  .panels{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .panel{border:1px solid var(--line);border-radius:12px;padding:18px 20px 20px;min-width:0}
+  .panel.masked{border-color:var(--teal-line)}
+  .panel h2{font-size:15px;font-weight:600;color:var(--text);margin:0 0 2px}
+  .panel .who{font-size:13px;color:var(--muted);margin:0 0 14px}
+  .body{font-size:15px;line-height:1.75;color:var(--soft)}
+  .body p{margin:0 0 12px}
   .body p:last-child{margin:0}
 
-  /* linked tokens */
+  /* Linked values: the original and its placeholder light up together. */
   .pii,.tag{
-    border-radius:5px;padding:1px 4px;margin:0 -1px;cursor:pointer;
-    border-bottom:1.5px dashed currentColor;transition:background .13s,box-shadow .13s;
-    outline:none;
+    border-radius:4px;padding:1px 4px;margin:0 -1px;cursor:pointer;outline:none;
+    transition:background-color .15s,color .15s,opacity .15s;
   }
-  .pii{color:var(--c);background:color-mix(in srgb,var(--c) 11%,transparent)}
-  .tag{color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);
-       font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:13px;border-bottom-style:solid}
-  .pii.on,.tag.on{
-    background:color-mix(in srgb,var(--c) 34%,transparent);
-    box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 55%,transparent);
-    color:#fff;
-  }
-  .dim{opacity:.34}
-
-  .hint{display:flex;align-items:center;gap:9px;color:var(--faint);font-size:13px;margin:0 0 20px}
-  .hint kbd{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:5px;padding:1px 7px;font:inherit;font-size:12px;color:var(--muted)}
-
-  /* mapping table */
-  .maph{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0 0 10px}
-  .maph h3{font-size:17px;margin:0;font-weight:700}
-  .maph span{color:var(--faint);font-size:13px}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  thead th{
-    text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--faint);font-weight:700;padding:0 10px 8px;border-bottom:1px solid var(--line);
-  }
-  thead th.num{text-align:right}
-  tbody tr{border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
-  tbody tr.on{background:rgba(255,255,255,.06)}
-  td{padding:5px 10px;vertical-align:middle}
-  td.tagc{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:var(--c);white-space:nowrap}
-  td.val{color:var(--muted);word-break:break-word}
-  td.src{color:var(--faint);font-size:12.5px;white-space:nowrap}
-  td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
-  .chip{display:inline-block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
-        padding:2px 8px;border-radius:20px;border:1px solid currentColor;color:var(--c);opacity:.9}
-  .bar{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.09);width:96px;display:inline-block;vertical-align:middle;margin-right:10px}
-  .bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--sc)}
-
-  .foot{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}
-  .note{background:var(--card);border:1px solid var(--line);border-left:2px solid var(--cyan);
-        border-radius:0 12px 12px 0;padding:11px 15px;color:var(--muted);font-size:13.5px;line-height:1.6}
-  .note b{color:#fff;font-weight:700}
-  .note code{color:var(--cyan);font-size:12.5px}
+  .pii{color:var(--text);background:rgba(255,255,255,.08);border-bottom:1px dashed var(--muted)}
+  .tag{color:var(--teal);background:var(--teal-wash);font:500 13px/1 var(--mono)}
+  .pii.on,.tag.on{background:rgba(91,184,204,.32);color:var(--text)}
+  .pii:focus-visible,.tag:focus-visible{box-shadow:0 0 0 2px var(--teal)}
+  .dim{opacity:.4}
 
   @media (max-width:1000px){
-    body{padding:22px 18px 14px}
-    .panels,.foot{grid-template-columns:1fr}
-    .panels{gap:14px;margin-bottom:18px}
+    body{padding:24px 18px 20px}
+    .panels{grid-template-columns:1fr}
+    .panels{gap:14px}
     h1{font-size:21px}
-    .lede{font-size:14px}
-    .rail{gap:6px;margin-bottom:16px}
-    .step{flex:1 1 46%}
-    .step span{display:none}          /* keep the five stage names, drop the prose */
-    .step b{margin:0}
-    .body{font-size:14px;line-height:1.7}
-    /* Narrow screens keep the two columns that carry the story */
-    th:nth-child(3),td:nth-child(3),
-    th:nth-child(4),td:nth-child(4){display:none}
-    .note{font-size:13px}
+    .stages{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px}
+    .stages p{display:none}          /* keep the five stage names, drop the prose */
   }
 
-  @media (max-width:620px){
-    /* Drop the bar rather than let the confidence column clip off-screen */
-    .bar{display:none}
-    table{font-size:12.5px}
-    thead th{font-size:10px;padding:0 6px 8px}
-    td{padding:6px}
-    td.tagc{font-size:11.5px;white-space:normal}
-    .maph h3{font-size:15.5px}
-  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>The provider sees <span class="accent">placeholders</span>, never the customer</h1>
+  <h1>The provider sees placeholders, never the customer</h1>
   <p class="lede">
     A real excerpt from a support record, and the exact text Proxyon forwarded to the model.
-    Hover any highlighted value to see where it went.
+    Hover or tap any highlighted value to see where it went.
   </p>
-  <div class="rule"></div>
 
-  <div class="rail">
-    <div class="step"><b>1 · Detect</b><span>GLiNER for context-dependent entities, regex for fixed formats</span></div>
-    <div class="step"><b>2 · Resolve</b><span>One span per region, chosen by an explicit priority table</span></div>
-    <div class="step"><b>3 · Tag</b><span>Equal values share a placeholder, so coreference survives</span></div>
-    <div class="step"><b>4 · Mask</b><span>Replaced by character offset, right to left</span></div>
-    <div class="step out"><b>5 · Restore</b><span>The reply is unmasked locally, for the user only</span></div>
-  </div>
+  <ol class="stages">
+    <li><span class="n">1</span><b>Detect</b><p>GLiNER for context-dependent entities, regex for fixed formats</p></li>
+    <li><span class="n">2</span><b>Resolve</b><p>One span per region, chosen by an explicit priority table</p></li>
+    <li><span class="n">3</span><b>Tag</b><p>Equal values share a placeholder, so coreference survives</p></li>
+    <li><span class="n">4</span><b>Mask</b><p>Replaced by character offset, right to left</p></li>
+    <li><span class="n">5</span><b>Restore</b><p>The reply is unmasked locally, for the user only</p></li>
+  </ol>
 
   <div class="panels">
     <section class="panel">
-      <h2><span class="dot" style="background:#8894b3"></span>What the user types</h2>
+      <h2>What the user types</h2>
       <p class="who">Stays inside your infrastructure</p>
       <div class="body" id="src">
         <p><s data-k="p1">Hannah</s> can be contacted via <s data-k="e1">hannah.mercer91@outlook.com</s>
@@ -165,7 +111,7 @@
     </section>
 
     <section class="panel masked">
-      <h2><span class="dot" style="background:#00ffaa"></span>What the provider receives</h2>
+      <h2>What the provider receives</h2>
       <p class="who">Sent to the hosted model</p>
       <div class="body" id="dst">
         <p><t data-k="p1">[PERSON_1]</t> can be contacted via <t data-k="e1">[EMAIL_ADDRESS_1]</t>
@@ -178,68 +124,15 @@
     </section>
   </div>
 
-
-  <div class="maph">
-    <h3>The mapping Proxyon keeps locally</h3>
-    <span>hover either side, or a row, to link the pair &middot; held in session state and discarded when the session ends</span>
-  </div>
-  <table id="map">
-    <thead>
-      <tr>
-        <th>Placeholder</th><th>Original value</th><th>Policy</th><th>Detected by</th><th class="num">Confidence</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <div class="foot">
-    <p class="note">
-      <b>Why placeholders are numbered.</b> Repeated values collapse onto one tag, so the model can still
-      reason about “the same person” or “that account” across a long conversation. Here
-      <code>[PERSON_1]</code> covers a bare first name, aliased back to the full name detected earlier
-      in the record.
-    </p>
-    <p class="note">
-      <b>Why two phone numbers, two tags.</b> Distinct values of the same type stay distinct, so the model
-      can tell the mobile from the work line without ever learning either number.
-    </p>
-  </div>
 </div>
 
 <script>
-const ROWS = [
-  {k:'p1',  tag:'[PERSON_1]',            val:'Hannah Louise Mercer', policy:'identity',  c:'--identity',  by:'model', score:0.99},
-  {k:'e1',  tag:'[EMAIL_ADDRESS_1]',     val:'hannah.mercer91@outlook.com', policy:'contact', c:'--contact', by:'regex', score:0.99},
-  {k:'ph1', tag:'[UK_PHONE_NUMBER_1]',   val:'07854 662913', policy:'contact', c:'--contact', by:'regex', score:0.99},
-  {k:'ph2', tag:'[UK_PHONE_NUMBER_2]',   val:'0118 496 0821', policy:'contact', c:'--contact', by:'regex', score:0.99},
-  {k:'t1',  tag:'[TRANSACTION_ID_1]',    val:'WB-TRX-558201', policy:'financial', c:'--financial', by:'model', score:0.93},
-  {k:'d1',  tag:'[DATE_2]',              val:'16/02/2025', policy:'temporal', c:'--temporal', by:'regex', score:0.97},
-  {k:'ac1', tag:'[UK_ACCOUNT_NUMBER_1]', val:'29174638', policy:'financial', c:'--financial', by:'model', score:0.91},
-  {k:'sc1', tag:'[UK_SORT_CODE_1]',      val:'40-22-17', policy:'financial', c:'--financial', by:'model', score:1.00},
-  {k:'ib1', tag:'[UK_IBAN_1]',           val:'GB31BARC40221729174638', policy:'financial', c:'--financial', by:'model', score:0.73}
-];
-
-const colourOf = Object.fromEntries(ROWS.map(r => [r.k, r.c]));
-const scoreColour = s => s >= 0.95 ? '#00ffaa' : (s >= 0.85 ? '#00d4ff' : '#ffb74d');
-
 // Style the inline tokens
 document.querySelectorAll('#src s, #dst t').forEach(el => {
   el.className = el.tagName === 'S' ? 'pii' : 'tag';
-  el.style.setProperty('--c', 'var(' + colourOf[el.dataset.k] + ')');
   el.tabIndex = 0;
   el.style.textDecoration = 'none';
 });
-
-// Build the mapping table
-const tbody = document.querySelector('#map tbody');
-tbody.innerHTML = ROWS.map(r => `
-  <tr data-k="${r.k}" style="--c:var(${r.c});--sc:${scoreColour(r.score)}">
-    <td class="tagc">${r.tag}</td>
-    <td class="val">${r.val}</td>
-    <td><span class="chip">${r.policy}</span></td>
-    <td class="src">${r.by === 'regex' ? 'regex backstop' : 'GLiNER'}</td>
-    <td class="num"><span class="bar"><i style="width:${(r.score * 100).toFixed(0)}%"></i></span>${r.score.toFixed(2)}</td>
-  </tr>`).join('');
 
 // Link every element that shares a key
 const all = () => document.querySelectorAll('[data-k]');
