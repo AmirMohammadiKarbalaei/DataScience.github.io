@@ -1,82 +1,45 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { projects } from '../data/projects';
-import LottieAnimation from './LottieAnimation';
+import { DOMAINS } from '../data/domains';
+import ProjectCard from './ProjectCard';
 import Navigation from './Navigation';
 import ParticleBackground from './ParticleBackground';
-import Preloader from './Preloader';
 import SEOHead from './SEOHead';
 import { trackContactInteraction, trackEvent } from '../utils/analytics';
 
-// Filter row is generated from this list rather than hardcoded, so counts can
-// never drift from the data. Each filter matches a project if the project carries
-// ANY of its keys, which keeps the row short: nine single-tag filters was too many,
-// and several returned a single result.
-const CATEGORY_FILTERS: { key: string; label: string; icon: string; match: string[] }[] = [
-  { key: 'aiml', label: 'AI & Machine Learning', icon: 'fas fa-brain',
-    match: ['AI', 'ML', 'RL', 'TimeSeries', 'CV'] },
-  { key: 'nlp',  label: 'NLP & LLMs',            icon: 'fas fa-robot',
-    match: ['NLP', 'LLM'] },
-  { key: 'data', label: 'Data & BI',             icon: 'fas fa-chart-bar',
-    match: ['DA', 'BI'] },
+const SKILL_GROUPS: { label: string; skills: string[] }[] = [
+  { label: 'Core Data & ML',
+    skills: ['Python', 'SQL', 'Pandas', 'NumPy', 'Scikit-Learn', 'XGBoost/LightGBM', 'Feature Engineering'] },
+  { label: 'Deep Learning & LLMs',
+    skills: ['PyTorch', 'Hugging Face Transformers', 'GLiNER', 'Ollama', 'Gemini API', 'RAG & Embeddings', 'Zero-shot NER', 'spaCy', 'NLTK', 'Computer Vision (OpenCV)'] },
+  { label: 'Engineering & Delivery',
+    skills: ['PostgreSQL', 'SQLAlchemy', 'Docker', 'GitHub Actions CI', 'pytest', 'CLI Tooling', 'Streamlit'] },
+  { label: 'Analytics, BI & Visualisation',
+    skills: ['A/B Testing & Experimentation', 'Statistical Inference', 'Model Explainability (SHAP/LIME)', 'Power BI', 'Matplotlib', 'Seaborn'] },
 ];
 
 const Home: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [currentTitle, setCurrentTitle] = useState('');
   const [titleIndex, setTitleIndex] = useState(0);
-  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
-  const [isClickedOpen, setIsClickedOpen] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
   const aboutRef = useRef<HTMLDivElement>(null);
-  const skillsRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
-  
+  const gridRef = useRef<HTMLDivElement>(null);
+  const isFirstFilter = useRef(true);
+
+  // useMemo keeps the array identity stable across renders. Without it the typing
+  // effect below re-runs on every state tick and spawns overlapping timer chains.
   // useMemo keeps the array identity stable across renders. Without it the typing
   // effect below re-runs on every state tick and spawns overlapping timer chains.
   const titles = useMemo(
-    () => ['a Data Scientist', 'an AI Engineer', 'a ML Engineer'],
+    () => ['a Data Scientist', 'a Data Analyst', 'an ML Engineer'],
     []
   );
 
-  // Skills section no longer uses progress bars; simple chips are displayed.
-
-  // Animation for stats counter
-  const animateStats = () => {
-    const statNumbers = document.querySelectorAll('.stat-number');
-    statNumbers.forEach((stat) => {
-      const target = parseInt(stat.getAttribute('data-target') || '0');
-      const increment = target / 100;
-      let current = 0;
-      
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-          current = target;
-          clearInterval(timer);
-        }
-        stat.textContent = Math.ceil(current).toString();
-      }, 20);
-    });
-  };
-
-  // Scroll progress effect
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset;
-      const docHeight = document.body.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      
-      const progressBar = document.querySelector('.scroll-progress-bar') as HTMLElement;
-      if (progressBar) {
-        progressBar.style.width = `${scrollPercent}%`;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Typing animation effect
+  // Typing animation effect. Deliberately runs even under reduced motion: the
+  // cycling roles are a confirmed part of the hero, and a frozen first role
+  // read as broken. Screen readers get the full list from a hidden sentence.
   useEffect(() => {
   let currentText = '';
   let isDeleting = false;
@@ -119,12 +82,6 @@ const Home: React.FC = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible');
-            
-            // Trigger specific animations based on the section
-            // No skill bar animation needed
-            if (entry.target === statsRef.current) {
-              setTimeout(animateStats, 500);
-            }
           }
         });
       },
@@ -133,7 +90,7 @@ const Home: React.FC = () => {
       }
     );
 
-    const refs = [aboutRef, skillsRef, statsRef];
+    const refs = [aboutRef];
     refs.forEach(ref => {
       if (ref.current) {
         observer.observe(ref.current);
@@ -149,61 +106,45 @@ const Home: React.FC = () => {
     };
   }, []);
 
-  // Close quick actions when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (!target.closest('.quick-actions')) {
-        setQuickActionsOpen(false);
-        setIsClickedOpen(false);
-      }
-    };
-
-    if (quickActionsOpen) {
-      document.addEventListener('click', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [quickActionsOpen]);
-
-  const activeFilter = CATEGORY_FILTERS.find(f => f.key === filter);
+  const activeFilter = DOMAINS.find(f => f.key === filter);
   const filteredProjects = !activeFilter
     ? projects
     : projects.filter(p => p.category.some(c => activeFilter.match.includes(c)));
 
-  // Map skill names to Font Awesome icons for visual variety
-  const getSkillIcon = (name: string) => {
-    const s = name.toLowerCase();
-    if (s.includes('python')) return 'fab fa-python';
-    if (s.includes('sql')) return 'fas fa-database';
-    if (s.includes('pandas')) return 'fas fa-table';
-    if (s.includes('numpy')) return 'fas fa-cubes';
-    if (s.includes('scikit') || s.includes('xgboost') || s.includes('lightgbm')) return 'fas fa-project-diagram';
-    if (s.includes('pytorch')) return 'fas fa-fire';
-    if (s.includes('tensor')) return 'fas fa-layer-group';
-    if (s.includes('power bi')) return 'fas fa-chart-bar';
-    if (s.includes('tableau')) return 'fas fa-chart-pie';
-    if (s.includes('feature')) return 'fas fa-tools';
-    if (s.includes('spacy')) return 'fas fa-language';
-    if (s.includes('transformer')) return 'fas fa-robot';
-    if (s.includes('vision') || s.includes('opencv')) return 'fas fa-camera';
-    if (s.includes('time series')) return 'fas fa-chart-line';
-    if (s.includes('a/b') || s.includes('experiment')) return 'fas fa-vial';
-    if (s.includes('statistical')) return 'fas fa-superscript';
-    if (s.includes('explainability') || s.includes('shap') || s.includes('lime')) return 'fas fa-lightbulb';
-    if (s.includes('matplotlib') || s.includes('seaborn') || s.includes('visualis')) return 'fas fa-chart-area';
-    if (s.includes('mlops') || s.includes('mlflow')) return 'fas fa-cogs';
-    return 'fas fa-circle';
-  };
+  // When a filter changes, the cards that remain settle into place one after
+  // another, so the grid visibly answers the choice. Web Animations rather than
+  // remounting, so Lottie cards aren't torn down and reloaded. Skipped on first
+  // render and under reduced motion.
+  useEffect(() => {
+    if (isFirstFilter.current) {
+      isFirstFilter.current = false;
+      return;
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cards = gridRef.current?.querySelectorAll<HTMLElement>('.project-card');
+    cards?.forEach((card, i) => {
+      card.animate(
+        [
+          { opacity: 0, transform: 'translateY(14px)' },
+          { opacity: 1, transform: 'none' },
+        ],
+        { duration: 420, delay: Math.min(i, 8) * 45, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' }
+      );
+    });
+  }, [filter]);
 
-  const SkillPill: React.FC<{ text: string }> = ({ text }) => (
-    <span className="skill-pill">
-      <i className={`${getSkillIcon(text)} pill-icon`} aria-hidden="true"></i>
-      {text}
-    </span>
-  );
+  // The address is shown in full so it can be copied; this makes that one
+  // click. On failure the address is still on screen to select by hand.
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText('a.mohammadikarbalaei@gmail.com');
+      setCopyState('copied');
+      trackEvent('contact_copy', 'Contact', 'email');
+    } catch {
+      setCopyState('failed');
+    }
+    window.setTimeout(() => setCopyState('idle'), 2400);
+  };
 
   return (
     <div>
@@ -285,243 +226,52 @@ const Home: React.FC = () => {
           }
         }}
       />
-      <Preloader />
       <Navigation />
       <ParticleBackground />
-      
-      {/* Scroll Progress Bar */}
-      <div className="scroll-progress">
-        <div className="scroll-progress-bar"></div>
-      </div>
-      
+      <main id="main">
+
       {/* Header */}
-      <header id="home" className="header" role="banner">
-        <img
-          className="header-image"
-          src="/media/data-science-new-banner.jpg"
-          alt="Amir Mohammadi Data Scientist and AI Engineer banner showing data visualization and machine learning concepts"
-          loading="eager"
-        />
-        <div className="header-overlay" aria-hidden="true"></div>
+      {/* No stock banner: the hero sits on the site's own particle field and
+          grid, so the name, title and proof line are the only things to read.
+          The banner image is still the link-preview image in index.html. */}
+      <header id="home" className="header">
 
         <div className="header-content">
           <div className="hero-text">
-            <h1 className="visually-hidden">
-              Amir Mohammadikarbalaei - Data Scientist and AI Engineer
+            <h1 className="header-title hero-name">
+              Amir Mohammadikarbalaei
             </h1>
-            <div className="typing-container">
+            {/* The typed role changes every few seconds; screen readers get the
+                full list once instead of hearing every keystroke. */}
+            <p className="visually-hidden">
+              I'm a Data Scientist, a Data Analyst and an ML Engineer.
+            </p>
+            <div className="typing-container" aria-hidden="true">
               <span className="typing-prefix">I'm </span>
-              <span className="typing-text">{currentTitle}</span>
-              <span className="cursor">|</span>
+              {/* Cursor inside the typed span so it sits right after the last
+                  letter instead of at the far edge of the reserved width. */}
+              <span className="typing-text">
+                {currentTitle}
+                <span className="cursor">|</span>
+              </span>
             </div>
             <p className="hero-description">
-              Building machine learning, NLP and LLM-powered solutions that deliver
-              real-world impact. Currently at Unilever, working on NLP and analytics
-              for employee-facing chatbot and service desk systems.
+              I build machine learning, NLP and LLM systems. At Unilever I work on
+              NLP and analytics for the employee-facing chatbot and service desk.
             </p>
             <div className="hero-buttons">
               <a href="#projects" className="btn-primary">
-                <i className="fas fa-rocket"></i>
-                View Projects
+                <i className="fas fa-arrow-down" aria-hidden="true"></i>
+                View projects
               </a>
-              <a href="#about" className="btn-secondary">
-                <i className="fas fa-user"></i>
-                About Me
+              <a href="#contact" className="btn-secondary">
+                <i className="fas fa-envelope" aria-hidden="true"></i>
+                Contact
               </a>
             </div>
           </div>
         </div>
       </header>
-
-      {/* About Section */}
-      <section id="about" className="about-section" aria-labelledby="about-title">
-        <div className="container">
-          <h2 id="about-title" className="section-title">About Me</h2>
-          <div className="about-content" ref={aboutRef}>
-            <div className="profile-container">
-              <img
-                className="profile-image"
-                src="/media/profile.jpg"
-                alt="Profile"
-              />
-              <div className="profile-badges">
-                <div className="profile-badge">
-                  <i className="fas fa-map-marker-alt"></i>
-                  Liverpool, UK
-                </div>
-                <div className="profile-badge">
-                  <i className="fas fa-briefcase"></i>
-                  Unilever
-                </div>
-                <div className="profile-badge">
-                  <i className="fas fa-calendar"></i>
-                  4+ Years Exp
-                </div>
-              </div>
-            </div>
-            <div className="about-text">
-              {/* <div className="about-highlights">
-                <div className="highlight-item">
-                  <i className="fas fa-brain"></i>
-                  <span>AI & Machine Learning Expert</span>
-                </div>
-                <div className="highlight-item">
-                  <i className="fas fa-chart-line"></i>
-                  <span>Data-Driven Decision Making</span>
-                </div>
-                <div className="highlight-item">
-                  <i className="fas fa-rocket"></i>
-                  <span>Y Combinator Experience</span>
-                </div>
-              </div> */}
-              <p className="about-description">
-                I am a dedicated data scientist with a passion for uncovering
-                meaningful insights from complex data. Currently working at <strong>Unilever</strong> as a 
-                Customer Operations and Una Bot Analyst.
-              </p>
-              <p className="about-description">
-                Beyond technical proficiency, my primary focus is on using data to drive positive societal change. I believe that uncovering insights is a commitment to guiding better decisions, and I am deeply invested in advancing a future where data science is ethical, transparent, and inclusive. By championing responsible AI and fostering interpretability, I strive to contribute to a field that balances innovation with accountability.
-              </p>
-              <div className="about-cta">
-                <Link to="/experience" className="btn-outline">
-                  <i className="fas fa-timeline"></i>
-                  View Full Journey
-                </Link>
-                <a href="#contact" className="btn-text">
-                  <i className="fas fa-envelope"></i>
-                  Get In Touch
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Skills Section */}
-      <section id="skills" className="skills-section" aria-label="Skills">
-        <div className="container">
-          <h2 className="section-title">Skills & Tools</h2>
-          {/* Core stack row: your primary tools */}
-          
-
-
-          {/* Categorised skills matrix - concise 4 buckets */}
-          <div className="skills-grid">
-            <div className="skills-category">
-              <h3><i className="fas fa-code"></i> Core Data & ML</h3>
-              <div className="skills-list">
-                {['Python','SQL','Pandas','NumPy','Scikit-Learn','XGBoost/LightGBM','Feature Engineering'].map(s => (
-                  <SkillPill key={`coreml-${s}`} text={s} />
-                ))}
-              </div>
-            </div>
-
-            <div className="skills-category">
-              <h3><i className="fas fa-robot"></i> Deep Learning & AI</h3>
-              <div className="skills-list">
-                {['PyTorch','TensorFlow','spaCy','Transformers','Computer Vision (OpenCV)'].map(s => (
-                  <SkillPill key={`dlai-${s}`} text={s} />
-                ))}
-              </div>
-            </div>
-
-            <div className="skills-category">
-              <h3><i className="fas fa-chart-line"></i> Analytics & Experimentation</h3>
-              <div className="skills-list">
-                {['A/B Testing & Experimentation','Statistical Inference','Model Explainability (SHAP/LIME)'].map(s => (
-                  <SkillPill key={`analytics-${s}`} text={s} />
-                ))}
-              </div>
-            </div>
-
-            <div className="skills-category">
-              <h3><i className="fas fa-chart-bar"></i> BI & Visualisation</h3>
-              <div className="skills-list">
-                {['Power BI','Tableau','Matplotlib','Seaborn'].map(s => (
-                  <SkillPill key={`biviz-${s}`} text={s} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Full-width banner of project types */}
-        <div className="skills-works">
-          <div className="container works-inner">
-            <span className="works-title">
-              <i className="fas fa-briefcase" aria-hidden="true"></i> What I build:
-            </span>
-            <div className="works-list">
-              {[
-                'Reinforcement Learning',
-                'Time Series Forecasting',
-                'Classification',
-                "Predictive Models",
-                'Object Detection',
-                'Clustering',
-                'Anomaly Detection',
-                'Recommendation Systems',
-                'LLM & NLP Solutions',
-                'Topic Modeling',
-                'RAG Apps',
-                'BI Dashboards',
-
-
-              ].map((item) => (
-                <span key={`work-${item}`} className="work-pill">
-                  <i
-                    className={`${
-                      item.toLowerCase().includes('time series') ? 'fas fa-chart-line' :
-                      item.toLowerCase().includes('object') ? 'fas fa-crosshairs' :
-                      item.toLowerCase().includes('cluster') ? 'fas fa-project-diagram' :
-                      item.toLowerCase().includes('anomaly') ? 'fas fa-exclamation-triangle' :
-                      item.toLowerCase().includes('recommend') ? 'fas fa-thumbs-up' :
-                      item.toLowerCase().includes('nlp') ? 'fas fa-language' :
-                      item.toLowerCase().includes('topic') ? 'fas fa-comments' :
-                      item.toLowerCase().includes('rag') ? 'fas fa-book-open' :
-                      item.toLowerCase().includes('dashboard') ? 'fas fa-chart-bar' :
-                      item.toLowerCase().includes('classification') ? 'fas fa-check-circle' :
-                      item.toLowerCase().includes('reinforcement') ? 'fas fa-dice' :
-                      item.toLowerCase().includes('predict') ? 'fas fa-bullseye' :
-                      'fas fa-circle'
-
-                      
-                    } pill-icon`}
-                    aria-hidden="true"
-                  ></i>
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section
-      <section className="stats-section">
-        <div className="container">
-          <div className="stats-grid" ref={statsRef}>
-            <div className="stat-card">
-              <div className="stat-number" data-target="25">0</div>
-              <div className="stat-label">Projects Completed</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number" data-target="5">0</div>
-              <div className="stat-label">Years Experience</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number" data-target="15">0</div>
-              <div className="stat-label">Technologies Mastered</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number" data-target="100">0</div>
-              <div className="stat-label">Problems Solved</div>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
-
 
       {/* Projects Section */}
       <section id="projects" className="projects-section" aria-labelledby="projects-title">
@@ -533,164 +283,172 @@ const Home: React.FC = () => {
         <div className="container">
           {/* Enhanced Filter Buttons */}
           <div className="filter-container">
-            <div className="filter-label">
-              <i className="fas fa-filter"></i>
-              Filter by Category:
-            </div>
-            <div className="filter-buttons">
+            <div className="filter-buttons" role="group" aria-label="Filter projects by domain">
               <button
                 className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
                 onClick={() => setFilter('all')}
+                aria-pressed={filter === 'all'}
               >
-                <i className="fas fa-th"></i>
-                All Projects
-                <span className="project-count">({projects.length})</span>
+                All projects
               </button>
-              {CATEGORY_FILTERS.map(({ key, label, icon, match }) => {
+              {DOMAINS.map(({ key, label, match }) => {
                 const count = projects.filter(p => p.category.some(c => match.includes(c))).length;
                 if (count === 0) return null;   // never render an empty filter
                 return (
                   <button
                     key={key}
-                    className={`filter-btn ${filter === key ? 'active' : ''}`}
+                    className={`filter-btn domain-${key} ${filter === key ? 'active' : ''}`}
                     onClick={() => setFilter(key)}
+                    aria-pressed={filter === key}
                   >
-                    <i className={icon}></i>
+                    {/* The swatch is the colour key: the same square, in the
+                        same hue, as the domain label on the cards it shows. */}
+                    <span className="domain-key" aria-hidden="true"></span>
                     {label}
-                    <span className="project-count">({count})</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <div className="projects-grid">
+          <div className="projects-grid" ref={gridRef}>
             {filteredProjects.map((project) => (
-              <Link 
-                key={project.id} 
-                to={`/project/${project.id}`} 
-                className="project-card-link"
-                onClick={() => trackEvent('project_click', 'Projects', project.title)}
-              >
-                <div className="project-card">
-                  <div className="project-image-container">
-                    {project.animation ? (
-                      <LottieAnimation
-                        animationPath={project.animation}
-                        className="project-animation"
-                        style={{ width: '100%', height: '100%' }}
-                      />
-                    ) : (
-                      <img
-                        className="project-image"
-                        src={project.image}
-                        alt={project.title}
-                      />
-                    )}
-                  </div>
-                  <div className="project-content">
-                    <h3 className="project-title">
-                      {project.title}
-                    </h3>
-                    <p className="project-description">
-                      {project.description}
-                    </p>
-                    <div className="project-tags">
-                      {project.tags.map((tag, index) => (
-                        <span key={index} className={`tag tag-${tag.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </Link>
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="about-section" aria-labelledby="about-title">
+        <div className="container">
+          <h2 id="about-title" className="section-title">About</h2>
+          <div className="about-content" ref={aboutRef}>
+            <div className="profile-container">
+              <img
+                className="profile-image"
+                src="/media/profile.jpg"
+                alt="Portrait of Amir Mohammadikarbalaei"
+              />
+              <div className="profile-badges">
+                <div className="profile-badge">
+                  <i className="fas fa-map-marker-alt" aria-hidden="true"></i>
+                  Liverpool, UK
+                </div>
+              </div>
+            </div>
+            <div className="about-text">
+              <p className="about-description">
+                I work at <strong>Unilever</strong> as a Data Expertise Analyst,
+                applying NLP and analytics to the company's employee-facing
+                chatbot and service desk. There I built an NLP system that validates
+                knowledge articles automatically, saving 1,300 hours of manual review a
+                year, and a quality scoring framework across 15,000+ articles.
+              </p>
+              <p className="about-description">
+                I care about data science that can be questioned: interpretable models,
+                transparent methods and responsible AI, so the decisions built on them
+                deserve the trust people place in them.
+              </p>
+              <div className="about-cta">
+                <Link to="/experience" className="btn-outline">
+                  <i className="fas fa-briefcase" aria-hidden="true"></i>
+                  See full experience
+                </Link>
+                <a href="#contact" className="btn-text">
+                  <i className="fas fa-envelope" aria-hidden="true"></i>
+                  Contact me
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <section id="skills" className="skills-section" aria-label="Skills">
+        <div className="container">
+          <h2 className="section-title">Skills &amp; tools</h2>
+          {/* One instrument panel read as a spec sheet: a row per category,
+              the label in the mono prompt voice, the tools beside it as plain
+              text. Bordered pills made ~35 separate objects compete. */}
+          <div className="skills-sheet">
+            {SKILL_GROUPS.map(({ label, skills }) => (
+              <div key={label} className="skills-row">
+                <h3 className="skills-row-label">{label}</h3>
+                <ul className="skills-list">
+                  {skills.map(s => (
+                    <li key={`${label}-${s}`}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </section>
+
       {/* Contact Section */}
       <section id="contact" className="contact-section" aria-labelledby="contact-title">
         <div className="container">
-          <h2 id="contact-title" className="contact-title">Get In Touch!</h2>
+          <h2 id="contact-title" className="contact-title">Contact</h2>
+          {/* The address is shown in full so it can be read or copied without
+              relying on a mail client being set up. */}
+          <a
+            href="mailto:a.mohammadikarbalaei@gmail.com"
+            className="btn-primary contact-email"
+            onClick={() => trackContactInteraction('email')}
+          >
+            <i className="fas fa-envelope" aria-hidden="true"></i>
+            a.mohammadikarbalaei@gmail.com
+          </a>
+          <div className="copy-email-row">
+            <button
+              type="button"
+              className={`copy-email ${copyState}`}
+              onClick={copyEmail}
+            >
+              <i
+                className={copyState === 'copied' ? 'fas fa-check' : 'far fa-copy'}
+                aria-hidden="true"
+              ></i>
+              Copy address
+            </button>
+            <span className="copy-email-readout" role="status">
+              {/* Keyed so each new readout fades in; the live region itself
+                  stays mounted so screen readers keep announcing it. */}
+              {copyState !== 'idle' && (
+                <span key={copyState} className="readout-text">
+                  {copyState === 'copied' ? 'address copied' : "couldn't copy: select the address above instead"}
+                </span>
+              )}
+            </span>
+          </div>
           <div className="social-links">
             <a
               href="https://github.com/AmirMohammadiKarbalaei"
               target="_blank"
               rel="noopener noreferrer"
               className="social-link"
-              aria-label="GitHub profile"
               onClick={() => trackContactInteraction('github')}
             >
-              <i className="fab fa-github"></i>
+              <i className="fab fa-github" aria-hidden="true"></i>
+              GitHub
             </a>
             <a
               href="https://www.linkedin.com/in/amir-mohammadik/"
               target="_blank"
               rel="noopener noreferrer"
               className="social-link"
-              aria-label="LinkedIn profile"
               onClick={() => trackContactInteraction('linkedin')}
             >
-              <i className="fab fa-linkedin"></i>
-            </a>
-            <a
-              href="mailto:a.mohammadikarbalaei@gmail.com"
-              className="social-link"
-              aria-label="Email Amir"
-              onClick={() => trackContactInteraction('email')}
-            >
-              <i className="fas fa-envelope"></i>
+              <i className="fab fa-linkedin" aria-hidden="true"></i>
+              LinkedIn
             </a>
           </div>
         </div>
       </section>
-
-      {/* Quick Actions Floating Menu */}
-      <div 
-        className={`quick-actions ${quickActionsOpen ? 'active' : ''}`}
-        onMouseEnter={() => {
-          if (!isClickedOpen) {
-            setQuickActionsOpen(true);
-          }
-        }}
-        onMouseLeave={() => {
-          if (!isClickedOpen) {
-            setQuickActionsOpen(false);
-          }
-        }}
-      >
-        <div 
-          className="quick-action-toggle"
-          onClick={(e) => {
-            e.stopPropagation();
-            const newState = !quickActionsOpen;
-            setQuickActionsOpen(newState);
-            setIsClickedOpen(newState);
-          }}
-        >
-          <i className="fas fa-plus"></i>
-        </div>
-        <div className="quick-actions-menu">
-          <a href="#contact" className="quick-action-btn" title="Contact Me">
-            <i className="fas fa-envelope"></i>
-          </a>
-          <Link to="/experience" className="quick-action-btn" title="My Experience">
-            <i className="fas fa-user-tie"></i>
-          </Link>
-          <a href="#skills" className="quick-action-btn" title="My Skills">
-            <i className="fas fa-code"></i>
-          </a>
-          <button 
-            className="quick-action-btn" 
-            title="Scroll to Top"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          >
-            <i className="fas fa-arrow-up"></i>
-          </button>
-        </div>
-      </div>
+      </main>
     </div>
   );
 };

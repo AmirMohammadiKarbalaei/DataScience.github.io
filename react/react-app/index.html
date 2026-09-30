@@ -4,14 +4,13 @@
     <meta charset="UTF-8" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Viewport and Mobile Optimization -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#00d4ff" />
+    <meta name="theme-color" content="#0a0a0f" />
 
     <!-- Basic SEO Meta Tags -->
     <title>Amir Mohammadikarbalaei - Data Scientist & AI Engineer | Portfolio</title>
@@ -46,8 +45,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Fonts, linked here rather than @import-ed from index.css: an @import
+         only starts downloading after the CSS bundle has arrived and parsed. -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap" />
+
+    <!-- Font Awesome, loaded without blocking first paint. Every icon sits
+         beside a text label, so the page is complete before the icons land. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" /></noscript>
 
     <!--
       Google Analytics is loaded here only. Do not also call initGA() in App.tsx:
@@ -62,6 +67,17 @@
     </script>
   </head>
   <body>
+    <!-- Without JavaScript the app cannot render; say so and give the ways to
+         reach Amir, rather than a blank page. -->
+    <noscript>
+      <div style="max-width:36rem;margin:15vh auto;padding:0 24px;font-family:Inter,system-ui,sans-serif;color:#e0e0e0;background:#0a0a0f;line-height:1.6">
+        <h1 style="color:#ffffff;font-size:2rem;margin:0 0 12px">Amir Mohammadikarbalaei</h1>
+        <p>Data scientist working on NLP, LLMs and machine learning. This portfolio needs JavaScript to show its projects.</p>
+        <p>Email: <a href="mailto:a.mohammadikarbalaei@gmail.com" style="color:#5bb8cc">a.mohammadikarbalaei@gmail.com</a><br />
+        LinkedIn: <a href="https://www.linkedin.com/in/amir-mohammadik/" style="color:#5bb8cc">linkedin.com/in/amir-mohammadik</a><br />
+        GitHub: <a href="https://github.com/AmirMohammadiKarbalaei" style="color:#5bb8cc">github.com/AmirMohammadiKarbalaei</a></p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

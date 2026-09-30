@@ -3,6 +3,39 @@ import { Link } from 'react-router-dom';
 import Navigation from './Navigation';
 import ParticleBackground from './ParticleBackground';
 import SEOHead from './SEOHead';
+import { DOMAINS } from '../data/domains';
+
+// Roles span several domains (NLP is part of ML, forecasting sits inside an
+// analytics role), so colour marks individual skills rather than whole roles.
+// Each tag takes the hue of the domain it names, by the same rule and hues as
+// the project cards. Tags outside the ML domains (tools, context, soft
+// skills) stay neutral, so a hue always means a domain.
+const TAG_DOMAINS: Record<string, string> = {
+  'NLP': 'nlp',
+  'Natural Language Processing': 'nlp',
+  'Natural Language Processing (NLP)': 'nlp',
+  'NLTK': 'nlp',
+  'Large Language Models (LLM)': 'nlp',
+  'Machine Learning': 'ml',
+  'MLflow': 'ml',
+  'Predictive Modelling': 'ml',
+  'Computer Vision': 'ml',
+  'Forecasting': 'ts',
+  'Reinforcement Learning': 'ml',
+  'SQL': 'data',
+  'Microsoft Power BI': 'data',
+  'Data Pipelines': 'data',
+  'Database Management': 'data',
+  'Data Analytics': 'data',
+};
+
+const RoleTag: React.FC<{ label: string }> = ({ label }) => {
+  const key = TAG_DOMAINS[label];
+  return <span className={`timeline-tag${key ? ` domain-${key}` : ''}`}>{label}</span>;
+};
+
+// The key lists only the domains the tags actually use, in DOMAINS order.
+const TAG_KEY = DOMAINS.filter(d => Object.values(TAG_DOMAINS).includes(d.key));
 
 const Experience: React.FC = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -41,7 +74,7 @@ const Experience: React.FC = () => {
   return (
     <div className="experience-page">
       <SEOHead 
-        title="Professional Experience - Amir Mohammadikarbalaei | Data Scientist Career Journey"
+        title="Experience | Amir Mohammadikarbalaei"
         description="Amir Mohammadikarbalaei's professional journey as a Data Scientist and AI Engineer, from a Y Combinator healthcare AI startup to NLP and machine learning at Unilever, alongside an MSc in Data Science at the University of Bath."
         keywords={[
           "Amir Mohammadikarbalaei Experience",
@@ -60,21 +93,21 @@ const Experience: React.FC = () => {
       />
       <Navigation />
       <ParticleBackground />
+      <main id="main">
       
       {/* Hero Section */}
       <section className="experience-hero">
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">Professional Journey</h1>
+            <h1 className="hero-title">Experience</h1>
             <p className="hero-subtitle">
-              A timeline of my career progression in data science and analytics
+              Roles, most recent first, with education below. Skill tags are coloured by domain.
             </p>
-            <div className="hero-stats">
-              <div className="stat-item">
-                <span className="stat-number">4+</span>
-                <span className="stat-label">Years Experience</span>
-              </div>
-            </div>
+            <ul className="domain-legend" aria-label="Colour key for the skill tags">
+              {TAG_KEY.map(domain => (
+                <li key={domain.key} className={`project-domain domain-${domain.key}`}>{domain.label}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -85,14 +118,28 @@ const Experience: React.FC = () => {
           <h2 id="timeline-heading" className="sr-only">Career timeline</h2>
           <div className="timeline" ref={timelineRef}>
             <div className="timeline-item">
-              <div className="timeline-date">Jun 2025 - Present</div>
+              <div className="timeline-date">Sep 2026 – Present</div>
               <div className="timeline-content">
-                <div className="company-logo">
-                  <i aria-hidden="true" className="fas fa-industry"></i>
+                <div className="company-logo has-mark">
+                  <img src="/media/logos/unilever.svg" alt="" />
+                </div>
+                <div className="job-header">
+                  <h3>Data Expertise Analyst</h3>
+                  <div className="achievement-badge current">Current role</div>
+                </div>
+                <h4 className="company-name">Unilever · Full-time</h4>
+                <div className="location">Port Sunlight, UK · Hybrid</div>
+              </div>
+            </div>
+
+            <div className="timeline-item">
+              <div className="timeline-date">Jun 2025 – Sep 2026</div>
+              <div className="timeline-content">
+                <div className="company-logo has-mark">
+                  <img src="/media/logos/unilever.svg" alt="" />
                 </div>
                 <div className="job-header">
                   <h3>Customer Operations and Una Bot Analyst</h3>
-                  <div className="achievement-badge current">Current Role</div>
                 </div>
                 <h4 className="company-name">Unilever · Full-time</h4>
                 <div className="location">Port Sunlight, UK · Hybrid</div>
@@ -107,20 +154,20 @@ const Experience: React.FC = () => {
                   <li>Drove <strong>12% agent escalation deflection</strong> by diagnosing user experience friction with the automation team.</li>
                 </ul>
                 <div className="timeline-tags">
-                  <span className="timeline-tag">NLP</span>
-                  <span className="timeline-tag">MLflow</span>
-                  <span className="timeline-tag">Forecasting</span>
-                  <span className="timeline-tag">ServiceNow</span>
-                  <span className="timeline-tag">Process Optimisation</span>
+                  <RoleTag label="NLP" />
+                  <RoleTag label="MLflow" />
+                  <RoleTag label="Forecasting" />
+                  <RoleTag label="ServiceNow" />
+                  <RoleTag label="Process Optimisation" />
                 </div>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-date">Feb 2025 - May 2025</div>
+              <div className="timeline-date">Feb 2025 – May 2025</div>
               <div className="timeline-content">
-                <div className="company-logo">
-                  <i aria-hidden="true" className="fas fa-university"></i>
+                <div className="company-logo has-mark">
+                  <img src="/media/logos/university-of-bath.svg" alt="" />
                 </div>
                 <h3>Research Assistant</h3>
                 <h4 className="company-name">School of Management, University of Bath · Part-time</h4>
@@ -130,28 +177,31 @@ const Experience: React.FC = () => {
                   <li>Took 700K+ USPTO records a year from raw bulk XML to a queryable database in one command, spread across CPU cores with batched writes to survive multi-year runs.</li>
                   <li>Wrote the classification stage with NLTK part-of-speech tagging and linguistic feature extraction, plus a labelled validation set built from an external benchmark to test it against.</li>
                 </ul>
+                <Link to="/project/patent-text-pipeline" className="timeline-project-link">
+                  See the project <i aria-hidden="true" className="fas fa-arrow-right"></i>
+                </Link>
                 <div className="timeline-tags">
-                  <span className="timeline-tag">Natural Language Processing (NLP)</span>
-                  <span className="timeline-tag">Data Pipelines</span>
-                  <span className="timeline-tag">SQL</span>
-                  <span className="timeline-tag">CLI Tooling</span>
-                  <span className="timeline-tag">NLTK</span>
+                  <RoleTag label="Natural Language Processing (NLP)" />
+                  <RoleTag label="Data Pipelines" />
+                  <RoleTag label="SQL" />
+                  <RoleTag label="CLI Tooling" />
+                  <RoleTag label="NLTK" />
                 </div>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-date">Nov 2024 - Dec 2024</div>
+              <div className="timeline-date">Nov 2024 – Dec 2024</div>
               <div className="timeline-content">
-                <div className="company-logo">
-                  <i aria-hidden="true" className="fas fa-rocket"></i>
+                <div className="company-logo has-mark">
+                  <img src="/media/logos/enterprise-bath.png" alt="" />
                 </div>
                 <h3>Technical Lead</h3>
                 <h4 className="company-name">Enterprise Bath · Part-time</h4>
-                <div className="location">Bath, England, United Kingdom · Remote</div>
+                <div className="location">Bath, UK · Remote</div>
                 <p>
-                  Led the development of a secure, scalable attendance tracking system for the University of Bath's 
-                  entrepreneurial community, enhancing student engagement and data accessibility.
+                  Led the development of a secure attendance tracking system for the University of Bath's
+                  entrepreneurial community.
                 </p>
                 <ul className="responsibilities">
                   <li>Designed an end‑to‑end data pipeline integrating multiple sources for automated attendance tracking.</li>
@@ -161,17 +211,17 @@ const Experience: React.FC = () => {
                   See the project <i aria-hidden="true" className="fas fa-arrow-right"></i>
                 </Link>
                 <div className="timeline-tags">
-                  <span className="timeline-tag">Software Development</span>
-                  <span className="timeline-tag">Project Delivery</span>
-                  <span className="timeline-tag">Database Management</span>
-                  <span className="timeline-tag">Microsoft Power BI</span>
-                  <span className="timeline-tag">Shell Scripting</span>
+                  <RoleTag label="Software Development" />
+                  <RoleTag label="Project Delivery" />
+                  <RoleTag label="Database Management" />
+                  <RoleTag label="Microsoft Power BI" />
+                  <RoleTag label="Shell Scripting" />
                 </div>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-date">Dec 2023 - Feb 2024</div>
+              <div className="timeline-date">Dec 2023 – Feb 2024</div>
               <div className="timeline-content">
                 <div className="company-logo">
                   <i aria-hidden="true" className="fas fa-brain"></i>
@@ -181,7 +231,7 @@ const Experience: React.FC = () => {
                   <div className="achievement-badge startup">Y Combinator</div>
                 </div>
                 <h4 className="company-name">Nightingaile, later Simplifine (Y Combinator) · Part-time</h4>
-                <div className="location">San Francisco, California, United States · Remote</div>
+                <div className="location">San Francisco, US · Remote</div>
                 <p>
                   Built localised language models for healthcare professionals at an early-stage startup,
                   and was main developer on the Windows application that put them in front of doctors.
@@ -193,50 +243,50 @@ const Experience: React.FC = () => {
                   <li>Worked with multidisciplinary teams on user needs and clinical domain requirements</li>
                 </ul>
                 <div className="timeline-tags">
-                  <span className="timeline-tag">Data Science</span>
-                  <span className="timeline-tag">Large Language Models (LLM)</span>
-                  <span className="timeline-tag">Software Development</span>
-                  <span className="timeline-tag">Healthcare AI</span>
-                  <span className="timeline-tag">Startups</span>
+                  <RoleTag label="Data Science" />
+                  <RoleTag label="Large Language Models (LLM)" />
+                  <RoleTag label="Software Development" />
+                  <RoleTag label="Healthcare AI" />
+                  <RoleTag label="Startups" />
                 </div>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-date">Oct 2023 - Jan 2024</div>
+              <div className="timeline-date">Oct 2023 – Jan 2024</div>
               <div className="timeline-content">
-                <div className="company-logo">
-                  <i aria-hidden="true" className="fas fa-chart-line"></i>
+                <div className="company-logo has-mark">
+                  <img src="/media/logos/generation-uk.svg" alt="" />
                 </div>
                 <div className="job-header">
                   <h3>Data Analytics Trainee</h3>
                  
                 </div>
                 <h4 className="company-name">Generation UK & Ireland · Full-time</h4>
-                <div className="location">Leeds, England, United Kingdom · Remote</div>
+                <div className="location">Leeds, UK · Remote</div>
                 <p>
-                  Comprehensive data analytics training program focusing on real-world business applications, 
-                  team leadership, and mentoring responsibilities.
+                  Data analytics training programme covering business applications, team leadership
+                  and mentoring.
                 </p>
 
                 <ul className="responsibilities">
-                  <li>Conducted comprehensive analysis of Olist dataset using Power BI and SQL, investigating customer satisfaction factors</li>
-                  <li>Guided two teams in completing interim and final projects, achieving 100% scores through effective leadership</li>
-                  <li>Collaborated with instructors to deliver lessons and mentored less experienced learners</li>
-                  <li>Demonstrated expertise in data exploration and manipulation through Excel, SQL, Python, NumPy, Pandas, and Matplotlib</li>
+                  <li>Analysed the Olist dataset with Power BI and SQL to find what drives customer satisfaction</li>
+                  <li>Led two teams through their interim and final projects; both scored 100%</li>
+                  <li>Co-delivered lessons with the instructors and mentored less experienced learners</li>
+                  <li>Explored and prepared data with Excel, SQL, Python, NumPy, Pandas and Matplotlib</li>
                 </ul>
                 <div className="timeline-tags">
-                  <span className="timeline-tag">Leadership</span>
-                  <span className="timeline-tag">Python</span>
-                  <span className="timeline-tag">SQL</span>
-                  <span className="timeline-tag">Microsoft Power BI</span>
-                  <span className="timeline-tag">Data Analytics</span>
+                  <RoleTag label="Leadership" />
+                  <RoleTag label="Python" />
+                  <RoleTag label="SQL" />
+                  <RoleTag label="Microsoft Power BI" />
+                  <RoleTag label="Data Analytics" />
                 </div>
               </div>
             </div>
 
             <div className="timeline-item">
-              <div className="timeline-date">Sep 2020 - Oct 2023</div>
+              <div className="timeline-date">Sep 2020 – Oct 2023</div>
               <div className="timeline-content">
                 <div className="company-logo">
                   <i aria-hidden="true" className="fas fa-laptop-code"></i>
@@ -244,22 +294,22 @@ const Experience: React.FC = () => {
                 <h3>Independent Data Scientist</h3>
                 <h4 className="company-name">Personal Projects</h4>
                 <p>
-                  Extensive portfolio of independent data science projects covering machine learning, 
-                  deep learning, computer vision, and competitive programming challenges.
+                  Independent data science projects covering machine learning, deep learning, computer
+                  vision and competitive programming challenges.
                 </p>
                 <ul className="responsibilities">
                   <li>Utilised time series forecasting and classification techniques to detect and analyse <Link to="/project/eeg-detection" className="timeline-inline-link">EEG biopotential signals</Link></li>
                   <li>Applied unsupervised learning to cluster retail customers enabling targeted marketing strategies</li>
                   <li>Implemented Q-learning to train autonomous agents for Gym environment games</li>
                   <li>Competed in the Kaggle <Link to="/project/detect-sleep-states" className="timeline-inline-link">"Detecting Sleep State"</Link> competition with thorough EDA and feature engineering</li>
-                  <li>Developed advanced models including <Link to="/project/diabetes-classification" className="timeline-inline-link">diabetes classification</Link> and custom hand gesture recognition with YOLOv5</li>
+                  <li>Developed advanced models including diabetes classification and custom hand gesture recognition with YOLOv5</li>
                 </ul>
                 <div className="timeline-tags">
-                  <span className="timeline-tag">Machine Learning</span>
-                  <span className="timeline-tag">Computer Vision</span>
-                  <span className="timeline-tag">Natural Language Processing</span>
-                  <span className="timeline-tag">Reinforcement Learning</span>
-                  <span className="timeline-tag">Predictive Modeling</span>
+                  <RoleTag label="Machine Learning" />
+                  <RoleTag label="Computer Vision" />
+                  <RoleTag label="Natural Language Processing" />
+                  <RoleTag label="Reinforcement Learning" />
+                  <RoleTag label="Predictive Modelling" />
                 </div>
               </div>
             </div>
@@ -274,8 +324,8 @@ const Experience: React.FC = () => {
           <h2 id="education-heading" className="section-title">Education</h2>
           <div className="education-grid">
             <article className="education-card">
-              <div className="education-icon">
-                <i aria-hidden="true" className="fas fa-graduation-cap"></i>
+              <div className="education-icon has-mark">
+                <img src="/media/logos/university-of-bath-crest.svg" alt="" />
               </div>
               <div className="education-body">
                 <h3>MSc Data Science</h3>
@@ -287,8 +337,8 @@ const Experience: React.FC = () => {
             </article>
 
             <article className="education-card">
-              <div className="education-icon">
-                <i aria-hidden="true" className="fas fa-cogs"></i>
+              <div className="education-icon has-mark">
+                <img src="/media/logos/newcastle-university-shield.svg" alt="" />
               </div>
               <div className="education-body">
                 <h3>
@@ -302,83 +352,51 @@ const Experience: React.FC = () => {
         </div>
       </section>
 
-      {/* Skills Evolution
-      <section className="skills-evolution">
-        <div className="container">
-          <h2 className="section-title">Skills Evolution</h2>
-          <div className="evolution-timeline">
-            <div className="evolution-item">
-              <div className="evolution-year">2019</div>
-              <div className="evolution-skills">
-                <span className="skill-badge basic">Engineering</span>
-                <span className="skill-badge basic">Quality Control</span>
-                <span className="skill-badge basic">Project Delivery</span>
-              </div>
-            </div>
-            <div className="evolution-item">
-              <div className="evolution-year">2020-2021</div>
-              <div className="evolution-skills">
-                <span className="skill-badge basic">Python</span>
-                <span className="skill-badge basic">Machine Learning</span>
-                <span className="skill-badge basic">Data Analysis</span>
-                <span className="skill-badge basic">Computer Vision</span>
-              </div>
-            </div>
-            <div className="evolution-item">
-              <div className="evolution-year">2022-2023</div>
-              <div className="evolution-skills">
-                <span className="skill-badge intermediate">Deep Learning</span>
-                <span className="skill-badge intermediate">NLP</span>
-                <span className="skill-badge intermediate">Reinforcement Learning</span>
-                <span className="skill-badge intermediate">Time Series</span>
-              </div>
-            </div>
-            <div className="evolution-item">
-              <div className="evolution-year">2024</div>
-              <div className="evolution-skills">
-                <span className="skill-badge advanced">Large Language Models</span>
-                <span className="skill-badge advanced">Healthcare AI</span>
-                <span className="skill-badge advanced">SQL</span>
-                <span className="skill-badge advanced">Power BI</span>
-                <span className="skill-badge advanced">Leadership</span>
-              </div>
-            </div>
-            <div className="evolution-item">
-              <div className="evolution-year">2025</div>
-              <div className="evolution-skills">
-                <span className="skill-badge expert">Database Management</span>
-                <span className="skill-badge expert">Software Development</span>
-                <span className="skill-badge expert">Customer Operations</span>
-                <span className="skill-badge expert">AI Analytics</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
-      {/* Floating Action Buttons */}
+      {/* One floating control, per DESIGN.md. Home is already in the navbar. */}
       <div className="floating-actions">
-        <button 
+        <button
           className="floating-btn scroll-top"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          title="Back to Top"
+          aria-label="Back to top"
+          title="Back to top"
         >
           <i aria-hidden="true" className="fas fa-arrow-up"></i>
         </button>
-        <Link to="/" className="floating-btn back-home" title="Back to Home">
-          <i aria-hidden="true" className="fas fa-home"></i>
-        </Link>
       </div>
 
-      {/* Back to Home */}
-      <section className="back-to-home">
+      {/* The page ends on the next step for a reader who has just read the
+          whole career: getting in touch. Home is always one tap away in the
+          nav. Same labelled links as the project pages. */}
+      <section id="contact" className="contact-section" aria-labelledby="experience-contact-title">
         <div className="container">
-          <Link to="/" className="back-home-btn">
-            <i aria-hidden="true" className="fas fa-arrow-left"></i>
-            Back to Home
-          </Link>
+          <h2 id="experience-contact-title" className="contact-title">Contact</h2>
+          <div className="social-links">
+            <a href="mailto:a.mohammadikarbalaei@gmail.com" className="social-link">
+              <i className="fas fa-envelope" aria-hidden="true"></i>
+              Email
+            </a>
+            <a
+              href="https://github.com/AmirMohammadiKarbalaei"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-link"
+            >
+              <i className="fab fa-github" aria-hidden="true"></i>
+              GitHub
+            </a>
+            <a
+              href="https://www.linkedin.com/in/amir-mohammadik/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-link"
+            >
+              <i className="fab fa-linkedin" aria-hidden="true"></i>
+              LinkedIn
+            </a>
+          </div>
         </div>
       </section>
+      </main>
     </div>
   );
 };

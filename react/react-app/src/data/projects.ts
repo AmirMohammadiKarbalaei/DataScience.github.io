@@ -5,6 +5,8 @@
  *   global-unemployment  Descriptive stats on a public dataset, no model.
  *   disaster-tweets      TF-IDF + Naive Bayes at ~78% on a tutorial dataset.
  *   business-analysis    3,000-row sales report, no code link.
+ *   diabetes-classification  Random Forest on the Pima Indians tutorial dataset.
+ *   business-data-analytics  Olist delivery/review dashboard, descriptive only.
  * Uncomment any of them to bring it back.
  */
 
@@ -12,9 +14,13 @@ export interface Project {
   id: string;
   title: string;
   description: string;
+  /** One-line headline result shown on the card, as a readout. Published facts only. */
+  result?: string;
   image: string;
   animation?: string;
   htmlSimulation?: string;
+  /** Shown instead of the simulation on narrow screens, where it cannot fit. */
+  simulationFallback?: { src: string; caption: string };
   tags: string[];
   category: string[];
   githubUrl?: string;
@@ -36,6 +42,7 @@ export const projects: Project[] = [
   id: 'proxyon-pii-masking',
   title: 'PII Masking Proxy for LLM Chat',
   description: 'A privacy layer that sits between users and a hosted LLM. Detects and masks personal data with a hybrid transformer plus regex pipeline, so raw PII never leaves the organisation.',
+  result: '23 PII types masked before any text leaves',
   image: '/media/proxyon/proxyon.png',
   animation: '/media/animation/piid.json',
   htmlSimulation: '/media/proxyon/proxyon-masking-demo.html',
@@ -47,14 +54,14 @@ export const projects: Project[] = [
     processSections: {
       'Objective': 'Make hosted LLMs usable on data that contains personal information, without relying on the model provider for confidentiality, and without degrading the quality of the conversation.',
       'Approach': [
-        'Hybrid detection: a GLiNER zero-shot transformer handles context-dependent entities such as names, organisations, addresses and banking identifiers, while deterministic regex extractors act as a backstop for the structural PII the model is least reliable on (emails, IPv4, UK postcodes, UK phone numbers, address blocks, dates and dates of birth).',
-        'Closed label set: detections are mapped into 23 canonical PII types through an explicit allowlist, so an unexpected model label can never reach the output. Every downstream stage is keyed on those canonical names.',
-        'Deterministic overlap resolution: transformer and regex spans overlap constantly (a postcode inside an address, an account number inside an IBAN). A priority table plus a greedy resolver sorted by priority, span length, confidence and position selects one span per region, giving the same answer for the same input every time.',
-        'Offset-based masking: replacement works on character offsets and runs right to left, so repeated or ambiguous substrings cannot corrupt the output the way find-and-replace would.',
-        'Stable tagging with dedupe: values are normalised per label before tagging, so the same email written five different ways collapses to one placeholder and downstream systems can reason about it as one entity.',
-        'Validation: Luhn checks on card numbers and IBAN mod-97 checks adjust confidence on structurally valid matches.',
-        'Evaluation harness: a scoring module compares detections against a labelled test bundle and reports recall, type accuracy and false positives, using a lenient matcher with a tunable similarity threshold so near-miss boundaries are not scored as failures.',
-        'Deployed application: a Streamlit app with authentication, a chat interface backed by Gemini, an admin portal with per-entity masking policies, and usage analytics.'
+        'A GLiNER zero-shot transformer handles context-dependent entities such as names, organisations, addresses and banking identifiers. Deterministic regex extractors back it up on the structural PII the model is least reliable on: emails, IPv4, UK postcodes, UK phone numbers, address blocks, dates and dates of birth.',
+        'Detections are mapped into 23 canonical PII types through an explicit allowlist, so an unexpected model label can never reach the output, and every downstream stage is keyed on those canonical names.',
+        'Transformer and regex spans overlap constantly: a postcode inside an address, an account number inside an IBAN. A priority table and a greedy resolver, sorted by priority, span length, confidence and position, pick one span per region, so the same input always gets the same answer.',
+        'Masking works on character offsets and runs right to left, so repeated or ambiguous substrings cannot corrupt the output the way find-and-replace would.',
+        'Values are normalised per label before tagging. The same email written five different ways collapses to one placeholder, and downstream systems can reason about it as one entity.',
+        'Luhn checks on card numbers and IBAN mod-97 checks adjust confidence on structurally valid matches.',
+        'A scoring module compares detections against a labelled test bundle and reports recall, type accuracy and false positives. Its lenient matcher has a tunable similarity threshold, so near-miss boundaries are not scored as failures.',
+        'It ships as a Streamlit app with authentication, a chat interface backed by Gemini, an admin portal with per-entity masking policies, and usage analytics.'
       ],
       'Tools': 'Python, GLiNER, Hugging Face Transformers, PyTorch, Google Gemini API, Streamlit, regex, pytest-style test bundle, Docker devcontainer.'
     },
@@ -81,6 +88,7 @@ export const projects: Project[] = [
   id: 'local-ai-voice-assistant',
   title: 'Jarvis: Local AI Voice Assistant with Tool Routing',
   description: 'A privacy-first voice assistant combining local speech recognition, LLM reasoning, JSON-based tool routing, real-time APIs, and text-to-speech. No cloud required.',
+  result: 'speech, LLM, tools and TTS, all on-device',
   image: '/media/jarvis/Jarvis.png',
   animation: '/media/animation/AI_Assistant.json',
   htmlSimulation: '/media/jarvis/voice-assistant-pipeline.html',
@@ -92,14 +100,14 @@ export const projects: Project[] = [
     data: 'A fully local AI voice assistant that listens for a wake word, transcribes speech with faster-whisper, routes requests through a custom LLM-based tool router, executes Python tools, and responds through Kokoro TTS, all running on-device via Ollama.',
     processSections: {
       'Objective': 'Build a private, local-first AI assistant that goes beyond chatbot interaction by supporting real-time voice input, on-device LLM reasoning, tool execution, and natural spoken output without relying on cloud AI services.',
-      'Skills & Technologies Demonstrated': [
-        'End-to-End Voice Pipeline: Designed the full system from microphone input through speech-to-text, LLM reasoning, tool execution, response generation, and TTS playback.',
-        'LLM Tool Routing: Built a JSON-based tool router that determines when a tool is needed, selects the correct one, repairs common speech-to-text transcription errors, validates arguments, and safely executes Python functions.',
-        'Hybrid Request Handling: Implemented deterministic fast paths for common requests (time, weather, Wikipedia) alongside an LLM router for ambiguous or multi-step commands, balancing latency and capability.',
-        'Local AI Inference: Integrated Ollama with configurable fast and smart models (qwen3:4b and qwen3:8b), enabling the assistant to trade off response speed against reasoning depth per request.',
-        'Voice UX Engineering: Added wake-word activation, conversation mode, stop and shutdown commands, listening beeps, streamed TTS output, and text cleaning (removing markdown, emojis, and code blocks) to produce natural spoken responses.',
-        'Modular Tool Architecture: Built a reusable ToolRegistry supporting weather, time, web search (Tavily with DuckDuckGo fallback), Wikipedia, calculator, currency conversion, and a full timer system.',
-        'Asynchronous Timer System: Developed a non-blocking threaded timer engine with labelled timers, spoken warnings, cancellation by label or ID, active timer listing, alarm playback, and voice-controlled alarm stopping.'
+      'Approach': [
+        'Designed the full pipeline, from microphone input through speech-to-text, LLM reasoning, tool execution and response generation to TTS playback.',
+        'A JSON-based tool router decides when a tool is needed, picks the right one, repairs common speech-to-text transcription errors, validates the arguments and executes the Python function safely.',
+        'Common requests (time, weather, Wikipedia) take deterministic fast paths; an LLM router handles ambiguous or multi-step commands. The split balances latency against capability.',
+        'Ollama runs configurable fast and smart models (qwen3:4b and qwen3:8b), so each request can trade response speed against reasoning depth.',
+        'The voice side has wake-word activation, a conversation mode, stop and shutdown commands, listening beeps, streamed TTS output, and text cleaning that strips markdown, emojis and code blocks so replies sound natural when spoken.',
+        'A reusable ToolRegistry supports weather, time, web search (Tavily, falling back to DuckDuckGo), Wikipedia, a calculator, currency conversion and a full timer system.',
+        'Timers run on a non-blocking threaded engine: labelled timers, spoken warnings, cancellation by label or ID, a list of active timers, alarm playback, and stopping the alarm by voice.'
       ],
       'Tools': 'Python, Ollama, faster-whisper, speech_recognition, Kokoro TTS, PyTorch, CUDA, Open-Meteo API, Tavily API, DuckDuckGo Instant Answer API, Wikipedia REST API, sounddevice, requests, threading.'
     },
@@ -111,15 +119,16 @@ export const projects: Project[] = [
       'Modular ToolRegistry design makes it straightforward to extend the assistant with new capabilities without touching the core conversation loop.',
       'Project prioritised practical voice-assistant concerns including latency, transcription robustness, privacy, and spoken output quality alongside model performance.'
     ],
-    images: [
-      { src: '/media/jarvis/tool-routing-flow.png', caption: 'System architecture: microphone to faster-whisper to LLM tool router to Python tools to Kokoro TTS' },
-    ]
+    // No sidebar image: the interactive diagram above is the architecture
+    // view, and it reflows for phones.
+    images: []
   }
 },
    {
     id: 'reinforcement-learning',
     title: 'Deep Reinforcement Learning for Robotic Locomotion',
-    description: 'Training a simulated bipedal robot, the HalfCheetah, to run using four distinct DRL algorithms.',
+    description: 'Four DRL algorithms implemented from scratch to teach the simulated HalfCheetah to run. The best agent, DDPG, reached a mean return of 12,050, above the 10,000 expert benchmark.',
+    result: 'DDPG return 12,050 vs 10,000 benchmark',
     image: '/media/reinforcement learning/HalfCheetah.png',
     animation: '/media/animation/RL.json',
     tags: ['Reinforcement-Learning', 'DRL', 'Robotics'],
@@ -130,20 +139,20 @@ export const projects: Project[] = [
         data: 'This project involved training a simulated bipedal robot, the HalfCheetah, to run. Four distinct Deep Reinforcement Learning (DRL) algorithms were implemented from scratch to systematically compare their effectiveness on this continuous control task.',
         processSections: {
           'Objective': 'To train a reinforcement learning agent to achieve stable and efficient forward locomotion in the HalfCheetah-v4 environment, which features a high-dimensional continuous state (17 dimensions) and action space (6 dimensions).',
-          'Skills & Technologies Demonstrated': [
-            'Algorithm Implementation: Implemented four major DRL algorithms from scratch: Deep Deterministic Policy Gradient (DDPG), Twin Delayed DDPG (TD3), Soft Actor-Critic (SAC), and Truncated Quantile Critics (TQC).',
-            'Technical Concepts: Applied deep understanding of actor-critic architectures, deterministic vs. stochastic policies, off-policy learning, entropy maximisation, and distributional reinforcement learning.',
-            'Experimental Design: Conducted a systematic comparison of algorithm performance, evaluating learning speed, sample efficiency, asymptotic performance, and stability.',
-            'Problem Solving & Optimisation: Identified and solved a critical training instability in DDPG by implementing online state normalisation, which dramatically improved its performance.'
+          'Approach': [
+            'Implemented four DRL algorithms from scratch: Deep Deterministic Policy Gradient (DDPG), Twin Delayed DDPG (TD3), Soft Actor-Critic (SAC) and Truncated Quantile Critics (TQC).',
+            'The work covers actor-critic architectures, deterministic versus stochastic policies, off-policy learning, entropy maximisation and distributional reinforcement learning.',
+            'The four were compared systematically on learning speed, sample efficiency, asymptotic performance and stability.',
+            'DDPG suffered a critical training instability; adding online state normalisation fixed it and substantially improved its performance.'
           ],
           'Tools': 'Utilised the Gymnasium simulation environment and the MuJoCo physics engine.'
         },
         keyFindings: [
-          'Exceeded Expert Performance: Three of the four algorithms achieved scores at or above the expert benchmark (a score of 10,000). The top-performing agent, DDPG, achieved a final mean return of 12,050.',
-          'Surprising Top Performer: The carefully optimised DDPG implementation outperformed more recent algorithms due to the implementation of online state normalisation.',
-          'Systematic Performance Ranking: The final evaluation produced a clear performance hierarchy for this task: DDPG > TQC > SAC > TD3.',
-          'DDPG: Fastest to learn and achieved the highest final score.',
-          'TQC & SAC: Demonstrated the most stable learning curves, consistent with their underlying entropy regularisation and distributional critic methods.',
+          'Three of the four algorithms scored at or above the expert benchmark of 10,000. The best agent, DDPG, reached a final mean return of 12,050.',
+          'The carefully tuned DDPG beat the more recent algorithms because of the online state normalisation.',
+          'The final evaluation gave a clear ranking for this task: DDPG > TQC > SAC > TD3.',
+          'DDPG learned fastest and reached the highest final score.',
+          'TQC and SAC had the most stable learning curves, consistent with their entropy regularisation and distributional critics.',
           'TD3: Underperformed due to high sensitivity to hyperparameters and limited computational time for extensive tuning.'
         ],
         images: [
@@ -156,6 +165,7 @@ export const projects: Project[] = [
   id: 'patent-text-pipeline',
   title: 'Patent Text Pipeline at USPTO Scale',
   description: 'A command-line pipeline that turns a year of USPTO bulk archives into a queryable dataset: selective XML parsing, structured extraction, an NLTK classification stage and batched writes, built for a university research group.',
+  result: '700K+ USPTO records a year, one command',
   image: '/media/patent-pipeline/patent-pipeline.png',
   animation: '/media/animation/patent.json',
   tags: ['Python', 'NLTK', 'SQL', 'CLI', 'Data Engineering'],
@@ -196,7 +206,8 @@ export const projects: Project[] = [
 },{
     id: 'eeg-detection',
     title: 'EEG Detection - Neurological Disability Hand Function',
-    description: 'Leverage Deep Learning and 1D-UNet segmentation models on Electroencephalogram (EEG) data to accurately identify and predict hand movements, achieving top-tier AUC scores.',
+    description: 'A 1D-UNet that detects six grasp-and-lift hand movements from EEG signals. Ensembling 12 cross-validation folds raised the private AUC from 0.910 to 0.965.',
+    result: 'private AUC 0.910 → 0.965',
     image: '/media/EEG/before_after_preprocessing.png',
     animation: '/media/animation/CMI.json',
     tags: ['Deep Learning', 'Time-Series', 'UNet', 'Ensemble', 'Signal Processing'],
@@ -208,9 +219,9 @@ export const projects: Project[] = [
         'Concept': 'The project addresses the need for assisting patients with neurological disabilities by leveraging EEG data to identify and understand hand movements.',
         'Data': 'The dataset includes 12 subjects, each with 10 series of trials. The training set comprises the first 8 series, while the test set includes the 9th and 10th series. The goal is to detect 6 sequential events: HandStart, FirstDigitTouch, BothStartLoadPhase, LiftOff, Replace, and BothReleased.',
         'Process': [
-          'Preprocessing & Signal Denoising: Applied Wavelet Denoising (db2, level 3) combined with universal hard thresholding. This isolated underlying neurological frequencies and removed high-frequency muscle artifacts while preserving temporal resolution.',
-          'Baseline Deep Learning: Shifted from basic classification models to a 1D-UNet architecture capable of outputting dense, per-sample probability traces, achieving a strong baseline Private AUC of 0.910.',
-          'Advanced Pipeline & Ensembling: Upgraded the UNet encoder to EfficientNet-B3, implemented Leave-One-Subject-Out (LOSO) cross-validation, and added robust data augmentations (Channel Dropout, Amplitude Scaling, Gaussian Noise). Ensembling the 12 fold models and applying causal smoothing boosted the Private AUC to an exceptional 0.965.'
+          'Signals were denoised with wavelet denoising (db2, level 3) and universal hard thresholding, which isolated the underlying neurological frequencies and removed high-frequency muscle artifacts while preserving temporal resolution.',
+          'Basic classification models gave way to a 1D-UNet that outputs dense, per-sample probability traces, reaching a baseline private AUC of 0.910.',
+          'The UNet encoder was then upgraded to EfficientNet-B3, with Leave-One-Subject-Out (LOSO) cross-validation and data augmentation (channel dropout, amplitude scaling, Gaussian noise). Ensembling the 12 fold models and applying causal smoothing raised the private AUC to 0.965.'
         ],
         'Future Directions': 'Future efforts will prioritize deploying these highly accurate, ensembled segmentation models into real-time, low-latency edge devices for live prosthetic control.'
       },
@@ -292,6 +303,7 @@ export const projects: Project[] = [
     id: 'beat',
     title: 'BEAT: RFID Attendance System for Bath Enterprise',
     description: 'An end-to-end attendance system reading RFID cards over the PC/SC protocol, resolving identities against the university LDAP directory, and writing to a cloud PostgreSQL database with Power BI reporting.',
+    result: '400+ students tracked, ~80% less reporting',
     image: '/media/BEAT/bathenterprise.png',
     tags: ['PowerShell', 'PostgreSQL', 'AWS', 'LDAP', 'RFID', 'Power BI'],
     category: ['BI', 'DA'],
@@ -299,15 +311,15 @@ export const projects: Project[] = [
       data: 'Enterprise Bath runs an extra-curricular programme of events, mentoring and competitions for student entrepreneurs, and had no reliable way to measure who was attending. Sign-in was manual and the resulting data was too patchy to act on. BEAT replaced it with card-tap attendance: students tap their existing university card on a reader, the system resolves who they are against the university directory, records the event to a database, and surfaces engagement trends in Power BI. It runs on Windows and macOS, with 400+ students tracked and manual reporting effort reduced by around 80%.',
       processSections: {
         'Objective': 'Replace manual sign-in sheets with automated, GDPR-compliant attendance capture using the university cards students already carry, and turn the resulting data into something staff could actually act on.',
-        'How it works': [
-          'Card reading at the protocol level: rather than relying on a vendor SDK, the system talks to an OMNIKEY 5427 G2 reader through the Windows PC/SC smartcard API, establishing a context, enumerating readers and transmitting raw APDU commands to retrieve each card UID.',
-          'Identity resolution: card holders are looked up against the University of Bath LDAP directory through a C# helper invoked from PowerShell, with connectivity tested at startup so a directory outage fails loudly rather than silently producing anonymous records.',
-          'Debounce and state tracking: a five-minute cooldown per card prevents double-taps creating duplicate rows, and per-card state determines whether a tap is a Start or an End event, so a single reader handles both arrival and departure.',
-          'Persistence: attendance is written to PostgreSQL hosted on AWS RDS over an SSL-required connection, using Npgsql loaded from locally restored .NET assemblies.',
-          'Cross-platform dispatch: an entry point detects the operating system and routes to the Windows or macOS implementation, with a fallback path if detection fails.',
-          'Reporting: Power BI dashboards give staff an attendance overview and engagement analysis without touching the database.',
-          'Configuration and secrets: non-secret settings live in a committed config file, while database credentials load from a git-ignored secrets file or from environment variables, which take precedence. Missing settings fail at startup naming exactly which values are absent.',
-          'Synthetic data: a Python generator produces realistic student records so the system can be developed and demonstrated without touching real personal data.'
+        'Approach': [
+          'Cards are read at the protocol level rather than through a vendor SDK: the system talks to an OMNIKEY 5427 G2 reader through the Windows PC/SC smartcard API, establishing a context, enumerating readers and sending raw APDU commands to retrieve each card UID.',
+          'Card holders are looked up in the University of Bath LDAP directory through a C# helper invoked from PowerShell. Connectivity is tested at startup, so a directory outage fails loudly instead of silently producing anonymous records.',
+          'A five-minute cooldown per card stops double-taps creating duplicate rows, and per-card state decides whether a tap is a Start or an End event, so one reader handles both arrival and departure.',
+          'Attendance is written to PostgreSQL on AWS RDS over an SSL-required connection, using Npgsql loaded from locally restored .NET assemblies.',
+          'An entry point detects the operating system and routes to the Windows or macOS implementation, with a fallback path if detection fails.',
+          'Power BI dashboards give staff an attendance overview and engagement analysis without touching the database.',
+          'Non-secret settings live in a committed config file; database credentials load from a git-ignored secrets file or from environment variables, which take precedence. Missing settings fail at startup and name exactly which values are absent.',
+          'A Python generator produces realistic synthetic student records, so the system could be developed and demonstrated without touching real personal data.'
         ],
         'Tools': 'PowerShell 7, C#, PC/SC (winscard) interop, LDAP, PostgreSQL, AWS RDS, Aiven, Npgsql, Power BI, Python.'
       },
@@ -325,8 +337,7 @@ export const projects: Project[] = [
       ],
       images: [
         { src: '/media/BEAT/Overview.png', caption: 'Power BI attendance overview' },
-        { src: '/media/BEAT/Analysis.png', caption: 'Engagement analysis dashboard' },
-        { src: '/media/BEAT/bathenterprise.png', caption: 'Bath Enterprise' }
+        { src: '/media/BEAT/Analysis.png', caption: 'Engagement analysis dashboard' }
       ]
     }
   },
@@ -334,6 +345,7 @@ export const projects: Project[] = [
   id: 'barebonesnn',
   title: 'BareBonesNN: Autodiff and Neural Nets from Scratch',
   description: 'A scalar automatic differentiation engine and multi-layer perceptron built in pure Python with no ML framework, packaged and published to PyPI with tests and a release pipeline.',
+  result: 'autodiff from scratch, published to PyPI',
   image: '/media/barebonesnn/barebonesnn.png',
   animation: '/media/animation/barebonesnn.json',
   tags: ['Python', 'Autodiff', 'PyPI', 'CI/CD'],
@@ -344,13 +356,13 @@ export const projects: Project[] = [
     processSections: {
       'Objective': 'Understand automatic differentiation properly by implementing it, then treat the result as a real library rather than a notebook: packaged, tested, documented and published.',
       'Approach': [
-        'Computational graph: each Value holds its data, its gradient, the child nodes it was produced from, and the operation that produced it, so the full graph is reconstructable from any output node.',
-        'Local gradients as closures: every operator (add, multiply, power, divide, negate, subtract, tanh, exp) attaches its own _backward function implementing the chain rule for that node, keeping each derivative next to the operation it belongs to.',
-        'Reverse-mode differentiation: backward() builds a topological ordering of the graph, seeds the output gradient, then walks the ordering in reverse so every node is visited only after everything depending on it.',
+        'Each Value holds its data, its gradient, the child nodes it came from and the operation that produced it, so the full computational graph can be rebuilt from any output node.',
+        'Every operator (add, multiply, power, divide, negate, subtract, tanh, exp) attaches its own _backward closure implementing the chain rule for that node, keeping each derivative next to the operation it belongs to.',
+        'backward() builds a topological ordering of the graph, seeds the output gradient, then walks the ordering in reverse, so each node is visited only after everything that depends on it.',
         'Operator overloading with reflected variants (__radd__, __rmul__) so Value composes naturally with plain Python numbers.',
-        'Network layer: Neuron holds weights and a bias, Layer composes neurons, MLP composes layers, and parameters() exposes the full parameter set for gradient inspection and updates.',
-        'Packaging and release: setuptools build producing wheel and sdist, published to PyPI, with a GitHub Actions workflow that builds and publishes automatically on release using trusted publishing.',
-        'Testing: unit tests covering the Value primitive and each network component, verifying forward values against hand-computed expectations.'
+        'Neuron holds weights and a bias, Layer composes neurons, MLP composes layers, and parameters() exposes the full parameter set for inspecting and updating gradients.',
+        'A setuptools build produces a wheel and an sdist, published to PyPI; a GitHub Actions workflow builds and publishes automatically on release using trusted publishing.',
+        'Unit tests cover the Value primitive and each network component, checking forward values against hand-computed expectations.'
       ],
       'Tools': 'Python, NumPy, setuptools, PyPI, GitHub Actions, unittest, type annotations, MIT licence.'
     },
@@ -369,7 +381,8 @@ export const projects: Project[] = [
 },{
     id: 'detect-sleep-states',
     title: 'Detect Sleep States - Child Mind Institute',
-    description: 'Detect sleep onset and wake from wrist-worn accelerometer data to determine a person\'s sleep state.',
+    description: 'Detects sleep onset and wake-up in around 500 multi-day recordings from wrist-worn accelerometers, using lag features, SHAP analysis and a Random Forest.',
+    result: 'test-set ROC AUC 0.82',
     image: '/media/Detect-Sleep-States-CMI/data_dis.png',
     animation: '/media/animation/cmi2.json',
     tags: ['ML', 'Classification', 'Time-Series', 'EDA'],
@@ -378,11 +391,11 @@ export const projects: Project[] = [
     content: {
       data: 'The "Zzzs" you catch each night are crucial for your overall health. Sleep affects everything from your development to cognitive functioning. This project aims to help researchers better analyse wrist-worn accelerometer data for sleep monitoring, enabling large-scale studies to improve understanding of sleep\'s importance and function. The dataset comprises about 500 multi-day recordings of wrist-worn accelerometer data annotated with sleep onset and wakeup events. Annotation guidelines used for the dataset include: a sleep period must be at least 30 minutes long; interruptions shorter than 30 consecutive minutes are allowed within a sleep window; the longest single sleep window in a night is recorded; no events are recorded for periods when the device is not worn; and there is at most one recorded sleep window per night.',
       process: [
-        'Exploratory Data Analysis (EDA): Thorough dataset cleaning and selection of continuous data series for model training',
-        'Feature Engineering: Incorporated lag features for Enmo and Angle-Z to introduce temporal elements',
-        'Additional features: Added "Hour of day," "Day of Month," and other temporal features to the dataset',
+        'Cleaned the dataset and selected continuous data series for model training.',
+        'Added lag features for Enmo and Angle-Z to capture temporal patterns.',
+        'Added "hour of day", "day of month" and other temporal features.',
         'Feature importance assessment using SHAP (Shapley Additive explanations) analysis',
-        'Model Implementation: Compared Random Forest and HistGradientBoostingClassifier algorithms',
+        'Compared Random Forest with HistGradientBoostingClassifier.',
         'Model evaluation and performance optimisation achieving approximately 75% accuracy'
       ],
       keyFindings: [
@@ -401,15 +414,14 @@ export const projects: Project[] = [
         'No predictions made during device removal periods to avoid false positives',
         'Model requires continuous data series without gaps for optimal performance'
       ],
+      // Only the figures that carry the result. The EDA plots (cluster map,
+      // distributions, class split), the feature-table screenshot and the
+      // classification report (same numbers as the confusion matrix) were cut;
+      // the files are still in /media/Detect-Sleep-States-CMI.
       images: [
-        { src: '/media/Detect-Sleep-States-CMI/data_clusters.png', caption: 'Cluster Map of Series Data' },
-        { src: '/media/Detect-Sleep-States-CMI/data_dis.png', caption: 'Enmo and Angle-Z Distributions' },
-        { src: '/media/Detect-Sleep-States-CMI/class_distributions.png', caption: 'Class Distributions for Data Split' },
-        { src: '/media/Detect-Sleep-States-CMI/Classification report.jpg', caption: 'Classification Report' },
-        { src: '/media/Detect-Sleep-States-CMI/Confusion matrix.png', caption: 'Confusion Matrix' },
-        { src: '/media/Detect-Sleep-States-CMI/ROC curve.png', caption: 'ROC Curve Analysis' },
-        { src: '/media/Detect-Sleep-States-CMI/feature_data.jpg', caption: 'Feature Data Analysis' },
-        { src: '/media/Detect-Sleep-States-CMI/shap.png', caption: 'SHAP Feature Importance Analysis' }
+        { src: '/media/Detect-Sleep-States-CMI/ROC curve.png', caption: 'ROC curve on the test set (AUC 0.82)' },
+        { src: '/media/Detect-Sleep-States-CMI/Confusion matrix.png', caption: 'Confusion matrix on the test set' },
+        { src: '/media/Detect-Sleep-States-CMI/shap.png', caption: 'SHAP feature importance: hour of day and step lead, followed by the Angle-Z lag features' }
       ]
     }
   },
@@ -472,76 +484,80 @@ export const projects: Project[] = [
   {
     id: 'daily-link-ai',
     title: 'DailyLinkAI',
-    description: 'Your Personalised Daily News Recommender.',
+    description: 'A personalised daily news feed. Articles from sources such as the BBC and Sky News are embedded with a BERT-based model, and semantic search over those embeddings recommends the closest matches to what each reader likes, served through a Streamlit app.',
+    result: 'semantic search over BBC and Sky News',
     image: '/media/DailyLinkAI/app_screenshot.png',
-    animation: '/media/animation/news.json',
+    // The original news.json is drawn in charcoal and vanished on the dark
+    // card; news-dark.json is the same animation recoloured for this site.
+    animation: '/media/animation/news-dark.json',
     tags: ['NLP', 'ML'], 
     category: ['NLP', 'AI'],
     githubUrl: 'https://github.com/AmirMohammadiKarbalaei/DailyLinkai',
     streamlitUrl: 'https://dailylinkai.streamlit.app',
     content: {
-        data: 'DailyLinkAI curates a personalised daily news feed by analysing article content from reputable sources such as BBC and SkyNews. The application uses NLP embeddings and retrieval techniques to recommend contextually relevant articles based on user interests.',
+        data: 'DailyLinkAI curates a personalised daily news feed by analysing article content from reputable sources such as BBC and SkyNews. It is semantic search and embedding-based recommendation: every article is embedded, and the reader is shown the nearest neighbours of the articles they upvote. There is no generation step.',
         processSections: {
           'Article Collection': 'Articles are scraped from trusted sources (sitemaps/RSS) and stored with metadata to ensure comprehensive coverage.',
           'Content Analysis': [
-            'Text is cleaned and converted to embeddings (BERT-based) so that semantic similarity can be computed across articles.',
-            'The system employs RAG (Retrieval-Augmented Generation) to find and suggest articles with the closest vector matches, ensuring recommendations are contextually relevant to the user\'s interests.'
+            'Text is cleaned and converted to embeddings with a BERT-based DPR encoder so that semantic similarity can be computed across articles.',
+            'Recommendation is a nearest-neighbour search over those embeddings in a FAISS index: for each article a reader upvotes, its closest articles are suggested, split into the reader\'s chosen topics and similar articles from other topics. Matches follow meaning rather than shared keywords.'
           ],
           'Deployment': 'Streamlit application provides an intuitive front-end and a lightweight backend designed for scalability and fast responses.'
         },
         keyFindings: [
-          'Personalised News Feed: Tailored news recommendations based on user interests and interactions.',
-          'Comprehensive Coverage: Articles from diverse, reputable sources covering various angles of important topics.',
-          'Intelligent Recommendations: Utilises state-of-the-art embedding techniques and similarity scoring to suggest articles that align with user preferences.',
-          'Scalable and Efficient: Lightweight backend system for fast and reliable news delivery.'
+          'News recommendations are tailored to each reader\'s interests and interactions.',
+          'Articles come from a range of reputable sources, covering different angles on each story.',
+          'Embeddings and similarity scoring suggest the articles closest to what the reader likes.',
+          'The backend is kept lightweight so the feed is served quickly and reliably.'
         ],
         images: [
           { src: '/media/DailyLinkAI/app_screenshot.png', caption: 'Streamlit App' }
         ]
     }
   },
-  {
-    id: 'diabetes-classification',
-    title: 'Diabetes Classification',
-    description: 'Classify diabetes patient\'s health status based on their current health metrics.',
-    image: '/media/diabetes/EDA.png',
-    animation: '/media/animation/diabetes.json',
-    tags: ['ML', 'Classification', 'EDA'],
-    category: ['AI', 'ML'],
-    githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Pima-Indians-Diabetes',
-    streamlitUrl: 'https://pima-indians-diabetes-k6mzyppban6rqolb5mtrdc.streamlit.app/?embed=true&embed_options=dark_theme',
-    content: {
-      data: 'The datasets consist of several medical predictor (independent) variables and one target (dependent) variable, Outcome. Independent variables include the number of pregnancies the patient has had, their BMI, insulin level, age, and so on.',
-      process: [
-        'Exploratory Data Analysis (EDA): Performed comprehensive data cleansing and exploratory analysis. Each feature was inspected to determine acceptable ranges, distributions and missing value treatment; visualisations were used to highlight skew, outliers and correlations.',
-        'Feature Engineering: Created interaction features (for example Age x Insulin) and transformed skewed variables. Feature importance and contribution were evaluated using SHAP (Shapley Additive Explanations) to identify the most influential predictors.',
-        'SMOTE (Synthetic Minority Oversampling Technique): Applied SMOTE to augment the minority class and mitigate class imbalance, improving model generalisation relative to naive oversampling.',
-        'Model Implementation: Implemented and compared multiple machine learning models (Random Forest, XGBoost, and a shallow neural network). Random Forest achieved the best performance (≈93% accuracy). A sequential neural network was also trained with its accuracy and loss curves provided for train/validation/test comparisons and showed comparable performance to Random Forest in this task.',
-        'Model Interpretation (SHAP): SHAP summary plots indicate that low Insulin values and interactions between Age and Insulin are among the strongest drivers of model predictions. Features such as Blood Pressure and number of pregnancies had relatively low impact and were candidates for removal to reduce model complexity.',
-        'Deployment: Following a comparative evaluation, the random forest (RF) model has been selected for deployment due to its performance similarity to the deep learning model. This decision is underpinned by the RF models interpretability and its lightweight, scalable characteristics, making it a pragmatic choice over deep learning models which demand significant computational resources. To streamline the models usability for prediction, a Streamlit application has been developed. This application seamlessly processes input data in the form of a pandas dataframe resembling the training dataset, conducting necessary preprocessing and feature engineering to enable predictions.'
-      ],
-      processSections: {
-        'Exploratory Data Analysis (EDA)': 'After comprehensive data cleansing, the dataset has undergone thorough exploratory analysis. Each feature has been carefully examined to determine acceptable ranges and ensure data integrity. Visualisations (histograms, boxplots, correlations) were used to surface skewness, outliers and relationships between features.',
-        'Feature Engineering': 'To enhance model performance, new features such as interactions between Age and Insulin were created. Skewed variables were transformed and missing values addressed. SHAP (Shapley Additive Explanations) was used to evaluate feature importance and guide feature selection.',
-        'Synthetic Minority Oversampling Technique (SMOTE)': 'SMOTE was applied to the training data to synthetically up-sample the minority class, improving balance and reducing model bias towards the majority class. This helped models better identify positive diabetes cases without overfitting to duplicates.',
-        'Model Implementation': [
-          'Multiple ML models implemented: Random Forest, XGBoost and a sequential neural network.',
-          'Random Forest achieved highest accuracy (~93%) on validation/test holdouts.',
-          'SHAP summary plots show low Insulin and Age x Insulin interactions are strong predictors; Blood Pressure and pregnancies were less influential.',
-          'The neural network produced similar performance but required more compute and tuning; accuracy/loss curves for train/validation/test are available in the project images.'
-        ],
-        'Deployment': 'Random Forest was selected for deployment due to interpretability and lower computational cost. A Streamlit app was created that accepts a pandas DataFrame, runs identical preprocessing/feature engineering steps and returns predictions via a simple web UI.'
-      },
-      images: [
-        { src: '/media/diabetes/Data-Table.png', caption: 'Dataset Overview' },
-        { src: '/media/diabetes/EDA.png', caption: 'Feature distributions' },
-        { src: '/media/diabetes/Feature-Corr.png', caption: 'Feature Correlation' },
-        { src: '/media/diabetes/Feature-importance.png', caption: 'Random Forest feature importance' },
-        { src: '/media/diabetes/NNloss.png', caption: 'NN Model Loss (train/val/test)' },
-        { src: '/media/diabetes/NNacc.png', caption: 'NN Model Accuracy (train/val/test)' }
-      ]
-    }
-  },
+  // --- Removed from the portfolio: see notes at the top of this file. ---
+  // {
+  // id: 'diabetes-classification',
+  // title: 'Diabetes Classification',
+  // description: 'Predicts diabetes from patient health metrics on the Pima Indians dataset. A Random Forest reached about 93% accuracy and is deployed as a Streamlit app.',
+  // image: '/media/diabetes/EDA.png',
+  // animation: '/media/animation/diabetes.json',
+  // tags: ['ML', 'Classification', 'EDA'],
+  // category: ['AI', 'ML'],
+  // githubUrl: 'https://github.com/AmirMohammadiKarbalaei/Pima-Indians-Diabetes',
+  // streamlitUrl: 'https://pima-indians-diabetes-k6mzyppban6rqolb5mtrdc.streamlit.app/?embed=true&embed_options=dark_theme',
+  // content: {
+  // data: 'The datasets consist of several medical predictor (independent) variables and one target (dependent) variable, Outcome. Independent variables include the number of pregnancies the patient has had, their BMI, insulin level, age, and so on.',
+  // process: [
+  // 'Exploratory Data Analysis (EDA): Performed comprehensive data cleansing and exploratory analysis. Each feature was inspected to determine acceptable ranges, distributions and missing value treatment; visualisations were used to highlight skew, outliers and correlations.',
+  // 'Feature Engineering: Created interaction features (for example Age x Insulin) and transformed skewed variables. Feature importance and contribution were evaluated using SHAP (Shapley Additive Explanations) to identify the most influential predictors.',
+  // 'SMOTE (Synthetic Minority Oversampling Technique): Applied SMOTE to augment the minority class and mitigate class imbalance, improving model generalisation relative to naive oversampling.',
+  // 'Model Implementation: Implemented and compared multiple machine learning models (Random Forest, XGBoost, and a shallow neural network). Random Forest achieved the best performance (≈93% accuracy). A sequential neural network was also trained with its accuracy and loss curves provided for train/validation/test comparisons and showed comparable performance to Random Forest in this task.',
+  // 'Model Interpretation (SHAP): SHAP summary plots indicate that low Insulin values and interactions between Age and Insulin are among the strongest drivers of model predictions. Features such as Blood Pressure and number of pregnancies had relatively low impact and were candidates for removal to reduce model complexity.',
+  // 'Deployment: Following a comparative evaluation, the random forest (RF) model has been selected for deployment due to its performance similarity to the deep learning model. This decision is underpinned by the RF models interpretability and its lightweight, scalable characteristics, making it a pragmatic choice over deep learning models which demand significant computational resources. To streamline the models usability for prediction, a Streamlit application has been developed. This application seamlessly processes input data in the form of a pandas dataframe resembling the training dataset, conducting necessary preprocessing and feature engineering to enable predictions.'
+  // ],
+  // processSections: {
+  // 'Exploratory Data Analysis (EDA)': 'After comprehensive data cleansing, the dataset has undergone thorough exploratory analysis. Each feature has been carefully examined to determine acceptable ranges and ensure data integrity. Visualisations (histograms, boxplots, correlations) were used to surface skewness, outliers and relationships between features.',
+  // 'Feature Engineering': 'To enhance model performance, new features such as interactions between Age and Insulin were created. Skewed variables were transformed and missing values addressed. SHAP (Shapley Additive Explanations) was used to evaluate feature importance and guide feature selection.',
+  // 'Synthetic Minority Oversampling Technique (SMOTE)': 'SMOTE was applied to the training data to synthetically up-sample the minority class, improving balance and reducing model bias towards the majority class. This helped models better identify positive diabetes cases without overfitting to duplicates.',
+  // 'Model Implementation': [
+  // 'Multiple ML models implemented: Random Forest, XGBoost and a sequential neural network.',
+  // 'Random Forest achieved highest accuracy (~93%) on validation/test holdouts.',
+  // 'SHAP summary plots show low Insulin and Age x Insulin interactions are strong predictors; Blood Pressure and pregnancies were less influential.',
+  // 'The neural network produced similar performance but required more compute and tuning; accuracy/loss curves for train/validation/test are available in the project images.'
+  // ],
+  // 'Deployment': 'Random Forest was selected for deployment due to interpretability and lower computational cost. A Streamlit app was created that accepts a pandas DataFrame, runs identical preprocessing/feature engineering steps and returns predictions via a simple web UI.'
+  // },
+  // images: [
+  // { src: '/media/diabetes/Data-Table.png', caption: 'Dataset Overview' },
+  // { src: '/media/diabetes/EDA.png', caption: 'Feature distributions' },
+  // { src: '/media/diabetes/Feature-Corr.png', caption: 'Feature Correlation' },
+  // { src: '/media/diabetes/Feature-importance.png', caption: 'Random Forest feature importance' },
+  // { src: '/media/diabetes/NNloss.png', caption: 'NN Model Loss (train/val/test)' },
+  // { src: '/media/diabetes/NNacc.png', caption: 'NN Model Accuracy (train/val/test)' }
+  // ]
+  // }
+  // },
   // {
   //   id: 'reinforcement-learning',
   //   title: 'OpenAI Gym - Reinforcement Learning',
@@ -605,33 +621,34 @@ export const projects: Project[] = [
   // ]
   // }
   // },
-  {
-    id: 'business-data-analytics',
-    title: 'Business Data Analytics',
-    description: 'Examining customer data from a Brazilian e-commerce store, to uncover valuable insights.',
-    image: '/media/Olist/Olist Delivery.jpg',
-    animation: '/media/animation/shop.json',
-    tags: ['BI', 'Dashboard', 'DA'],
-    category: ['DA', 'BI', 'Power BI'],
-    content: {
-      data: 'Comprehensive analysis of customer data from a Brazilian e-commerce platform, providing insights into customer behavior, sales patterns, and business performance.',
-      processSections: {
-        'Data Analysis': 'This is a public dataset from a Brazilian e-commerce platform, featuring information on 100,000 orders placed at the Olist Store between 2016 and 2018. The dataset encompasses orders from various marketplaces in Brazil. Its diverse features enable a comprehensive view of each order, spanning from order status, price, payment, and freight performance to customer location, product attributes, and customer reviews. Additionally, geolocation dataset is provided that associates Brazilian zip codes with latitude/longitude coordinates. It\'s important to note that this dataset consists of real commercial data, has been anonymized, and any references to companies and partners in the review text have been replaced with the names of Game of Thrones great houses.',
-        'Concept': 'This dataset was generously provided by Olist, the largest department store in Brazilian marketplaces. Olist connects small businesses from all over Brazil to channels without hassle and with a single contract. Those merchants are able to sell their products through the Olist Store and ship them directly to the customers using Olist logistics partners. After a customer purchases the product from Olist Store a seller gets notified to fulfill that order. Once the customer receives the product, or the estimated delivery date is due, the customer gets a satisfaction survey by email where he can give a note for the purchase experience and write down some comments.',
-        'Process': 'In an ever-changing market landscape, customer contentment is closely linked to the smooth integration of product excellence, efficient delivery, and the overall service encounter. This Project aims to transform the comprehension and improvement of customer contentment by exploring the domains of delivery and review sentiment.',
-    
-      },
-      findings: {
-        'Delivery': ['Delays concentrated in specific regions and sellers; targeted interventions reduced delays.'],
-        'Reviews': ['On-time deliveries correlate with higher review scores and repeat purchases.']
-      },
-      images: [
-        { src: '/media/Olist/Data Schema.png', caption: 'Database Schema' },
-        { src: '/media/Olist/Olist Reviews.jpg', caption: 'Reviews Analysis' },
-        { src: '/media/Olist/Olist Delivery.jpg', caption: 'Delivery Analysis' }
-      ]
-    }
-  },
+  // --- Removed from the portfolio: see notes at the top of this file. ---
+  // {
+  // id: 'business-data-analytics',
+  // title: 'Business Data Analytics',
+  // description: 'Delivery and review analysis of 100,000 orders from Olist, a Brazilian e-commerce marketplace (2016 to 2018), looking at how on-time delivery relates to review scores.',
+  // image: '/media/Olist/Olist Delivery.jpg',
+  // animation: '/media/animation/shop.json',
+  // tags: ['BI', 'Dashboard', 'DA'],
+  // category: ['DA', 'BI', 'Power BI'],
+  // content: {
+  // data: 'Comprehensive analysis of customer data from a Brazilian e-commerce platform, providing insights into customer behavior, sales patterns, and business performance.',
+  // processSections: {
+  // 'Data Analysis': 'This is a public dataset from a Brazilian e-commerce platform, featuring information on 100,000 orders placed at the Olist Store between 2016 and 2018. The dataset encompasses orders from various marketplaces in Brazil. Its diverse features enable a comprehensive view of each order, spanning from order status, price, payment, and freight performance to customer location, product attributes, and customer reviews. Additionally, geolocation dataset is provided that associates Brazilian zip codes with latitude/longitude coordinates. It\'s important to note that this dataset consists of real commercial data, has been anonymized, and any references to companies and partners in the review text have been replaced with the names of Game of Thrones great houses.',
+  // 'Concept': 'This dataset was generously provided by Olist, the largest department store in Brazilian marketplaces. Olist connects small businesses from all over Brazil to channels without hassle and with a single contract. Those merchants are able to sell their products through the Olist Store and ship them directly to the customers using Olist logistics partners. After a customer purchases the product from Olist Store a seller gets notified to fulfill that order. Once the customer receives the product, or the estimated delivery date is due, the customer gets a satisfaction survey by email where he can give a note for the purchase experience and write down some comments.',
+  // 'Process': 'In an ever-changing market landscape, customer contentment is closely linked to the smooth integration of product excellence, efficient delivery, and the overall service encounter. This Project aims to transform the comprehension and improvement of customer contentment by exploring the domains of delivery and review sentiment.',
+  // 
+  // },
+  // findings: {
+  // 'Delivery': ['Delays concentrated in specific regions and sellers; targeted interventions reduced delays.'],
+  // 'Reviews': ['On-time deliveries correlate with higher review scores and repeat purchases.']
+  // },
+  // images: [
+  // { src: '/media/Olist/Data Schema.png', caption: 'Database Schema' },
+  // { src: '/media/Olist/Olist Reviews.jpg', caption: 'Reviews Analysis' },
+  // { src: '/media/Olist/Olist Delivery.jpg', caption: 'Delivery Analysis' }
+  // ]
+  // }
+  // },
   // {
   //   id: 'yolo5',
   //   title: 'YOLO5 - You Only Look Once',

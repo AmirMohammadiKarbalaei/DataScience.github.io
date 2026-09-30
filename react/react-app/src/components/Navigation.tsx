@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
+// Jump instead of gliding when the visitor has asked for reduced motion.
+const scrollBehavior = (): ScrollBehavior =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -9,34 +13,45 @@ const Navigation: React.FC = () => {
 
   const navItems = React.useMemo(() => [
     { id: 'home', label: 'Home', href: location.pathname === '/' ? '#home' : '/' },
+    { id: 'projects', label: 'Projects', href: location.pathname === '/' ? '#projects' : '/#projects' },
     { id: 'about', label: 'About', href: location.pathname === '/' ? '#about' : '/#about' },
     { id: 'skills', label: 'Skills', href: location.pathname === '/' ? '#skills' : '/#skills' },
     { id: 'experience', label: 'Experience', href: '/experience' },
-    { id: 'projects', label: 'Projects', href: location.pathname === '/' ? '#projects' : '/#projects' },
     { id: 'contact', label: 'Contact', href: location.pathname === '/' ? '#contact' : '/#contact' }
   ], [location.pathname]);
+
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
 
-      // Update active section based on scroll position
-      const sections = navItems.map(item => item.id);
-      const currentSection = sections.find(section => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top <= 100 && rect.bottom >= 100;
-        }
-        return false;
-      });
-
-      if (currentSection) {
-        setActiveSection(currentSection);
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+      // Written straight to the element: a React state update per scroll event
+      // would re-render the whole nav dozens of times a second.
+      if (progressRef.current) {
+        progressRef.current.style.transform = `scaleX(${progress})`;
       }
+
+      // Active section is the last one whose top has passed a scan line just
+      // under the fixed navbar. Only one can match, so two links are never lit
+      // at once. At the very bottom the last section wins even if it is too
+      // short to reach the line.
+      const sections = navItems
+        .map(item => document.getElementById(item.id))
+        .filter((el): el is HTMLElement => el !== null);
+      const atBottom = scrollable - window.scrollY < 2;
+      let current = sections[0]?.id;
+      for (const el of sections) {
+        if (el.getBoundingClientRect().top <= 120) current = el.id;
+      }
+      if (atBottom && sections.length) current = sections[sections.length - 1].id;
+      if (current) setActiveSection(current);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [navItems]);
 
@@ -64,7 +79,7 @@ const Navigation: React.FC = () => {
         const offsetTop = targetElement.offsetTop - 80;
         window.scrollTo({
           top: offsetTop,
-          behavior: 'smooth'
+          behavior: scrollBehavior()
         });
       }
     }
@@ -77,10 +92,9 @@ const Navigation: React.FC = () => {
       {/* Main Navigation */}
       <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`}>
         <div className="nav-container">
-          <Link to="/" className="nav-brand">
-            <span className="brand-text">Amir</span>
-            <span className="brand-dot">.</span>
-            <span className="brand-domain">Data</span>
+          <Link to="/" className="nav-brand" aria-label="Amir Mohammadikarbalaei, home">
+            <span className="brand-full">Amir Mohammadikarbalaei</span>
+            <span className="brand-short" aria-hidden="true">Amir</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -115,6 +129,9 @@ const Navigation: React.FC = () => {
             <button
               className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-nav"
             >
               <span></span>
               <span></span>
@@ -124,7 +141,7 @@ const Navigation: React.FC = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className={`mobile-nav ${isMobileMenuOpen ? 'active' : ''}`}>
+        <div id="mobile-nav" className={`mobile-nav ${isMobileMenuOpen ? 'active' : ''}`}>
           <ul className="mobile-nav-menu">
             {navItems.map((item) => (
               <li key={item.id} className="mobile-nav-item">
@@ -155,36 +172,17 @@ const Navigation: React.FC = () => {
       </nav>
 
       {/* Scroll Progress Bar */}
-      <div className="scroll-progress">
-        <div 
-          className="scroll-progress-bar"
-          style={{
-            width: `${(window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100}%`
-          }}
-        ></div>
-      </div>
-
-      {/* Floating Navigation Dots */}
-      <div className="floating-nav">
-        {navItems.filter(item => !item.href.startsWith('/')).map((item) => (
-          <a
-            key={item.id}
-            href={item.href}
-            className={`floating-nav-dot ${activeSection === item.id ? 'active' : ''}`}
-            onClick={(e) => handleNavClick(e, item.href)}
-            title={item.label}
-          >
-            <span className="dot-tooltip">{item.label}</span>
-          </a>
-        ))}
+      <div className="scroll-progress" aria-hidden="true">
+        <div ref={progressRef} className="scroll-progress-bar"></div>
       </div>
 
       {/* Back to Top Button */}
       <button
         className={`back-to-top ${isScrolled ? 'visible' : ''}`}
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })}
+        aria-label="Back to top"
       >
-        <i className="fas fa-chevron-up"></i>
+        <i className="fas fa-chevron-up" aria-hidden="true"></i>
       </button>
     </>
   );
