@@ -339,16 +339,19 @@ const Home: React.FC = () => {
             </div>
             <div className="about-text">
               <p className="about-description">
-                I work at <strong>Unilever</strong> as a Data Expertise Analyst,
-                applying NLP and analytics to the company's employee-facing
-                chatbot and service desk. There I built an NLP system that validates
-                knowledge articles automatically, saving 1,300 hours of manual review a
-                year, and a quality scoring framework across 15,000+ articles.
+                I build data and ML systems that make it out of the notebook and
+                into daily use.
               </p>
               <p className="about-description">
-                I care about data science that can be questioned: interpretable models,
-                transparent methods and responsible AI, so the decisions built on them
-                deserve the trust people place in them.
+                Today that means NLP and forecasting at <strong>Unilever</strong>, where
+                one system I built saves over a thousand hours of manual review a
+                year. Before that, I built LLM tools for doctors at
+                a <strong>Y Combinator</strong> startup and data pipelines for research
+                at the <strong>University of Bath</strong>.
+              </p>
+              <p className="about-description">
+                Trained as a mechanical engineer, I judge a model by how it holds
+                up in use rather than how it scores in a notebook.
               </p>
               <div className="about-cta">
                 <Link to="/experience" className="btn-outline">
