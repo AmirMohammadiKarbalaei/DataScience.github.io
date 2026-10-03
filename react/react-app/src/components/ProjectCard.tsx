@@ -43,9 +43,9 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
               animationPath={project.animation}
               className={`project-animation anim-${project.id}`}
               style={{ width: '100%', height: '100%' }}
-              fallback={<img className="project-image" src={project.image} alt="" onError={hideBroken} />}
+              fallback={project.image && <img className="project-image" src={project.image} alt="" onError={hideBroken} />}
             />
-          ) : (
+          ) : project.image && (
             <img className="project-image" src={project.image} alt="" onError={hideBroken} />
           )}
         </div>

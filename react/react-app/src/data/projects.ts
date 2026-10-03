@@ -16,16 +16,19 @@ export interface Project {
   description: string;
   /** One-line headline result shown on the card, as a readout. Published facts only. */
   result?: string;
-  image: string;
+  /** Card image, and the fallback if the card animation fails. Optional when the card has an animation. */
+  image?: string;
   animation?: string;
   htmlSimulation?: string;
   /** Shown instead of the simulation on narrow screens, where it cannot fit. */
-  simulationFallback?: { src: string; caption: string };
+  simulationFallback?: { src: string; caption: string; width?: number; height?: number };
   tags: string[];
   category: string[];
   githubUrl?: string;
   streamlitUrl?: string;
   video?: string;
+  /** A real frame from the video, shown before it plays, so the player is never a black box. */
+  poster?: string;
   content: {
     data?: string;
   process?: string[];
@@ -33,7 +36,8 @@ export interface Project {
     keyFindings?: string[];
     findings?: { [section: string]: string[] };
     limitations?: string[];
-    images?: { src: string; caption: string }[];
+    // Pixel size of each file, so the page reserves its space before it loads.
+    images?: { src: string; caption: string; width?: number; height?: number }[];
   };
 }
 
@@ -80,16 +84,15 @@ export const projects: Project[] = [
       'Validators adjust confidence rather than discarding matches, so a value that fails a checksum is still masked rather than let through.'
     ],
     images: [
-      { src: '/media/proxyon/proxyon-policies.png', caption: 'Admin portal: six data-protection policies, each toggling a group of PII types. Turning one off removes those entities from masking on every request, including the chat page.' }
+      { src: '/media/proxyon/proxyon-policies.png', width: 1651, height: 922, caption: 'Admin portal: six data-protection policies, each toggling a group of PII types. Turning one off removes those entities from masking on every request, including the chat page.' }
     ]
   }
 },
    {
   id: 'local-ai-voice-assistant',
   title: 'Jarvis: Local AI Voice Assistant with Tool Routing',
-  description: 'A privacy-first voice assistant combining local speech recognition, LLM reasoning, JSON-based tool routing, real-time APIs, and text-to-speech. No cloud required.',
+  description: 'A privacy-first voice assistant that routes spoken requests to tools and real-time APIs through JSON-based tool calls.',
   result: 'speech, LLM, tools and TTS, all on-device',
-  image: '/media/jarvis/Jarvis.png',
   animation: '/media/animation/AI_Assistant.json',
   htmlSimulation: '/media/jarvis/voice-assistant-pipeline.html',
   tags: ['LLM', 'Voice-AI', 'Ollama'],
@@ -127,13 +130,13 @@ export const projects: Project[] = [
    {
     id: 'reinforcement-learning',
     title: 'Deep Reinforcement Learning for Robotic Locomotion',
-    description: 'Four DRL algorithms implemented from scratch to teach the simulated HalfCheetah to run. The best agent, DDPG, reached a mean return of 12,050, above the 10,000 expert benchmark.',
+    description: 'Four deep RL algorithms implemented from scratch and compared on teaching the simulated HalfCheetah to run.',
     result: 'DDPG return 12,050 vs 10,000 benchmark',
-    image: '/media/reinforcement learning/HalfCheetah.png',
     animation: '/media/animation/RL.json',
     tags: ['Reinforcement-Learning', 'DRL', 'Robotics'],
     category: ['RL', 'AI'],
     video: '/media/reinforcement learning/halfcheetah.mp4',
+    poster: '/media/reinforcement learning/halfcheetah-poster.jpg',
     githubUrl: 'https://github.com/AmirMohammadiKarbalaei/DRL-Robotic-Locomotion',
     content: {
         data: 'This project involved training a simulated bipedal robot, the HalfCheetah, to run. Four distinct Deep Reinforcement Learning (DRL) algorithms were implemented from scratch to systematically compare their effectiveness on this continuous control task.',
@@ -156,9 +159,9 @@ export const projects: Project[] = [
           'TD3: Underperformed due to high sensitivity to hyperparameters and limited computational time for extensive tuning.'
         ],
         images: [
-          { src: '/media/reinforcement learning/moving average.png', caption: '50-episode moving average of training return' },
-          { src: '/media/reinforcement learning/evaluation episodes.png', caption: 'Return during the final 20 evaluation episodes' },
-          { src: '/media/reinforcement learning/Asymptotic score.png', caption: 'Asymptotic score, learning speed, GPU footprint, and wall-clock training time' }
+          { src: '/media/reinforcement learning/moving average.png', width: 2100, height: 1200, caption: '50-episode moving average of training return' },
+          { src: '/media/reinforcement learning/evaluation episodes.png', width: 2102, height: 1394, caption: 'Return during the final 20 evaluation episodes' },
+          { src: '/media/reinforcement learning/Asymptotic score.png', width: 754, height: 154, caption: 'Asymptotic score, learning speed, GPU footprint, and wall-clock training time' }
         ]
     }
   },{
@@ -199,14 +202,14 @@ export const projects: Project[] = [
       'The code is not public. It was built for a research group under confidentiality, so this page covers the engineering rather than the study it supports.'
     ],
     images: [
-      { src: '/media/patent-pipeline/patent-pipeline-stages.png', caption: 'Checks run in order of cost. A length threshold, a section-marker scan and a sequence-listing check discard most of the archive before the XML parser is ever invoked, so the expensive stages only see documents that can contribute.' },
-      { src: '/media/patent-pipeline/patent-cli.png', caption: 'One entry point handles a single year, a year range, or files already on disk. Stages are individually selectable, so an interrupted job resumes where it stopped rather than restarting.' }
+      { src: '/media/patent-pipeline/patent-pipeline-stages.png', width: 940, height: 1120, caption: 'Checks run in order of cost. A length threshold, a section-marker scan and a sequence-listing check discard most of the archive before the XML parser is ever invoked, so the expensive stages only see documents that can contribute.' },
+      { src: '/media/patent-pipeline/patent-cli.png', width: 940, height: 772, caption: 'One entry point handles a single year, a year range, or files already on disk. Stages are individually selectable, so an interrupted job resumes where it stopped rather than restarting.' }
     ]
   }
 },{
     id: 'eeg-detection',
-    title: 'EEG Detection - Neurological Disability Hand Function',
-    description: 'A 1D-UNet that detects six grasp-and-lift hand movements from EEG signals. Ensembling 12 cross-validation folds raised the private AUC from 0.910 to 0.965.',
+    title: 'EEG Detection: Neurological Disability Hand Function',
+    description: 'A 1D-UNet that detects six grasp-and-lift hand movements from EEG signals, ensembled across 12 cross-validation folds.',
     result: 'private AUC 0.910 → 0.965',
     image: '/media/EEG/before_after_preprocessing.png',
     animation: '/media/animation/CMI.json',
@@ -237,17 +240,11 @@ export const projects: Project[] = [
         'Translating a 12-model ensemble into a real-time clinical application requires extensive model distillation and quantization.'
       ],
       images: [
-        { 
-          src: '/media/EEG/before_after_preprocessing.png', 
-          caption: 'EEG Signal Preprocessing: Raw vs. Wavelet Denoised Data' 
+        { src: '/media/EEG/before_after_preprocessing.png', width: 1489, height: 590, caption: 'EEG Signal Preprocessing: Raw vs. Wavelet Denoised Data' 
         },
-        { 
-          src: '/media/EEG/prediction_traces.png', 
-          caption: 'UNet Segmentation: Predicted Probabilities vs. Ground Truth' 
+        { src: '/media/EEG/prediction_traces.png', width: 1398, height: 1180, caption: 'UNet Segmentation: Predicted Probabilities vs. Ground Truth' 
         },
-        { 
-          src: '/media/EEG/roc_curves.png', 
-          caption: 'Validation ROC Curves across all 6 Hand Movement Events' 
+        { src: '/media/EEG/roc_curves.png', width: 862, height: 708, caption: 'Validation ROC Curves across all 6 Hand Movement Events' 
         }
       ]
     }
@@ -293,9 +290,9 @@ export const projects: Project[] = [
   // 'Geographic granularity is limited for some deliveries, restricting fine-grained regional analysis.'
   // ],
   // images: [
-  // { src: '/media/Business analysis/Overview.png', caption: 'Overview' },
-  // { src: '/media/Business analysis/Orders.png', caption: 'Orders' },
-  // { src: '/media/Business analysis/Profit.png', caption: 'Profit' }
+  // { src: '/media/Business analysis/Overview.png', width: 1492, height: 806, caption: 'Overview' },
+  // { src: '/media/Business analysis/Orders.png', width: 1497, height: 811, caption: 'Orders' },
+  // { src: '/media/Business analysis/Profit.png', width: 1498, height: 811, caption: 'Profit' }
   // ]
   // }
   // },
@@ -336,8 +333,8 @@ export const projects: Project[] = [
         'Reporting is manual refresh in Power BI rather than a live connection.'
       ],
       images: [
-        { src: '/media/BEAT/Overview.png', caption: 'Power BI attendance overview' },
-        { src: '/media/BEAT/Analysis.png', caption: 'Engagement analysis dashboard' }
+        { src: '/media/BEAT/Overview.png', width: 1466, height: 812, caption: 'Power BI attendance overview' },
+        { src: '/media/BEAT/Analysis.png', width: 1464, height: 810, caption: 'Engagement analysis dashboard' }
       ]
     }
   },
@@ -346,7 +343,6 @@ export const projects: Project[] = [
   title: 'BareBonesNN: Autodiff and Neural Nets from Scratch',
   description: 'A scalar automatic differentiation engine and multi-layer perceptron built in pure Python with no ML framework, packaged and published to PyPI with tests and a release pipeline.',
   result: 'autodiff from scratch, published to PyPI',
-  image: '/media/barebonesnn/barebonesnn.png',
   animation: '/media/animation/barebonesnn.json',
   tags: ['Python', 'Autodiff', 'PyPI', 'CI/CD'],
   category: ['AI', 'ML'],
@@ -380,7 +376,7 @@ export const projects: Project[] = [
   }
 },{
     id: 'detect-sleep-states',
-    title: 'Detect Sleep States - Child Mind Institute',
+    title: 'Detect Sleep States: Child Mind Institute',
     description: 'Detects sleep onset and wake-up in around 500 multi-day recordings from wrist-worn accelerometers, using lag features, SHAP analysis and a Random Forest.',
     result: 'test-set ROC AUC 0.82',
     image: '/media/Detect-Sleep-States-CMI/data_dis.png',
@@ -419,9 +415,9 @@ export const projects: Project[] = [
       // classification report (same numbers as the confusion matrix) were cut;
       // the files are still in /media/Detect-Sleep-States-CMI.
       images: [
-        { src: '/media/Detect-Sleep-States-CMI/ROC curve.png', caption: 'ROC curve on the test set (AUC 0.82)' },
-        { src: '/media/Detect-Sleep-States-CMI/Confusion matrix.png', caption: 'Confusion matrix on the test set' },
-        { src: '/media/Detect-Sleep-States-CMI/shap.png', caption: 'SHAP feature importance: hour of day and step lead, followed by the Angle-Z lag features' }
+        { src: '/media/Detect-Sleep-States-CMI/ROC curve.png', width: 702, height: 547, caption: 'ROC curve on the test set (AUC 0.82)' },
+        { src: '/media/Detect-Sleep-States-CMI/Confusion matrix.png', width: 436, height: 393, caption: 'Confusion matrix on the test set' },
+        { src: '/media/Detect-Sleep-States-CMI/shap.png', width: 790, height: 700, caption: 'SHAP feature importance: hour of day and step lead, followed by the Angle-Z lag features' }
       ]
     }
   },
@@ -475,16 +471,16 @@ export const projects: Project[] = [
   // 'Model persistence enables simple deployment and integration into downstream systems.'
   // ],
   // images: [
-  // { src: '/media/FraudDetection/modeleval.png', caption: 'Model Evaluation' },
-  // { src: '/media/FraudDetection/ROC-AUC.png', caption: 'ROC-AUC' },
-  // { src: '/media/FraudDetection/ConfusionMatrix.png', caption: 'Confusion Matrix' }
+  // { src: '/media/FraudDetection/modeleval.png', width: 398, height: 126, caption: 'Model Evaluation' },
+  // { src: '/media/FraudDetection/ROC-AUC.png', width: 542, height: 392, caption: 'ROC-AUC' },
+  // { src: '/media/FraudDetection/ConfusionMatrix.png', width: 740, height: 556, caption: 'Confusion Matrix' }
   // ]
   // }
   // },
   {
     id: 'daily-link-ai',
     title: 'DailyLinkAI',
-    description: 'A personalised daily news feed. Articles from sources such as the BBC and Sky News are embedded with a BERT-based model, and semantic search over those embeddings recommends the closest matches to what each reader likes, served through a Streamlit app.',
+    description: 'A personalised daily news feed: articles are embedded with a BERT-based model and the closest matches to each reader\'s interests are recommended, served through a Streamlit app.',
     result: 'semantic search over BBC and Sky News',
     image: '/media/DailyLinkAI/app_screenshot.png',
     // The original news.json is drawn in charcoal and vanished on the dark
@@ -511,7 +507,7 @@ export const projects: Project[] = [
           'The backend is kept lightweight so the feed is served quickly and reliably.'
         ],
         images: [
-          { src: '/media/DailyLinkAI/app_screenshot.png', caption: 'Streamlit App' }
+          { src: '/media/DailyLinkAI/app_screenshot.png', width: 1198, height: 971, caption: 'Streamlit App' }
         ]
     }
   },
@@ -549,12 +545,12 @@ export const projects: Project[] = [
   // 'Deployment': 'Random Forest was selected for deployment due to interpretability and lower computational cost. A Streamlit app was created that accepts a pandas DataFrame, runs identical preprocessing/feature engineering steps and returns predictions via a simple web UI.'
   // },
   // images: [
-  // { src: '/media/diabetes/Data-Table.png', caption: 'Dataset Overview' },
-  // { src: '/media/diabetes/EDA.png', caption: 'Feature distributions' },
-  // { src: '/media/diabetes/Feature-Corr.png', caption: 'Feature Correlation' },
-  // { src: '/media/diabetes/Feature-importance.png', caption: 'Random Forest feature importance' },
-  // { src: '/media/diabetes/NNloss.png', caption: 'NN Model Loss (train/val/test)' },
-  // { src: '/media/diabetes/NNacc.png', caption: 'NN Model Accuracy (train/val/test)' }
+  // { src: '/media/diabetes/Data-Table.png', width: 800, height: 345, caption: 'Dataset Overview' },
+  // { src: '/media/diabetes/EDA.png', width: 989, height: 1990, caption: 'Feature distributions' },
+  // { src: '/media/diabetes/Feature-Corr.png', width: 1451, height: 1306, caption: 'Feature Correlation' },
+  // { src: '/media/diabetes/Feature-importance.png', width: 783, height: 740, caption: 'Random Forest feature importance' },
+  // { src: '/media/diabetes/NNloss.png', width: 656, height: 399, caption: 'NN Model Loss (train/val/test)' },
+  // { src: '/media/diabetes/NNacc.png', width: 675, height: 422, caption: 'NN Model Accuracy (train/val/test)' }
   // ]
   // }
   // },
@@ -615,9 +611,9 @@ export const projects: Project[] = [
   // ]
   // },
   // images: [
-  // { src: '/media/disaster_tweets/Model Eval.jpg', caption: 'XGBoost evaluation' },
-  // { src: '/media/disaster_tweets/not a disaster.png', caption: 'Document-Term Matrix for not a disaster' },
-  // { src: '/media/disaster_tweets/disaster.png', caption: 'Document-Term Matrix for a disaster' }
+  // { src: '/media/disaster_tweets/Model Eval.jpg', width: 487, height: 767, caption: 'XGBoost evaluation' },
+  // { src: '/media/disaster_tweets/not a disaster.png', width: 231, height: 231, caption: 'Document-Term Matrix for not a disaster' },
+  // { src: '/media/disaster_tweets/disaster.png', width: 231, height: 231, caption: 'Document-Term Matrix for a disaster' }
   // ]
   // }
   // },
@@ -643,9 +639,9 @@ export const projects: Project[] = [
   // 'Reviews': ['On-time deliveries correlate with higher review scores and repeat purchases.']
   // },
   // images: [
-  // { src: '/media/Olist/Data Schema.png', caption: 'Database Schema' },
-  // { src: '/media/Olist/Olist Reviews.jpg', caption: 'Reviews Analysis' },
-  // { src: '/media/Olist/Olist Delivery.jpg', caption: 'Delivery Analysis' }
+  // { src: '/media/Olist/Data Schema.png', width: 2486, height: 1496, caption: 'Database Schema' },
+  // { src: '/media/Olist/Olist Reviews.jpg', width: 1397, height: 797, caption: 'Reviews Analysis' },
+  // { src: '/media/Olist/Olist Delivery.jpg', width: 1396, height: 792, caption: 'Delivery Analysis' }
   // ]
   // }
   // },
@@ -673,7 +669,7 @@ export const projects: Project[] = [
   //       'Bounding box methodology effective for gesture delineation'
   //     ],
   //     images: [
-  //       { src: '/media/Computer vision/test.jpg', caption: 'Model Accuracy and Performance Results' }
+  //       { src: '/media/Computer vision/test.jpg', width: 199, height: 512, caption: 'Model Accuracy and Performance Results' }
   //     ]
   //   }
   // },
@@ -709,9 +705,9 @@ export const projects: Project[] = [
   // 'Conclusion': 'Overall, these findings emphasise the intricate mix of factors affecting user ratings, reviews, and prices in the book world. Elements such as book quality, genre popularity, and pricing strategies all come into play. However, it\'s essential to remember that correlation doesn\'t equal causation. While books with more reviews often have higher ratings, it doesn\'t necessarily mean one directly causes the other. Other factors, like the book\'s inherent quality or its genre\'s popularity, likely contribute significantly to these observed trends.'
   // },
   // images: [
-  // { src: '/media/Amazon Top50 Books/BoxPlot.png', caption: 'Box Plot Analysis' },
-  // { src: '/media/Amazon Top50 Books/data distribution.png', caption: 'Data Distribution' },
-  // { src: '/media/Amazon Top50 Books/Relationship.png', caption: 'Relationship Analysis' }
+  // { src: '/media/Amazon Top50 Books/BoxPlot.png', width: 1390, height: 990, caption: 'Box Plot Analysis' },
+  // { src: '/media/Amazon Top50 Books/data distribution.png', width: 1390, height: 990, caption: 'Data Distribution' },
+  // { src: '/media/Amazon Top50 Books/Relationship.png', width: 1390, height: 990, caption: 'Relationship Analysis' }
   // ]
   // }
   // },
@@ -744,7 +740,7 @@ export const projects: Project[] = [
   //       'Annotation consistency is critical; noisy labels reduce model performance.'
   //     ],
   //     images: [
-  //       { src: '/media/Computer vision/test.jpg', caption: 'Sample detection result and model performance' }
+  //       { src: '/media/Computer vision/test.jpg', width: 199, height: 512, caption: 'Sample detection result and model performance' }
   //     ]
   //   }
   // },
@@ -777,10 +773,10 @@ export const projects: Project[] = [
   // 'Strong positive correlation between gender unemployment trends over time'
   // ],
   // images: [
-  // { src: '/media/Global Unemployment/Lowest unemployement countries.png', caption: 'Countries with Lowest Unemployment Rate' },
-  // { src: '/media/Global Unemployment/Highest unemployement countries.png', caption: 'Countries with Highest Unemployment Rate' },
-  // { src: '/media/Global Unemployment/Unemployment Rate for age groups boxplot.png', caption: 'Unemployment Rate for Age Groups' },
-  // { src: '/media/Global Unemployment/Gendre unemployment rates.png', caption: 'Unemployment Rate For Each Gender Over Time' }
+  // { src: '/media/Global Unemployment/Lowest unemployement countries.png', width: 985, height: 590, caption: 'Countries with Lowest Unemployment Rate' },
+  // { src: '/media/Global Unemployment/Highest unemployement countries.png', width: 983, height: 590, caption: 'Countries with Highest Unemployment Rate' },
+  // { src: '/media/Global Unemployment/Unemployment Rate for age groups boxplot.png', width: 989, height: 590, caption: 'Unemployment Rate for Age Groups' },
+  // { src: '/media/Global Unemployment/Gendre unemployment rates.png', width: 989, height: 590, caption: 'Unemployment Rate For Each Gender Over Time' }
   // ]
   // }
   // }

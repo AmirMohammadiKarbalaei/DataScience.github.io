@@ -21,9 +21,18 @@ const ParticleBackground: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Positions are in CSS pixels; the backing store is scaled by the device
+    // pixel ratio (capped at 2, which is past what the eye resolves on dots
+    // this small) so the field is crisp on high-density screens.
+    let width = 0;
+    let height = 0;
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const createParticles = () => {
@@ -31,12 +40,12 @@ const ParticleBackground: React.FC = () => {
       // Density by area, capped: linking is pairwise, so an uncapped 4K
       // screen (~550 particles) meant ~150,000 distance checks every frame.
       // 160 keeps a 1080p screen's look (~140) and bounds the worst case.
-      const particleCount = Math.min(160, Math.floor((canvas.width * canvas.height) / 15000));
+      const particleCount = Math.min(160, Math.floor((width * height) / 15000));
 
       for (let i = 0; i < particleCount; i++) {
         particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
+          x: Math.random() * width,
+          y: Math.random() * height,
           vx: (Math.random() - 0.5) * 0.5,
           vy: (Math.random() - 0.5) * 0.5,
           size: Math.random() * 2 + 1,
@@ -52,13 +61,15 @@ const ParticleBackground: React.FC = () => {
         particle.x += particle.vx;
         particle.y += particle.vy;
 
-        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
-        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        // Turn back only when heading further out, so a particle left outside
+        // by a resize returns instead of flipping direction every frame.
+        if ((particle.x < 0 && particle.vx < 0) || (particle.x > width && particle.vx > 0)) particle.vx *= -1;
+        if ((particle.y < 0 && particle.vy < 0) || (particle.y > height && particle.vy > 0)) particle.vy *= -1;
       });
     };
 
     const drawParticles = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, width, height);
 
       particlesRef.current.forEach(particle => {
         ctx.beginPath();
@@ -105,15 +116,17 @@ const ParticleBackground: React.FC = () => {
 
     resizeCanvas();
     createParticles();
-    if (reduceMotion) {
-      drawParticles();
-    } else {
-      animate();
-    }
+    if (reduceMotion) drawParticles();
+    else animate();
 
+    // A phone's address bar showing or hiding resizes the viewport height on
+    // every scroll direction change. Only a width change (rotation, a desktop
+    // window resize) reshuffles the field; a height change keeps every
+    // particle where it is, and any now below the edge drift back in.
     const handleResize = () => {
+      const previousWidth = width;
       resizeCanvas();
-      createParticles();
+      if (width !== previousWidth) createParticles();
       if (reduceMotion) drawParticles();
     };
 
@@ -121,9 +134,7 @@ const ParticleBackground: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, []);
 

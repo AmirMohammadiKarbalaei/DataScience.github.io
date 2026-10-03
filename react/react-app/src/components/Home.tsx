@@ -7,7 +7,6 @@ import Navigation from './Navigation';
 import ParticleBackground from './ParticleBackground';
 import SEOHead from './SEOHead';
 import { trackContactInteraction, trackEvent } from '../utils/analytics';
-
 const SKILL_GROUPS: { label: string; skills: string[] }[] = [
   { label: 'Core Data & ML',
     skills: ['Python', 'SQL', 'Pandas', 'NumPy', 'Scikit-Learn', 'XGBoost/LightGBM', 'Feature Engineering'] },
@@ -30,11 +29,13 @@ const Home: React.FC = () => {
 
   // useMemo keeps the array identity stable across renders. Without it the typing
   // effect below re-runs on every state tick and spawns overlapping timer chains.
-  // useMemo keeps the array identity stable across renders. Without it the typing
-  // effect below re-runs on every state tick and spawns overlapping timer chains.
   const titles = useMemo(
     () => ['a Data Scientist', 'a Data Analyst', 'an ML Engineer'],
     []
+  );
+  const longestTitle = useMemo(
+    () => titles.reduce((a, b) => (b.length > a.length ? b : a)),
+    [titles]
   );
 
   // Typing animation effect. Deliberately runs even under reduced motion: the
@@ -44,16 +45,16 @@ const Home: React.FC = () => {
   let currentText = '';
   let isDeleting = false;
   let timer: ReturnType<typeof setTimeout>;
-    
+
     const typeEffect = () => {
       const fullText = titles[titleIndex];
-      
+
       if (isDeleting) {
         currentText = fullText.substring(0, currentText.length - 1);
       } else {
         currentText = fullText.substring(0, currentText.length + 1);
       }
-      
+
       setCurrentTitle(currentText);
       
       let typeSpeed = isDeleting ? 50 : 100;
@@ -135,6 +136,11 @@ const Home: React.FC = () => {
 
   // The address is shown in full so it can be copied; this makes that one
   // click. On failure the address is still on screen to select by hand.
+  // Each click restarts the readout's clock, so a second copy keeps its full
+  // 2.4s instead of being cut short by the first click's timer.
+  const copyTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText('a.mohammadikarbalaei@gmail.com');
@@ -143,7 +149,8 @@ const Home: React.FC = () => {
     } catch {
       setCopyState('failed');
     }
-    window.setTimeout(() => setCopyState('idle'), 2400);
+    window.clearTimeout(copyTimer.current);
+    copyTimer.current = window.setTimeout(() => setCopyState('idle'), 2400);
   };
 
   return (
@@ -250,15 +257,28 @@ const Home: React.FC = () => {
               <span className="typing-prefix">I'm </span>
               {/* Cursor inside the typed span so it sits right after the last
                   letter instead of at the far edge of the reserved width. */}
+              {/* The longest role sits invisibly underneath, so the sentence
+                  is centred at its full width and "I'm" never shifts while
+                  a role types out or deletes. */}
               <span className="typing-text">
-                {currentTitle}
-                <span className="cursor">|</span>
+                <span className="typing-reserve">{longestTitle}<span className="cursor">|</span></span>
+                <span className="typing-live">
+                  {currentTitle}
+                  <span className="cursor">|</span>
+                </span>
               </span>
             </div>
             <p className="hero-description">
               I build machine learning, NLP and LLM systems. At Unilever I work on
               NLP and analytics for the employee-facing chatbot and service desk.
             </p>
+            {/* The level signal for a skimming recruiter, in the console
+                voice: where the work has been done, published facts only. */}
+            <ul className="hero-readout" aria-label="Background">
+              <li>Unilever</li>
+              <li>Y Combinator startup</li>
+              <li>MSc Data Science, Bath</li>
+            </ul>
             <div className="hero-buttons">
               <a href="#projects" className="btn-primary">
                 <i className="fas fa-arrow-down" aria-hidden="true"></i>
@@ -350,8 +370,9 @@ const Home: React.FC = () => {
                 at the <strong>University of Bath</strong>.
               </p>
               <p className="about-description">
-                Trained as a mechanical engineer, I judge a model by how it holds
-                up in use rather than how it scores in a notebook.
+                I came to data science from mechanical engineering, so I judge a
+                model by how it holds up in use rather than how it scores in a
+                notebook.
               </p>
               <div className="about-cta">
                 <Link to="/experience" className="btn-outline">

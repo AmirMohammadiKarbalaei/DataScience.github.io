@@ -127,7 +127,7 @@ const Experience: React.FC = () => {
                   <h3>Data Expertise Analyst</h3>
                   <div className="achievement-badge current">Current role</div>
                 </div>
-                <h4 className="company-name">Unilever · Full-time</h4>
+                <p className="company-name">Unilever · Full-time</p>
                 <div className="location">Port Sunlight, UK · Hybrid</div>
               </div>
             </div>
@@ -141,7 +141,7 @@ const Experience: React.FC = () => {
                 <div className="job-header">
                   <h3>Customer Operations and Una Bot Analyst</h3>
                 </div>
-                <h4 className="company-name">Unilever · Full-time</h4>
+                <p className="company-name">Unilever · Full-time</p>
                 <div className="location">Port Sunlight, UK · Hybrid</div>
                 <p>
                   NLP and analytics on millions of ServiceNow and Moveworks records in Unilever's
@@ -170,7 +170,7 @@ const Experience: React.FC = () => {
                   <img src="/media/logos/university-of-bath.svg" alt="" />
                 </div>
                 <h3>Research Assistant</h3>
-                <h4 className="company-name">School of Management, University of Bath · Part-time</h4>
+                <p className="company-name">School of Management, University of Bath · Part-time</p>
                 <div className="location">Bath, UK</div>
                 <ul className="responsibilities">
                   <li>Built the data pipeline for a School of Management research project analysing US patent text.</li>
@@ -197,7 +197,7 @@ const Experience: React.FC = () => {
                   <img src="/media/logos/enterprise-bath.png" alt="" />
                 </div>
                 <h3>Technical Lead</h3>
-                <h4 className="company-name">Enterprise Bath · Part-time</h4>
+                <p className="company-name">Enterprise Bath · Part-time</p>
                 <div className="location">Bath, UK · Remote</div>
                 <p>
                   Led the development of a secure attendance tracking system for the University of Bath's
@@ -230,7 +230,7 @@ const Experience: React.FC = () => {
                   <h3>Data Scientist - AI Healthcare Applications</h3>
                   <div className="achievement-badge startup">Y Combinator</div>
                 </div>
-                <h4 className="company-name">Nightingaile, later Simplifine (Y Combinator) · Part-time</h4>
+                <p className="company-name">Nightingaile, later Simplifine (Y Combinator) · Part-time</p>
                 <div className="location">San Francisco, US · Remote</div>
                 <p>
                   Built localised language models for healthcare professionals at an early-stage startup,
@@ -262,7 +262,7 @@ const Experience: React.FC = () => {
                   <h3>Data Analytics Trainee</h3>
                  
                 </div>
-                <h4 className="company-name">Generation UK & Ireland · Full-time</h4>
+                <p className="company-name">Generation UK & Ireland · Full-time</p>
                 <div className="location">Leeds, UK · Remote</div>
                 <p>
                   Data analytics training programme covering business applications, team leadership
@@ -292,7 +292,7 @@ const Experience: React.FC = () => {
                   <i aria-hidden="true" className="fas fa-laptop-code"></i>
                 </div>
                 <h3>Independent Data Scientist</h3>
-                <h4 className="company-name">Personal Projects</h4>
+                <p className="company-name">Personal Projects</p>
                 <p>
                   Independent data science projects covering machine learning, deep learning, computer
                   vision and competitive programming challenges.
@@ -329,7 +329,7 @@ const Experience: React.FC = () => {
               </div>
               <div className="education-body">
                 <h3>MSc Data Science</h3>
-                <h4 className="education-institution">University of Bath</h4>
+                <p className="education-institution">University of Bath</p>
                 <p className="education-note">
                   Dissertation on efficient fine-tuning of large language models.
                 </p>
@@ -345,24 +345,12 @@ const Experience: React.FC = () => {
                   BEng (Hons) Mechanical Engineering
                   <span className="education-grade">First Class</span>
                 </h3>
-                <h4 className="education-institution">Newcastle University</h4>
+                <p className="education-institution">Newcastle University</p>
               </div>
             </article>
           </div>
         </div>
       </section>
-
-      {/* One floating control, per DESIGN.md. Home is already in the navbar. */}
-      <div className="floating-actions">
-        <button
-          className="floating-btn scroll-top"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          aria-label="Back to top"
-          title="Back to top"
-        >
-          <i aria-hidden="true" className="fas fa-arrow-up"></i>
-        </button>
-      </div>
 
       {/* The page ends on the next step for a reader who has just read the
           whole career: getting in touch. Home is always one tap away in the

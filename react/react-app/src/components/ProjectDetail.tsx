@@ -220,6 +220,37 @@ const ProjectDetail: React.FC = () => {
   const hasGallery = imageCount >= 4;
   const hasSidebar = imageCount > 0 && !hasGallery;
 
+  // The repository and live app, shown under the header and again after the
+  // write-up. The live app opens in its own tab instead of an embed: a
+  // sleeping Streamlit app rendered as 600px of empty frame.
+  const renderActions = (placement: 'header' | 'footer') =>
+    (project.githubUrl || project.streamlitUrl) && (
+      <div className={`project-actions project-actions-${placement}`}>
+        {project.githubUrl && (
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+            onClick={() => trackEvent('github_click', 'Projects', project.title)}
+          >
+            GitHub repository
+          </a>
+        )}
+        {project.streamlitUrl && (
+          <a
+            href={project.streamlitUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary"
+            onClick={() => trackEvent('live_app_click', 'Projects', project.title)}
+          >
+            Live app
+          </a>
+        )}
+      </div>
+    );
+
   return (
     <div
       className={`project-detail${domain ? ` domain-${domain.key}` : ''}`}
@@ -270,6 +301,11 @@ const ProjectDetail: React.FC = () => {
             {domain && (
               <p className="project-domain">{domain.label}</p>
             )}
+            {/* The same headline result as the card that was clicked, so the
+                number a reader came for is the first thing the page confirms. */}
+            {project.result && (
+              <p className="project-result">{project.result}</p>
+            )}
             {/* The tools, moved here from the homepage card: one quiet line of
                 plain text, the same treatment as the skills list. */}
             {project.tags.length > 0 && (
@@ -277,6 +313,9 @@ const ProjectDetail: React.FC = () => {
                 {project.tags.map(tag => <li key={tag}>{tag}</li>)}
               </ul>
             )}
+            {/* The code is one click from the top for a technical reader; the
+                same actions repeat after the write-up. */}
+            {renderActions('header')}
           </header>
 
           {/* small visual divider */}
@@ -292,7 +331,10 @@ const ProjectDetail: React.FC = () => {
                   <source src={project.video} type="audio/mp4" />
                 </audio>
               ) : (
-                <video controls preload="metadata" className="project-video" aria-label={`${project.title}: demo video`}>
+                // With a poster nothing is fetched until play: the frame and
+                // play button show at once, with no spinner while the browser
+                // seeks the file's index (12MB, index at the end, for the RL demo).
+                <video controls preload={project.poster ? "none" : "metadata"} poster={project.poster} className="project-video" aria-label={`${project.title}: demo video`}>
                   <source src={project.video} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
@@ -315,7 +357,7 @@ const ProjectDetail: React.FC = () => {
               static version of the same diagram stands in for it. */}
           {project.simulationFallback && (
             <figure className="project-simulation-fallback">
-              <img src={project.simulationFallback.src} alt={project.simulationFallback.caption} />
+              <img src={project.simulationFallback.src} alt={project.simulationFallback.caption} width={project.simulationFallback.width} height={project.simulationFallback.height} />
               <figcaption className="image-caption">{project.simulationFallback.caption}</figcaption>
             </figure>
           )}
@@ -327,6 +369,27 @@ const ProjectDetail: React.FC = () => {
                 <div className="project-section">
                   <h2>Overview</h2>
                   <p>{project.content.data}</p>
+                </div>
+              )}
+
+              {/* Findings before the method: the result first, then how it
+                  was reached, as a reader weighing the work wants it. */}
+              {project.content.keyFindings && (
+                <div className="project-section">
+                  <h2>Findings</h2>
+                  <SectionList items={project.content.keyFindings} defaultVisibleCount={project.content.keyFindings.length} />
+                </div>
+              )}
+
+              {project.content.findings && (
+                <div className="project-section">
+                  <h2>Findings</h2>
+                  {Object.entries(project.content.findings).map(([section, bullets]) => (
+                    <div key={section} style={{ marginBottom: '1.5rem' }}>
+                      <h3>{section}</h3>
+                      <SectionList items={bullets} defaultVisibleCount={bullets.length} />
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -351,25 +414,6 @@ const ProjectDetail: React.FC = () => {
                 </div>
               )}
 
-              {project.content.keyFindings && (
-                <div className="project-section">
-                  <h2>Findings</h2>
-                  <SectionList items={project.content.keyFindings} defaultVisibleCount={project.content.keyFindings.length} />
-                </div>
-              )}
-
-              {project.content.findings && (
-                <div className="project-section">
-                  <h2>Findings</h2>
-                  {Object.entries(project.content.findings).map(([section, bullets]) => (
-                    <div key={section} style={{ marginBottom: '1.5rem' }}>
-                      <h3>{section}</h3>
-                      <SectionList items={bullets} defaultVisibleCount={bullets.length} />
-                    </div>
-                  ))}
-                </div>
-              )}
-
               {project.content.limitations && (
                 <div className="project-section">
                   <h2>Limitations</h2>
@@ -387,6 +431,8 @@ const ProjectDetail: React.FC = () => {
                     <img
                       src={image.src}
                       alt={image.caption}
+                      width={image.width}
+                      height={image.height}
                       className="project-detail-image"
                       loading="lazy"
                       onError={(e) => { e.currentTarget.hidden = true; }}
@@ -404,7 +450,7 @@ const ProjectDetail: React.FC = () => {
               <div className="project-gallery-grid">
                 {project.content.images?.map((image, index) => (
                   <figure key={index} className="project-gallery-item">
-                    <img src={image.src} alt={image.caption} loading="lazy" onError={(e) => { e.currentTarget.hidden = true; }} />
+                    <img src={image.src} alt={image.caption} width={image.width} height={image.height} loading="lazy" onError={(e) => { e.currentTarget.hidden = true; }} />
                     <figcaption className="image-caption">{image.caption}</figcaption>
                   </figure>
                 ))}
@@ -412,35 +458,9 @@ const ProjectDetail: React.FC = () => {
             </section>
           )}
 
-          {/* Actions after all the evidence. The live app opens in its own tab
-              instead of an embed: a sleeping Streamlit app rendered as 600px
-              of empty frame. */}
-          {(project.githubUrl || project.streamlitUrl) && (
-            <div className="project-actions">
-              {project.githubUrl && (
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary"
-                  onClick={() => trackEvent('github_click', 'Projects', project.title)}
-                >
-                  GitHub repository
-                </a>
-              )}
-              {project.streamlitUrl && (
-                <a
-                  href={project.streamlitUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary"
-                  onClick={() => trackEvent('live_app_click', 'Projects', project.title)}
-                >
-                  Live app
-                </a>
-              )}
-            </div>
-          )}
+          {/* The actions again after all the evidence, for a reader who has
+              just finished the write-up. */}
+          {renderActions('footer')}
         </div>
       </section>
 
@@ -521,7 +541,7 @@ const ProjectDetail: React.FC = () => {
           .project-demo-title {
             font-size: var(--type-heading);
             font-weight: 600;
-            color: #ffffff;
+            color: var(--text);
             margin: 0 0 16px;
           }
 
@@ -557,7 +577,7 @@ const ProjectDetail: React.FC = () => {
           .project-gallery-title {
             font-size: var(--type-heading);
             font-weight: 600;
-            color: #ffffff;
+            color: var(--text);
             margin: 0 0 1.25rem;
           }
 
@@ -630,11 +650,9 @@ const ProjectDetail: React.FC = () => {
           }
 
           .project-image-container img {
-            width: 100%; /* Ensure the image takes up the full width of its container */
-            height: auto; /* Maintain aspect ratio */
-            max-width: 1400px; /* Further increased maximum width for larger displays */
-            margin: 0 auto; /* Center the image horizontally */
-            display: block; /* Ensure proper centering */
+            display: block;
+            width: 100%;
+            height: auto;
           }
 
           .project-simulation-container {
@@ -656,9 +674,6 @@ const ProjectDetail: React.FC = () => {
             box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
           }
 
-          .section-preview {
-            display: block;
-          }
         `}
       </style>
     </div>

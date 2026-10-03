@@ -8,9 +8,29 @@
 :root {
   /* Colour roles outside the accent: the teal step used on hover, and the
      opaque field colour used where a surface must hide what is behind it. */
+  /* A dark-only site: native scrollbars, controls and media players render
+     dark, and their checked/played parts take the accent. */
+  color-scheme: dark;
+  accent-color: var(--accent);
+
   --accent: #5bb8cc;
   --accent-hover: #6cc3d5;
   --field-solid: #0d0f18;
+
+  /* Neutral roles, named as in DESIGN.md. Text runs white (headings, primary
+     copy) to soft silver (filters, skills) to mist grey (secondary copy,
+     resting links). Void black is the field and the text on a teal fill. */
+  --text: #ffffff;          /* Starlight White */
+  --text-soft: #e0e0e0;     /* Soft Silver */
+  --text-muted: #b0b0b0;    /* Mist Grey */
+  --void: #0a0a0f;          /* Void Black */
+
+  /* Glass readouts: the panel fill, its teal hairline, and the faint teal
+     wash for active and hover states. Other teal strengths are one-off
+     states and stay written out where they are used. */
+  --glass: rgba(0, 0, 0, 0.4);
+  --hairline: rgba(91, 184, 204, 0.2);
+  --wash: rgba(91, 184, 204, 0.1);
 
   /* Type roles. Every text size on the site is one of these; name the role,
      not the value. Titles scale with the viewport, reading sizes do not. */
@@ -56,8 +76,8 @@
 .skills-sheet {
   max-width: 1200px;
   margin: 0 auto;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(91, 184, 204, 0.2);
+  background: var(--glass);
+  border: 1px solid var(--hairline);
   border-radius: 16px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -85,13 +105,13 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1.5;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .skills-row-label::before {
   content: '> ';
   content: '> ' / '';
-  color: #5bb8cc;
+  color: var(--accent);
 }
 
 /* Tools as a plain run of text, split by quiet mid-dots. The dot rides on
@@ -103,7 +123,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  color: #e0e0e0;
+  color: var(--text-soft);
   font-size: var(--type-body);
   line-height: 1.6;
 }
@@ -131,8 +151,8 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--void) 0%, #1a1a2e 50%, #16213e 100%);
+  color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;
   /* The gradient is sized to the page; on a short page it repeated in bands. */
@@ -149,7 +169,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #5bb8cc;
+  background: var(--accent);
   border-radius: 4px;
 }
 
@@ -192,9 +212,10 @@ body::before {
 /* Header Styles */
 .header {
   position: relative;
-  /* Short of a full screen on purpose: the top of the Projects heading shows
-     below the fold, cueing that the work is directly underneath. */
-  min-height: 88vh;
+  /* Well short of a full screen on purpose: the Projects heading and the
+     domain filters show in the first viewport, so a visitor sees the range
+     of the work before scrolling. */
+  min-height: 76vh;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -234,7 +255,7 @@ body::before {
   position: relative;
   line-height: 1.2;
   word-break: break-word;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .header-title::after {
@@ -245,7 +266,7 @@ body::before {
   transform: translateX(-50%);
   width: 48px;
   height: 2px;
-  background: #5bb8cc;
+  background: var(--accent);
   opacity: 0.7;
   border-radius: 1px;
 }
@@ -295,24 +316,32 @@ body::before {
   font-weight: 500;
 }
 
-/* The line splits at the centre: "I'm" ends there and the role types out
-   from it, so the pair stays balanced however long the current role is. */
+/* The whole sentence is centred at the width of the longest role: the role
+   types out into that reserved space, so "I'm" stays put while it types and
+   deletes, and the line reads as centred under the name. */
 .typing-prefix {
-  flex: 1;
-  text-align: right;
-  color: #b0b0b0;
+  color: var(--text-muted);
 }
 
 .typing-text {
-  flex: 1;
-  color: #5bb8cc;
+  display: inline-grid;
+  color: var(--accent);
   margin-left: 0.5rem;
   text-align: left;
   white-space: nowrap;
 }
 
+.typing-reserve,
+.typing-live {
+  grid-area: 1 / 1;
+}
+
+.typing-reserve {
+  visibility: hidden;
+}
+
 .cursor {
-  color: #5bb8cc;
+  color: var(--accent);
   animation: blink 1s infinite;
   font-weight: 300;
 }
@@ -320,12 +349,48 @@ body::before {
 .hero-description {
   font-size: var(--type-lead);
   line-height: 1.6;
-  color: #b0b0b0;
+  color: var(--text-muted);
   margin-bottom: 2.5rem;
   text-wrap: pretty;
   max-width: 34rem;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* The level line under the hero copy: a mono readout with the teal prompt,
+   items split by the same quiet teal mid-dots as the skills sheet. Each item
+   stays whole when the line wraps on a phone, and the dot rides on the item
+   before it so a wrapped line never starts with one. */
+.hero-readout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 0;
+  max-width: 34rem;
+  margin: -1.25rem auto 2.25rem;
+  padding: 0;
+  list-style: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--type-label);
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.hero-readout li {
+  white-space: nowrap;
+}
+
+.hero-readout li:first-child::before {
+  content: '> ';
+  content: '> ' / '';
+  color: var(--accent);
+}
+
+.hero-readout li:not(:last-child)::after {
+  content: '·';
+  content: '·' / '';
+  margin: 0 10px;
+  color: rgba(91, 184, 204, 0.55);
 }
 
 
@@ -342,7 +407,7 @@ body::before {
   gap: 10px;
   padding: 13px 28px;
   background: transparent;
-  color: #5bb8cc;
+  color: var(--accent);
   border: 1px solid rgba(91, 184, 204, 0.5);
   text-decoration: none;
   border-radius: 30px;
@@ -351,10 +416,12 @@ body::before {
 }
 
 /* A wash, not a fill: the secondary action stays secondary on hover. */
-.btn-secondary:hover {
-  background: rgba(91, 184, 204, 0.1);
-  border-color: #5bb8cc;
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .btn-secondary:hover {
+    background: var(--wash);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
 }
 
 .btn-primary {
@@ -362,8 +429,8 @@ body::before {
   align-items: center;
   gap: 10px;
   padding: 14px 32px;
-  background: #5bb8cc;
-  color: #0a0a0f;
+  background: var(--accent);
+  color: var(--void);
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
@@ -373,10 +440,12 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.btn-primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
+@media (hover: hover) {
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
+  }
 }
 
 /* About Section */
@@ -439,25 +508,25 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #b0b0b0;
+  color: var(--text-muted);
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--type-label);
 }
 
 .profile-badge i {
-  color: #5bb8cc;
+  color: var(--accent);
 }
 
 .about-description {
   font-size: var(--type-lead);
   line-height: 1.8;
-  color: #b0b0b0;
+  color: var(--text-muted);
   margin-bottom: 1.5rem;
 }
 
 .about-description strong {
   /* White, not teal: teal is reserved for things you can act on. */
-  color: #ffffff;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -475,32 +544,36 @@ body::before {
   gap: 10px;
   padding: 12px 24px;
   background: transparent;
-  color: #5bb8cc;
-  border: 2px solid #5bb8cc;
+  color: var(--accent);
+  border: 2px solid var(--accent);
   text-decoration: none;
   border-radius: 25px;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
-.btn-outline:hover {
-  background: rgba(91, 184, 204, 0.1);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .btn-outline:hover {
+    background: var(--wash);
+    transform: translateY(-2px);
+  }
 }
 
 .btn-text {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #b0b0b0;
+  color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.btn-text:hover {
-  color: #5bb8cc;
-  transform: translateX(5px);
+@media (hover: hover) {
+  .btn-text:hover {
+    color: var(--accent);
+    transform: translateX(5px);
+  }
 }
 
 /* One glass readout holds the whole statement. Two paragraphs in two boxes
@@ -508,8 +581,8 @@ body::before {
 .about-text {
   text-align: left;
   padding: clamp(24px, 4vw, 44px);
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(91, 184, 204, 0.2);
+  background: var(--glass);
+  border: 1px solid var(--hairline);
   border-radius: 16px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -519,13 +592,13 @@ body::before {
 .about-text p {
   font-size: var(--type-lead);
   line-height: 1.75;
-  color: #e0e0e0;
+  color: var(--text-soft);
   margin: 0 0 1.25em;
 }
 
 /* Projects Section */
 .projects-section {
-  padding: 40px 0 var(--space-section);
+  padding: 24px 0 var(--space-section);
   background: transparent;
 }
 
@@ -556,7 +629,7 @@ body::before {
   margin-bottom: var(--space-title);
 -webkit-text-fill-color: currentColor;
   position: relative;
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* Flex rather than grid so a short final row centres instead of leaving an
@@ -577,11 +650,11 @@ body::before {
 }
 
 .project-card {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--glass);
   border-radius: 16px;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border: 1px solid rgba(91, 184, 204, 0.2);
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid var(--hairline);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   display: flex;
@@ -608,11 +681,18 @@ body::before {
 
 /* Keyboard focus on a card gets the same response as hover: a short lift and
    a brighter hairline, no scaling. */
-.project-card:hover,
 .project-card-link:focus-visible .project-card {
   transform: translateY(-3px);
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
   border-color: rgba(91, 184, 204, 0.4);
+}
+
+@media (hover: hover) {
+  .project-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+    border-color: rgba(91, 184, 204, 0.4);
+  }
 }
 
 .project-card-link:focus-visible {
@@ -620,8 +700,10 @@ body::before {
   border-radius: 20px;
 }
 
-.project-card:hover::before {
-  opacity: 1;
+@media (hover: hover) {
+  .project-card:hover::before {
+    opacity: 1;
+  }
 }
 
 .project-image-container {
@@ -648,14 +730,16 @@ body::before {
 /* Home grid cards: every card gets the same media height, so titles and
    descriptions start on the same line across a row. Without this the block is
    height:auto, so a square Lottie renders tall and a wide PNG renders short,
-   and the text below them starts at different heights.
+   and the text below them starts at different heights. The band is short
+   (16:7): the animation is an accent, and the result line below is the
+   evidence, so the card reaches its text quickly.
    object-fit: contain keeps the whole asset visible (nothing is cropped). */
 .project-card .project-image-container {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 7;
   height: auto;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 14px 16px;
   overflow: hidden;
 }
 
@@ -674,17 +758,27 @@ body::before {
   transition: opacity 0.3s ease, filter 0.3s ease;
 }
 
-.project-card:hover .project-image-container,
 .project-card-link:focus-visible .project-image-container {
   opacity: 1;
   filter: none;
 }
 
+@media (hover: hover) {
+  .project-card:hover .project-image-container {
+    opacity: 1;
+    filter: none;
+  }
+}
+
 /* Inside a card the loading frame fills the fixed media box; its detail-page
-   min-height of 250px overflowed the card's 240px of space. */
+   min-height of 250px overflowed the card's 240px of space. It is also
+   invisible there: a grey box read as broken media while the animation
+   loaded, and an empty band simply reads as space until it arrives. */
 .project-card .lottie-loading,
 .project-card .lottie-error {
   min-height: 0;
+  background: none;
+  border: 0;
 }
 
 .project-card .project-content {
@@ -697,7 +791,7 @@ body::before {
 .project-title {
   font-size: var(--type-subheading);
   margin-bottom: 8px;
-  color: #ffffff;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -711,7 +805,7 @@ body::before {
   font-size: var(--type-label);
   font-weight: 500;
   letter-spacing: 0.02em;
-  color: var(--domain, #b0b0b0);
+  color: var(--domain, var(--text-muted));
 }
 
 .project-domain::before {
@@ -723,24 +817,28 @@ body::before {
   background: currentColor;
 }
 
-/* The card's headline result: a mono readout with the teal prompt. */
+/* The card's headline result: a mono readout with the teal prompt. It is the
+   card's evidence, so it reads before the description: a step larger than
+   the labels around it, and medium weight. */
 .project-result {
   margin: -6px 0 14px;
   font-family: 'JetBrains Mono', monospace;
   font-variant-numeric: tabular-nums;
-  font-size: var(--type-label);
+  font-size: var(--type-small);
+  font-weight: 500;
   line-height: 1.5;
-  color: #ffffff;
+  color: var(--text);
+  text-wrap: balance;
 }
 
 .project-result::before {
   content: '> ';
   content: '> ' / '';
-  color: #5bb8cc;
+  color: var(--accent);
 }
 
 .project-description {
-  color: #b0b0b0;
+  color: var(--text-muted);
   margin-bottom: 20px;
   line-height: 1.7;
   flex-grow: 1;
@@ -758,7 +856,7 @@ body::before {
 .contact-title {
   font-size: var(--type-section);
   margin-bottom: 40px;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .contact-email {
@@ -788,15 +886,15 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #b0b0b0;
+  color: var(--text-muted);
   font-size: var(--type-body);
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   padding: 12px 22px;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(91, 184, 204, 0.2);
+  border: 1px solid var(--hairline);
   backdrop-filter: blur(10px);
 }
 
@@ -804,11 +902,13 @@ body::before {
   font-size: 1.25rem;
 }
 
-.social-link:hover {
-  color: #5bb8cc;
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  border-color: rgba(91, 184, 204, 0.6);
+@media (hover: hover) {
+  .social-link:hover {
+    color: var(--accent);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    border-color: rgba(91, 184, 204, 0.6);
+  }
 }
 
 /* Animations */
@@ -878,7 +978,7 @@ body::before {
    The opaque base keeps the timeline's centre line from showing through. */
 .timeline-date {
   background: var(--field-solid);
-  color: #5bb8cc;
+  color: var(--accent);
   border: 1px solid rgba(91, 184, 204, 0.4);
   padding: 8px 18px;
   border-radius: 20px;
@@ -891,9 +991,9 @@ body::before {
 }
 
 .timeline-item:first-child .timeline-date {
-  background: #5bb8cc;
-  color: #0a0a0f;
-  border-color: #5bb8cc;
+  background: var(--accent);
+  color: var(--void);
+  border-color: var(--accent);
   font-weight: 600;
 }
 
@@ -901,12 +1001,12 @@ body::before {
 
 .timeline-content {
   flex: 1;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--glass);
   padding: 30px;
   border-radius: 16px;
-  border: 1px solid rgba(91, 184, 204, 0.2);
+  border: 1px solid var(--hairline);
   backdrop-filter: blur(20px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
@@ -923,26 +1023,31 @@ body::before {
   transition: opacity 0.3s ease;
 }
 
-.timeline-content:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in oklch, var(--domain, #5bb8cc) 40%, transparent);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+@media (hover: hover) {
+  .timeline-content:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklch, var(--domain, var(--accent)) 40%, transparent);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  }
 }
 
-.timeline-content:hover::before {
-  opacity: 1;
+@media (hover: hover) {
+  .timeline-content:hover::before {
+    opacity: 1;
+  }
 }
 
 .timeline-content h3 {
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: 15px;
   font-size: var(--type-subheading);
 }
 
 .timeline-content p {
-  color: #b0b0b0;
+  color: var(--text-muted);
   line-height: 1.6;
   margin-bottom: 20px;
+  max-width: 60ch; /* about 75 characters a line, as in the write-ups */
 }
 
 .timeline-tags {
@@ -959,12 +1064,11 @@ body::before {
 
 .timeline-tag {
   background: rgba(91, 184, 204, 0.2);
-  color: #5bb8cc;
+  color: var(--accent);
   padding: 5px 12px;
   border-radius: 12px;
   font-size: var(--type-label);
   border: 1px solid rgba(91, 184, 204, 0.3);
-  transition: transform 0.2s ease, border-color 0.2s ease;
   position: relative;
 }
 
@@ -978,17 +1082,19 @@ body::before {
   border-radius: 8px;
   font-size: var(--type-label);
   font-weight: 500;
-  color: #5bb8cc;
+  color: var(--accent);
   text-decoration: none;
   border: 1px solid rgba(91, 184, 204, 0.35);
   background: rgba(91, 184, 204, 0.08);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.timeline-project-link:hover {
-  background: rgba(91, 184, 204, 0.18);
-  border-color: rgba(91, 184, 204, 0.7);
-  transform: translateX(3px);
+@media (hover: hover) {
+  .timeline-project-link:hover {
+    background: rgba(91, 184, 204, 0.18);
+    border-color: rgba(91, 184, 204, 0.7);
+    transform: translateX(3px);
+  }
 }
 
 .timeline-project-link i {
@@ -996,15 +1102,17 @@ body::before {
 }
 
 .timeline-inline-link {
-  color: #5bb8cc;
+  color: var(--accent);
   text-decoration: none;
   border-bottom: 1px dotted rgba(91, 184, 204, 0.55);
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
-.timeline-inline-link:hover {
-  color: #5bb8cc;
-  border-bottom-color: #5bb8cc;
+@media (hover: hover) {
+  .timeline-inline-link:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
 }
 
 /* ---- Education ---- */
@@ -1025,18 +1133,20 @@ body::before {
   display: flex;
   align-items: center;
   gap: 18px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(91, 184, 204, 0.2);
+  background: var(--glass);
+  border: 1px solid var(--hairline);
   border-radius: 16px;
   padding: 22px 26px;
   backdrop-filter: blur(20px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.education-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(91, 184, 204, 0.55);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+@media (hover: hover) {
+  .education-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(91, 184, 204, 0.55);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  }
 }
 
 .education-icon {
@@ -1049,7 +1159,7 @@ body::before {
   justify-content: center;
   background: rgba(91, 184, 204, 0.12);
   border: 1px solid rgba(91, 184, 204, 0.3);
-  color: #5bb8cc;
+  color: var(--accent);
   font-size: 1.05rem;
 }
 
@@ -1064,7 +1174,7 @@ body::before {
 
 .education-card h3 {
   font-size: var(--type-lead);
-  color: #ffffff;
+  color: var(--text);
   margin: 0 0 5px;
   font-weight: 600;
   line-height: 1.35;
@@ -1072,13 +1182,13 @@ body::before {
 
 .education-institution {
   font-size: var(--type-small);
-  color: #e0e0e0;
+  color: var(--text-soft);
   margin: 0;
   font-weight: 500;
 }
 
 .education-note {
-  color: #b0b0b0;
+  color: var(--text-muted);
   font-size: var(--type-small);
   line-height: 1.65;
   margin: 10px 0 0;
@@ -1093,7 +1203,7 @@ body::before {
   font-size: var(--type-micro);
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: #5bb8cc;
+  color: var(--accent);
   border: 1px solid rgba(91, 184, 204, 0.4);
   background: rgba(91, 184, 204, 0.12);
   vertical-align: middle;
@@ -1150,18 +1260,6 @@ body::before {
     
     .achievement-badge {
         align-self: flex-start;
-    }
-    
-    .floating-actions {
-        bottom: 20px;
-        right: 20px;
-        gap: 10px;
-    }
-    
-    .floating-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 1rem;
     }
     
     /* Mobile adjustments for homepage enhancements */
@@ -1259,7 +1357,7 @@ body::before {
   right: 0;
   z-index: 1000;
   padding: 15px 0;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
   background: rgba(10, 10, 15, 0.8);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(91, 184, 204, 0.1);
@@ -1285,19 +1383,21 @@ body::before {
   font-size: var(--type-lead);
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: var(--text);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.nav-brand:hover {
-  color: #5bb8cc;
+@media (hover: hover) {
+  .nav-brand:hover {
+    color: var(--accent);
+  }
 }
 
 /* Text selection in the signal colour instead of the browser's default blue. */
 ::selection {
   background: rgba(91, 184, 204, 0.3);
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* The brand is the name, set like the headings: Inter semibold, white,
@@ -1320,11 +1420,11 @@ body::before {
 }
 
 .nav-link {
-  color: #b0b0b0;
+  color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
   font-size: var(--type-small);
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
   position: relative;
   padding: 8px 0;
 }
@@ -1336,21 +1436,31 @@ body::before {
   left: 0;
   width: 100%;
   height: 2px;
-  background: #5bb8cc;
+  background: var(--accent);
   /* Grown with transform rather than width, so it never triggers layout. */
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
 }
 
-.nav-link:hover,
 .nav-link.active {
-  color: #ffffff;
+  color: var(--text);
 }
 
-.nav-link:hover::after,
+@media (hover: hover) {
+  .nav-link:hover {
+    color: var(--text);
+  }
+}
+
 .nav-link.active::after {
   transform: scaleX(1);
+}
+
+@media (hover: hover) {
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
 }
 
 .nav-actions {
@@ -1374,11 +1484,19 @@ body::before {
   gap: 4px;
 }
 
+/* Phones: the bar takes the page gutter, so the full name (229px) and the
+   menu button share one row down to a 320px screen. */
+@media (max-width: 640px) {
+  .nav-container {
+    padding: 0 var(--gutter);
+  }
+}
+
 .mobile-menu-toggle span {
   width: 25px;
   height: 3px;
-  background: #ffffff;
-  transition: all 0.3s ease;
+  background: var(--text);
+  transition: transform 0.3s ease, opacity 0.3s ease;
   border-radius: 2px;
 }
 
@@ -1427,7 +1545,7 @@ body::before {
 }
 
 .mobile-nav-link {
-  color: #b0b0b0;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: var(--type-lead);
   font-weight: 500;
@@ -1436,9 +1554,14 @@ body::before {
   transition: color 0.3s ease;
 }
 
-.mobile-nav-link.active,
-.mobile-nav-link:hover {
-  color: #5bb8cc;
+.mobile-nav-link.active {
+  color: var(--accent);
+}
+
+@media (hover: hover) {
+  .mobile-nav-link:hover {
+    color: var(--accent);
+  }
 }
 
 .project-nav {
@@ -1461,13 +1584,15 @@ body::before {
   margin-right: 30px;
 }
 
-.project-nav .nav-brand:hover {
-  color: #5bb8cc;
+@media (hover: hover) {
+  .project-nav .nav-brand:hover {
+    color: var(--accent);
+  }
 }
 
 .project-nav .nav-link {
   font-size: var(--type-body);
-  color: #b0b0b0;
+  color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
   margin-right: 20px;
@@ -1476,8 +1601,10 @@ body::before {
   padding: 6px 0;
 }
 
-.project-nav .nav-link:hover {
-  color: #5bb8cc;
+@media (hover: hover) {
+  .project-nav .nav-link:hover {
+    color: var(--accent);
+  }
 }
 
 /* Scroll Progress Bar. Scaled rather than resized, so tracking the scroll
@@ -1495,7 +1622,7 @@ body::before {
 .scroll-progress-bar {
   height: 100%;
   width: 100%;
-  background: #5bb8cc;
+  background: var(--accent);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -1507,13 +1634,13 @@ body::before {
   right: 30px;
   width: 50px;
   height: 50px;
-  background: #5bb8cc;
+  background: var(--accent);
   border: none;
   border-radius: 50%;
-  color: #0a0a0f;
+  color: var(--void);
   font-size: 1.2rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   opacity: 0;
   visibility: hidden;
   transform: translateY(20px);
@@ -1526,15 +1653,17 @@ body::before {
   transform: translateY(0);
 }
 
-.back-to-top:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+@media (hover: hover) {
+  .back-to-top:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
 }
 
 /* Experience Page Styles */
 .experience-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, var(--void) 0%, #1a1a2e 50%, #16213e 100%);
 }
 
 .experience-hero {
@@ -1549,12 +1678,12 @@ body::before {
   text-wrap: balance;
 -webkit-text-fill-color: currentColor;
   margin-bottom: 20px;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .hero-subtitle {
   font-size: var(--type-lead);
-  color: #b0b0b0;
+  color: var(--text-muted);
   margin-bottom: 1.25rem;
   max-width: 600px;
   margin-left: auto;
@@ -1576,14 +1705,14 @@ body::before {
 .company-logo {
   width: 52px;
   height: 52px;
-  background: rgba(91, 184, 204, 0.1);
+  background: var(--wash);
   border: 1px solid rgba(91, 184, 204, 0.3);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  color: #5bb8cc;
+  color: var(--accent);
   margin-bottom: 20px;
 }
 
@@ -1612,14 +1741,14 @@ body::before {
 }
 
 .company-name {
-  color: #e0e0e0;
+  color: var(--text-soft);
   font-size: var(--type-lead);
   margin-bottom: 15px;
   font-weight: 600;
 }
 
 .location {
-  color: #b0b0b0;
+  color: var(--text-muted);
   font-size: var(--type-small);
   margin-bottom: 15px;
   font-style: italic;
@@ -1646,14 +1775,14 @@ body::before {
 }
 
 .achievement-badge {
-  background: rgba(91, 184, 204, 0.1);
+  background: var(--wash);
   border: 1px solid rgba(91, 184, 204, 0.3);
-  color: #5bb8cc;
+  color: var(--accent);
   font-family: 'JetBrains Mono', monospace;
 }
 
 .achievement-badge.current {
-  border-color: #5bb8cc;
+  border-color: var(--accent);
 }
 
 .responsibilities {
@@ -1666,7 +1795,7 @@ body::before {
   position: relative;
   padding-left: 25px;
   margin-bottom: 10px;
-  color: #b0b0b0;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
@@ -1680,47 +1809,7 @@ body::before {
   width: 6px;
   height: 6px;
   border-radius: 1px;
-  background: #5bb8cc;
-}
-
-/* Floating Action Buttons */
-.floating-actions {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  z-index: 1000;
-}
-
-.floating-btn {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-}
-
-.floating-btn.scroll-top {
-  background: #5bb8cc;
-  color: #0a0a0f;
-}
-
-.floating-btn:hover {
-  transform: translateY(-5px) scale(1.1);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-}
-
-.floating-btn:active {
-  transform: translateY(-2px) scale(1.05);
+  background: var(--accent);
 }
 
 /* Enhanced Filter Styles */
@@ -1744,7 +1833,7 @@ body::before {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 25px;
-  color: #b0b0b0;
+  color: var(--text-muted);
   cursor: pointer;
   transition: border-color 0.25s ease, color 0.25s ease, background-color 0.25s ease;
   font-family: 'JetBrains Mono', monospace;
@@ -1752,15 +1841,17 @@ body::before {
   font-weight: 500;
 }
 
-.filter-btn:hover {
-  border-color: rgba(91, 184, 204, 0.5);
-  color: #e0e0e0;
+@media (hover: hover) {
+  .filter-btn:hover {
+    border-color: rgba(91, 184, 204, 0.5);
+    color: var(--text-soft);
+  }
 }
 
 .filter-btn.active {
-  background: rgba(91, 184, 204, 0.1);
+  background: var(--wash);
   border-color: rgba(91, 184, 204, 0.7);
-  color: #5bb8cc;
+  color: var(--accent);
 }
 
 /* The swatch is the legend key for its domain: the same 8px square as the
@@ -1844,7 +1935,7 @@ body::before {
 
 .image-caption {
   font-size: var(--type-small);
-  color: #b0b0b0;
+  color: var(--text-muted);
   text-align: left;
   margin-bottom: 16px;
 }
@@ -1865,7 +1956,7 @@ body::before {
   text-align: left;
   padding-bottom: 1rem;
   position: relative;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .project-detail-title::after {
@@ -1875,7 +1966,7 @@ body::before {
   left: 0;
   width: 100px;
   height: 4px;
-  background: var(--domain, #5bb8cc);
+  background: var(--domain, var(--accent));
   border-radius: 2px;
 }
 
@@ -1900,7 +1991,7 @@ body::before {
   list-style: none;
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--type-label);
-  color: #b0b0b0;
+  color: var(--text-muted);
 }
 
 .project-tools li:not(:last-child)::after {
@@ -1925,7 +2016,7 @@ body::before {
 .project-section h2 {
   font-size: var(--type-heading);
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: 1rem;
 }
 
@@ -1933,7 +2024,7 @@ body::before {
 .project-section h3 {
   font-size: var(--type-body);
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--text-soft);
   margin: 0 0 0.5rem;
 }
 
@@ -1944,7 +2035,7 @@ body::before {
 }
 
 .project-not-found p {
-  color: #b0b0b0;
+  color: var(--text-muted);
   font-size: var(--type-lead);
   margin: 0 auto 2rem;
   max-width: 44ch;
@@ -1992,6 +2083,18 @@ body::before {
   gap: 1rem;
 }
 
+/* In the header the actions sit closer: they belong to the title block. */
+.project-actions-header {
+  margin-top: 1.5rem;
+}
+
+/* The card's result, restated under the domain line a step larger, as the
+   page's headline claim. */
+.project-header .project-result {
+  margin: 0.75rem 0 0;
+  font-size: var(--type-body);
+}
+
 /* The images flow beside the write-up at their natural height. A sticky
    sidebar capped at the window height clipped the last image into its own
    scroll area, where most readers never found it. */
@@ -2015,7 +2118,7 @@ body::before {
 .btn-text {
   background: transparent;
   border: none;
-  color: #5bb8cc;
+  color: var(--accent);
   cursor: pointer;
   /* A taller hit area without moving the text: padding out, margin back in. */
   padding: 10px 0;
@@ -2024,8 +2127,10 @@ body::before {
   text-decoration: underline;
 }
 
-.btn-text:hover {
-  color: #5bb8cc;
+@media (hover: hover) {
+  .btn-text:hover {
+    color: var(--accent);
+  }
 }
 
 /* Contact Section */
@@ -2062,7 +2167,7 @@ body::before {
    colour, offset so it clears glows and rounded corners. Mouse clicks don't
    show it (:focus-visible), keyboard navigation always does. */
 :focus-visible {
-  outline: 2px solid #5bb8cc;
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -2114,14 +2219,14 @@ body::before {
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--type-label);
   letter-spacing: 0.02em;
-  color: #b0b0b0;
+  color: var(--text-muted);
 }
 
 .copy-email-readout:not(:empty)::before,
 .not-found-readout::before {
   content: '> ';
   content: '> ' / '';
-  color: #5bb8cc;
+  color: var(--accent);
 }
 
 .copy-email-row {
@@ -2140,22 +2245,24 @@ body::before {
   background: transparent;
   border: 1px solid rgba(91, 184, 204, 0.3);
   border-radius: 8px;
-  color: #b0b0b0;
+  color: var(--text-muted);
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--type-label);
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.copy-email:hover {
-  color: #5bb8cc;
-  border-color: rgba(91, 184, 204, 0.6);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .copy-email:hover {
+    color: var(--accent);
+    border-color: rgba(91, 184, 204, 0.6);
+    transform: translateY(-2px);
+  }
 }
 
 .copy-email.copied {
-  color: #5bb8cc;
-  border-color: #5bb8cc;
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* Reserved height, so the line appearing never nudges the links below. */
@@ -2217,7 +2324,7 @@ body::before {
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--type-label);
   letter-spacing: 0.02em;
-  color: #b0b0b0;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2227,7 +2334,7 @@ body::before {
 .section-readout:not(:empty)::before {
   content: '> ';
   content: '> ' / '';
-  color: #5bb8cc;
+  color: var(--accent);
 }
 
 @media (max-width: 640px) {
@@ -2244,7 +2351,7 @@ body::before {
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: var(--domain, #5bb8cc);
+  background: var(--domain, var(--accent));
   transform: scaleX(0);
   transform-origin: left center;
 }
@@ -2263,13 +2370,13 @@ body::before {
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--type-label);
   letter-spacing: 0.02em;
-  color: #b0b0b0;
+  color: var(--text-muted);
 }
 
 .up-next-readout::before {
   content: '> ';
   content: '> ' / '';
-  color: #5bb8cc;
+  color: var(--accent);
 }
 
 .up-next-domain {
@@ -2282,8 +2389,8 @@ body::before {
   align-items: center;
   gap: 24px;
   padding: clamp(22px, 3vw, 30px) clamp(22px, 3.5vw, 36px);
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid color-mix(in oklch, var(--domain, #5bb8cc) 35%, transparent);
+  background: var(--glass);
+  border: 1px solid color-mix(in oklch, var(--domain, var(--accent)) 35%, transparent);
   border-radius: 16px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -2305,11 +2412,18 @@ body::before {
   opacity: 0.7;
 }
 
-.up-next-card:hover,
 .up-next-card:focus-visible {
   transform: translateY(-4px);
-  border-color: var(--domain, #5bb8cc);
+  border-color: var(--domain, var(--accent));
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+@media (hover: hover) {
+  .up-next-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--domain, var(--accent));
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  }
 }
 
 .up-next-body {
@@ -2323,13 +2437,13 @@ body::before {
   font-size: var(--type-subheading);
   font-weight: 600;
   line-height: 1.3;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .up-next-description {
   font-size: var(--type-small);
   line-height: 1.6;
-  color: #b0b0b0;
+  color: var(--text-muted);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2340,13 +2454,18 @@ body::before {
   flex: none;
   margin-left: auto;
   font-size: 1.25rem;
-  color: var(--domain, #5bb8cc);
+  color: var(--domain, var(--accent));
   transition: transform 0.3s ease;
 }
 
-.up-next-card:hover .up-next-arrow,
 .up-next-card:focus-visible .up-next-arrow {
   transform: translateX(4px);
+}
+
+@media (hover: hover) {
+  .up-next-card:hover .up-next-arrow {
+    transform: translateX(4px);
+  }
 }
 
 .up-next-all {
@@ -2378,23 +2497,14 @@ body::before {
 .timeline-tag {
   background: rgba(0, 0, 0, 0.3);
   border-color: rgba(255, 255, 255, 0.16);
-  color: #e0e0e0;
+  color: var(--text-soft);
 }
 
-.timeline-tag:hover {
-  background: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
+/* Tags are labels, not controls, so they have no hover state. */
 .timeline-tag[class*='domain-'] {
-  color: color-mix(in oklch, var(--domain) 25%, #ffffff);
+  color: color-mix(in oklch, var(--domain) 25%, var(--text));
   background: color-mix(in oklch, var(--domain) 14%, rgba(0, 0, 0, 0.3));
   border-color: color-mix(in oklch, var(--domain) 50%, transparent);
-}
-
-.timeline-tag[class*='domain-']:hover {
-  background: color-mix(in oklch, var(--domain) 20%, rgba(0, 0, 0, 0.3));
-  border-color: var(--domain);
 }
 
 /* The colour key under the hero: each domain named beside its swatch. */
@@ -2568,10 +2678,12 @@ html[data-vt-dir='close']::view-transition-new(root) {
   }
 }
 
-/* Write-ups keep a reading measure of about 70 characters per line. */
+/* Write-ups keep a reading measure of about 75 characters per line. In
+   Inter a "ch" (the width of a zero) is wider than the average letter, so
+   70ch ran to about 90 characters; 60ch lands near 75. */
 .project-main .project-section p,
 .project-main .project-section ul {
-  max-width: 70ch;
+  max-width: 60ch;
 }
 
 /* Skip link: off-screen until focused, then a teal pill over the nav. */
@@ -2582,8 +2694,8 @@ html[data-vt-dir='close']::view-transition-new(root) {
   z-index: 2000;
   padding: 10px 16px;
   border-radius: 8px;
-  background: #5bb8cc;
-  color: #0a0a0f;
+  background: var(--accent);
+  color: var(--void);
   font-weight: 600;
   text-decoration: none;
   transform: translateY(-200%);

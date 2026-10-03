@@ -19,7 +19,7 @@ colors:
 typography:
   display:
     fontFamily: "Inter, sans-serif"
-    fontSize: "clamp(2.25rem, 7vw, 5rem)"
+    fontSize: "clamp(1.75rem, 8vw, 5rem)"
     fontWeight: 600
     lineHeight: 1.05
     letterSpacing: "-0.025em"
@@ -170,6 +170,8 @@ A near-black lab field with white type, one muted teal accent, and four balanced
   As tints it becomes the hairline (20%, up to 60% on hover) and the wash (10%).
 
 ### Neutral
+In code these are tokens on `:root` in `index.css`: `--text` (Starlight White), `--text-soft` (Soft Silver), `--text-muted` (Mist Grey), `--void` (Void Black), `--glass` (Glass Surface), `--hairline` (Signal Hairline) and `--wash` (Signal Wash), beside `--accent`, `--accent-hover` and `--field-solid`. Use the token, never the hex. Other teal strengths (30%, 40%, 60%, 70%) are one-off state tints and stay written out. `:root` also sets `color-scheme: dark` and `accent-color: var(--accent)`, so native scrollbars, controls and media players match the field.
+
 - **Void Black** (`{colors.void-black}`) → **Nebula Navy** (`{colors.nebula-navy}`) → **Abyss Blue** (`{colors.abyss-blue}`): the body background, as one 135° gradient in that order. Void black at 80–95% opacity is also the navbar glass and the browser `theme-color`.
 - **Glass Surface** (`{colors.glass-surface}`): the fill for every card, filter, pill and panel. It sits over the grid, never over a solid colour.
 - **Signal Hairline** (`{colors.signal-hairline}`) and **Signal Wash** (`{colors.signal-wash}`): borders on glass, and faint tints for badges, hover rows and active ghost controls.
@@ -215,7 +217,7 @@ A project's domain is the first entry in `DOMAINS` that its categories match, so
 
 | Token | Size | Used for |
 |---|---|---|
-| `--type-display` | `clamp(2.25rem, 7vw, 5rem)` | the hero name |
+| `--type-display` | `clamp(1.75rem, 8vw, 5rem)` | the hero name (8vw keeps the 18-letter surname whole at 320–390px) |
 | `--type-title` | `clamp(2rem, 5.5vw, 3.75rem)` | page titles (project, Experience, not found), weight 700 |
 | `--type-section` | `clamp(2rem, 4.5vw, 3rem)` | section titles (Projects, About, Skills, Contact, Education) |
 | `--type-heading` | 1.5rem | headings inside a page, the typing line |
@@ -232,7 +234,7 @@ How the roles are set:
 - **Hero name** (`--type-display`, 600, 1.05, −0.025em, balanced): the homepage h1, in white, and the largest thing on screen. It breaks between "Amir" and "Mohammadikarbalaei" on phones, never mid-word.
 - **Page titles** (`--type-title`, 700, balanced): white. Project titles carry a flat 48px, 2px rule in the domain hue beneath.
 - **Section titles** (`--type-section`, 700, 48px below): centred and white, with no framing glyphs.
-- **Typing line** (`--type-heading`, 500; 1.25rem on phones): one row of fixed height, split at the centre, with the mist-grey "I'm" to the left and the teal role typing out to the right, the cursor directly after the last letter.
+- **Typing line** (`--type-heading`, 500; 1.25rem on phones): one row of fixed height, the whole sentence centred at the width of the longest role (an invisible copy reserves it), so "I'm" never shifts while a role types or deletes; mist-grey "I'm", then the teal role, the cursor directly after the last letter.
 - **Lead** (`--type-lead`, 400, 1.6): hero description in mist grey, capped at 34rem; About paragraphs left-aligned with 1.75 leading, max 68ch.
 - **Body** (`--type-body`, 400, 1.6): running copy. Project write-ups keep a 780px column.
 - **Labels** (`--type-label`, mono): the instrument's voice for domains, tags, dates, filters, readouts and the tools line.
@@ -247,13 +249,13 @@ How the roles are set:
 ## Layout
 
 The homepage reads in the order a recruiter needs it:
-1. **Hero:** name, typing role, current work, then View projects and Contact. The domains show in the project filters.
+1. **Hero:** name, typing role, current work, a mono level line ("> Unilever · Y Combinator startup · MSc Data Science, Bath", teal prompt, 55% teal mid-dots, each item kept whole on wrap), then View projects and Contact. The domains show in the project filters.
 2. **Projects.**
 3. **About.**
 4. **Skills.**
 5. **Contact.**
 
-The hero is 88vh, deliberately short of a full screen so the Projects heading shows at the fold. Its backdrop is the banner image under an overlay that is darker through the centre, so the text stays legible. On phones it pads only 88px at the top, so it fits one screen.
+The hero is 76vh, well short of a full screen, and the Projects section opens only 24px below it, so the Projects heading and the domain filters sit inside the first viewport (checked at 1440×900, 1366×768 and a 390×844 phone): range is visible before any scrolling. The hero sits on the particle field and grid, with no banner image. On phones it pads only 88px at the top.
 
 Spacing roles live as tokens on `:root` in `index.css`:
 - **`--gutter`:** `clamp(16px, 4vw, 40px)`. The `.container` spans up to 1400px inside it.
@@ -289,7 +291,7 @@ Surfaces carry a neutral ambient shadow at rest. When touched they rise, their h
 - **Portrait** (`box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45)`, 1px white 14% ring): the profile image.
 
 ### Named Rules
-**The Lift Rule.** Every interactive surface answers hover in two ways at once. It rises a short way and never scales (−1px for buttons, −2px for chips and timeline cards, −3px for project cards, −5px for social links), and its hairline brightens. Tags are labels, not controls, so they do not react. A hover that only changes colour is incomplete.
+**The Lift Rule.** Every interactive surface answers hover in two ways at once. It rises a short way and never scales (−1px for buttons, −2px for chips and timeline cards, −3px for project cards, −5px for social links), and its hairline brightens. Tags are labels, not controls, so they do not react. A hover that only changes colour is incomplete. Hover styles apply only where the device can hover (`@media (hover: hover)`), so a tapped card or chip never stays lifted on a phone; keyboard focus keeps its look everywhere.
 
 **The Glass-Over-Grid Rule.** Panels are translucent black with backdrop blur. The grid and particles must remain faintly visible through them.
 
@@ -317,7 +319,7 @@ Gently rounded glass (16px) holds content, tight 6–8px corners mark precise co
 - **Location caption:** under the portrait, mono 0.85rem in mist grey with a teal pin. A plain line, not a capsule, and no hover.
 
 ### Tags
-Project cards carry no tags: a card is animation, title, domain and description. A project's tags appear once, on its page, as a single mono line under the domain label, split by 55% teal mid-dots. Timeline tags are the single-hue variant: teal wash, teal text, 12px corners.
+Project cards carry no tags: a card is animation, title, domain, result line and description. A project's tags appear once, on its page, as a single mono line under the domain label, split by 55% teal mid-dots. Timeline tags are the single-hue variant: teal wash, teal text, 12px corners.
 
 ### Experience Timeline
 - **Domain colour lives on the skill tags, never on whole roles.** Roles span several domains: NLP is part of ML, and forecasting sits inside an analytics role. A single hue per role would overstate a distinction the work doesn't have.
@@ -338,8 +340,8 @@ Project cards carry no tags: a card is animation, title, domain and description.
 
 ### Cards / Containers
 - **Project cards:**
-  - **Surface:** glass, 20px blur, 16px corners and a teal hairline. The media box is fixed at 16:10 with the asset contained.
-  - **Result line:** under the domain label, one mono readout with a teal `> ` prompt stating the headline result (`result` in projects.ts; published facts only, e.g. "private AUC 0.910 → 0.965"). It is the proof a recruiter takes away without opening the project.
+  - **Surface:** glass, 20px blur, 16px corners and a teal hairline. The media band is a short 16:7 with the asset contained, so the animation is an accent and the card reaches its text quickly. While an animation loads the band stays empty; no grey placeholder box.
+  - **Result line:** under the domain label, one mono readout with a teal `> ` prompt stating the headline result (`result` in projects.ts; published facts only, e.g. "private AUC 0.910 → 0.965"). It is the proof a recruiter takes away without opening the project, so it reads before the description: mono at `--type-small`, weight 500, white. The description never repeats it; it says what the problem and approach were.
     - **Motion:** when the card comes into view, each number in the line counts up from zero to its value once (1.8s, decelerating), starting only when the line is fully on screen above the bottom quarter, then holds. Only digits move, in tabular figures, so the line never shifts. Screen readers get the final sentence immediately; under reduced motion the final values show from the start (`ResultReadout.tsx`).
   - **Media:** at rest the animation or image sits at 82% opacity and 80% saturation, so it doesn't out-shout the text; hover and focus bring it to full strength.
   - **Hover and focus:** the card lifts 3px and its hairline brightens to 40%. It does not scale. Keyboard focus looks identical.
@@ -351,19 +353,19 @@ Project cards carry no tags: a card is animation, title, domain and description.
 
 ### Navigation
 - **Bar:** fixed glass (void black at 80%, 20px blur) with a teal 10% bottom hairline.
-- **Brand:** the name, "Amir Mohammadikarbalaei", in Inter 600 at the lead size, white, turning teal on hover; accessible name "Amir Mohammadikarbalaei, home". The same mark sits in the main nav, the project bar and the 404. In the project bar on phones (640px and below) it shortens to "Amir" so Projects, Experience and Contact still fit on one row.
+- **Brand:** the name, "Amir Mohammadikarbalaei", in Inter 600 at the lead size, white, turning teal on hover; accessible name "Amir Mohammadikarbalaei, home". The same mark sits in the main nav, the project bar and the 404. In the project bar on phones (640px and below) it shortens to "Amir" so Projects, Experience and Contact still fit on one row. The main bar keeps the full name down to 320px.
 - **Favicon:** the console voice as a mark: a teal `>` prompt and a white cursor on a void-black rounded square (`public/favicon.svg`, with 32px and 180px PNG renders).
 - **Page head:** every route sets its own tab title, description, canonical URL and structured data through `SEOHead`, which writes the tags directly (react-helmet-async does not support React 19). Project pages read "<project title> | Amir Mohammadikarbalaei".
 - **Links:** Inter 500 at 0.95rem in mist grey. They turn white with a teal underline on hover or when active. Exactly one link is active: the last section whose top has passed a scan line 120px down.
 - **Skip link and landmarks:** every page starts with a "Skip to content" link (hidden until focused) and wraps its content in `<main id="main">`.
 - **Failure paths:** a route that fails to load or render shows "This page didn't load" with Reload and Homepage actions (`RouteError.tsx`); a page chunk missing after a redeploy reloads once automatically first. Without JavaScript, a `<noscript>` block in index.html gives the name, a one-line summary and email, LinkedIn and GitHub. A card or project image that fails to load hides itself instead of showing a broken-image icon; captions still describe the figure. The layout holds at 320px and at 200% zoom.
 - **Scroll trace:** a 3px flat teal line that scales with `scaleX`.
-- **Floating controls:** the only one is a single back-to-top button.
+- **Floating controls:** the only one is a single back-to-top button, rendered by the navigation on every page that has it. Pages never add their own.
 
 ### Signature Components
-- **Typing hero:** a mist-grey "I'm", then a teal role cycling Data Scientist → Data Analyst → ML Engineer. The line splits at the centre so the pair stays balanced. The hero offers two actions: View projects (primary) and Contact (secondary).
+- **Typing hero:** a mist-grey "I'm", then a teal role cycling Data Scientist → Data Analyst → ML Engineer. The sentence is centred under the name at the width of the longest role, so it reads as centred and "I'm" holds still. The hero offers two actions: View projects (primary) and Contact (secondary).
   - **Timing:** 100ms per character to type, 50ms to delete, with a 2s pause on each word, ending in a blinking teal cursor.
-  - **Reduced motion:** it keeps running by the owner's choice.
+  - **Reduced motion:** it keeps running by the owner's choice. There is no pause control: the owner removed it, knowing the typing line and card animations then loop without one (WCAG 2.2.2).
   - **Screen readers:** they get the full role list once, from a visually hidden sentence.
   - **Confirmed identity element; keep it.**
 - **Particle field:** teal dots at reduced strength, joined by faint grey lines that fade with distance. It sits behind every page and draws once, holding still, under reduced motion. The count scales with screen area but is capped at 160, because linking is pairwise and an uncapped 4K screen meant about 150,000 checks per frame. **Confirmed identity element; keep it.**
@@ -375,15 +377,15 @@ Project cards carry no tags: a card is animation, title, domain and description.
   - **Not found:** the page reports what it looked up, for example "nothing lives at /x" or "no project with the id …".
   - **Rules:** readouts confirm real events and nothing else. No readout is decorative, none loops, and none adds a claim.
 - **Project page instruments:**
-  - **Reading order:** title, domain and tools; then **Demo** (a recording, when the project has one: an audio strip capped at 560px, or video capped at 960px); then the interactive simulation, when there is one; then the write-up; then the repository link.
+  - **Reading order:** title, domain, the card's result line (mono, body size), tools, and the GitHub / Live app actions; then **Demo** (a recording, when the project has one: an audio strip capped at 560px, or video capped at 960px, always with a `poster` frame taken from the video itself so the player is never a black box); then the interactive simulation, when there is one; then the write-up; then the same actions again.
   - **Columns:** the write-up sits beside an image sidebar only when the project has one to three images. From four up the images would outgrow the text, so they move to a **Figures** gallery under the write-up: two per row, one on phones. With none it runs as one column capped at 780px, never beside an empty sidebar. The sidebar flows at its natural height; it is never sticky or height-capped, because a capped sidebar hid its last images in a nested scroll area.
-  - **Actions:** GitHub (primary) and, when there is one, **Live app** (secondary, opens the Streamlit app in a new tab) sit below both columns, after all the evidence. Streamlit apps are never embedded: a sleeping app rendered as an empty 600px frame.
+  - **Actions:** GitHub (primary) and, when there is one, **Live app** (secondary, opens the Streamlit app in a new tab) sit in the header, so the code is one click from the top, and repeat below both columns after all the evidence. Streamlit apps are never embedded: a sleeping app rendered as an empty 600px frame.
   - **Simulations:** an embedded simulation reports its own height (`simulation:height` message), so the frame fits its content. A wide simulation should reflow for phones itself (the Jarvis diagram stacks its lanes below 720px). Where one cannot, a project may set `simulationFallback`, a static image of the same diagram shown instead below 768px; that image is not repeated in the sidebar. Embedded demos are built in the site's own system: Inter and JetBrains Mono, the one teal accent on a flat #0d0f18 field, sentence-case headings, and no gradient text, inner grid, extra hues, uppercase tracked labels or left-stripe callouts.
-  - **Headings:** Overview, How it works, Findings, Limitations. Plain names for what each section holds, not a report template.
+  - **Headings:** Overview, Findings, How it works, Limitations: the result before the method. Plain names for what each section holds, not a report template.
   - **Sections:** unboxed. They read as one document, split by 2.5rem of space and a 1px white 8% rule. Headings are plain white (1.6rem) with no underline; named parts (Concept, Data, Process) are soft-silver 600 at 1.05rem; list markers are drawn 6px teal squares, not ticks.  - **Sticky bar:** the project bar is sticky. A 2px reading trace in the project's domain hue fills along its bottom edge, scaled with `scaleX`.
   - **Project bar:** the name brand (links home), then Projects, Experience and Contact, so a reader who lands on a project from LinkedIn can reach everything. On phones the spacing tightens to fit one row.
   - **Disclosure:** Overview, Findings and Limitations always show in full; only Approach lists longer than six items collapse, after three.
-  - **Measure:** write-up paragraphs and lists are capped at 70ch.
+  - **Measure:** write-up paragraphs and lists, and the role paragraphs on Experience, are capped at 60ch. In Inter a ch (the width of a zero) is wider than an average letter, so 60ch reads as about 75 characters a line; 70ch ran to about 90.
   - **Section readout:** above 640px the bar names the section under it, for example "> Findings".
   - **Up next:** each write-up ends with "> next in <domain>", a glass link card to the next project in the same domain (wrapping round), with the domain rule and arrow in its hue. "All projects" follows it.
   - **Contact:** then comes Contact, with labelled Email, GitHub and LinkedIn links.

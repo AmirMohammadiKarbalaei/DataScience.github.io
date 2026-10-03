@@ -10,6 +10,8 @@ const Navigation: React.FC = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   const navItems = React.useMemo(() => [
     { id: 'home', label: 'Home', href: location.pathname === '/' ? '#home' : '/' },
@@ -55,6 +57,36 @@ const Navigation: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [navItems]);
 
+  // A route link (Experience) versus a homepage section link. Exactly one link
+  // is active: the current route, or on the homepage the section in view.
+  // The same answer drives the underline and aria-current, so screen readers
+  // hear which page or section is current.
+  const isRoute = (href: string) => href.startsWith('/') && !href.includes('#');
+  const isActive = (item: { id: string; href: string }) =>
+    isRoute(item.href)
+      ? location.pathname === item.href
+      : (location.pathname === '/' && activeSection === item.id) || location.pathname === item.href;
+
+  // An open menu closes on Escape (focus returns to the button that opened
+  // it) and on a tap anywhere outside the bar.
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setIsMobileMenuOpen(false);
+      toggleRef.current?.focus();
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (!navRef.current?.contains(e.target as Node)) setIsMobileMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPointer);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointer);
+    };
+  }, [isMobileMenuOpen]);
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     // If it's a route link (starts with /) but not an anchor link, don't prevent default
     if (href.startsWith('/') && !href.includes('#')) {
@@ -90,7 +122,7 @@ const Navigation: React.FC = () => {
   return (
     <>
       {/* Main Navigation */}
-      <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`}>
+      <nav ref={navRef} className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`}>
         <div className="nav-container">
           <Link to="/" className="nav-brand" aria-label="Amir Mohammadikarbalaei, home">
             <span className="brand-full">Amir Mohammadikarbalaei</span>
@@ -101,20 +133,19 @@ const Navigation: React.FC = () => {
           <ul className="nav-menu desktop-nav">
             {navItems.map((item) => (
               <li key={item.id} className="nav-item">
-                {item.href.startsWith('/') && !item.href.includes('#') ? (
+                {isRoute(item.href) ? (
                   <Link
                     to={item.href}
-                    className={`nav-link ${location.pathname === item.href ? 'active' : ''}`}
+                    className={`nav-link ${isActive(item) ? 'active' : ''}`}
+                    aria-current={isActive(item) ? 'page' : undefined}
                   >
                     {item.label}
                   </Link>
                 ) : (
                   <a
                     href={item.href}
-                    className={`nav-link ${
-                      location.pathname === '/' && activeSection === item.id ? 'active' : 
-                      location.pathname === item.href ? 'active' : ''
-                    }`}
+                    className={`nav-link ${isActive(item) ? 'active' : ''}`}
+                    aria-current={isActive(item) ? 'location' : undefined}
                     onClick={(e) => handleNavClick(e, item.href)}
                   >
                     {item.label}
@@ -127,6 +158,8 @@ const Navigation: React.FC = () => {
           {/* Mobile Menu Toggle */}
           <div className="nav-actions">
             <button
+              ref={toggleRef}
+              type="button"
               className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
@@ -145,10 +178,11 @@ const Navigation: React.FC = () => {
           <ul className="mobile-nav-menu">
             {navItems.map((item) => (
               <li key={item.id} className="mobile-nav-item">
-                {item.href.startsWith('/') && !item.href.includes('#') ? (
+                {isRoute(item.href) ? (
                   <Link
                     to={item.href}
-                    className={`mobile-nav-link ${location.pathname === item.href ? 'active' : ''}`}
+                    className={`mobile-nav-link ${isActive(item) ? 'active' : ''}`}
+                    aria-current={isActive(item) ? 'page' : undefined}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.label}
@@ -156,10 +190,8 @@ const Navigation: React.FC = () => {
                 ) : (
                   <a
                     href={item.href}
-                    className={`mobile-nav-link ${
-                      location.pathname === '/' && activeSection === item.id ? 'active' : 
-                      location.pathname === item.href ? 'active' : ''
-                    }`}
+                    className={`mobile-nav-link ${isActive(item) ? 'active' : ''}`}
+                    aria-current={isActive(item) ? 'location' : undefined}
                     onClick={(e) => handleNavClick(e, item.href)}
                   >
                     {item.label}
